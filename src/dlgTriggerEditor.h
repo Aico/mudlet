@@ -22,6 +22,7 @@
 #define DLGTRIGGEREDITOR_H
 
 #include <QFile>
+#include <QString>
 
 #include "ui_trigger_editor.h"
 #include <QDialog>
@@ -195,6 +196,7 @@ private:
     void                        addTrigger( bool isFolder );
     void                        addAction( bool isFolder );
     void                        addKey( bool );
+    QString&                    getScriptLanguage();
 
     void                        expand_child_triggers( TTrigger * pTriggerParent, QTreeWidgetItem * pItem );
     void                        expand_child_timers( TTimer * pTimerParent, QTreeWidgetItem * pWidgetItemParent );

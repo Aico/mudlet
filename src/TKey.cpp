@@ -170,20 +170,30 @@ bool TKey::setScript( QString & script )
 bool TKey::compileScript()
 {
     mFuncName = QString("Key")+QString::number( mID );
-    QString code = QString("function ")+ mFuncName + QString("()\n") + mScript + QString("\nend\n");
-    QString error;
-    if( mpHost->mLuaInterpreter.compile( code, error ) )
+    if (mScriptLanguage == "PYTHON")
     {
-        mNeedsToBeCompiled = false;
-        mOK_code = true;
-        return true;
+        QString indent = mScript;
+        (mpHost->getPythonInterpreter())->executeScript(QString("def ")+ mFuncName + QString("():\n    ") + indent.replace("\n","\n    "));
     }
     else
-    {
-        mOK_code = false;
-        setError( error );
-        return false;
+    { 
+        QString code = QString("function ")+ mFuncName + QString("()\n") + mScript + QString("\nend\n");
+        QString error;
+        if( mpHost->mLuaInterpreter.compile( code, error ) )
+        {
+            mNeedsToBeCompiled = false;
+            mOK_code = true;
+            return true;
+        }
+        else
+        {
+            mOK_code = false;
+            setError( error );
+            return false;
+        }
     }
+    
+    return true;
 }
 
 void TKey::execute()
@@ -199,7 +209,14 @@ void TKey::execute()
             return;
         }
     }
-    mpHost->mLuaInterpreter.call( mFuncName, mName );
+    if (mScriptLanguage == "PYTHON")
+    {
+        (mpHost->getPythonInterpreter())->call( mFuncName);
+    }
+    else
+    {
+        mpHost->mLuaInterpreter.call( mFuncName, mName );
+    }
 }
 
 TKey& TKey::clone(const TKey& b)

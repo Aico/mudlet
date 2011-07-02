@@ -214,6 +214,7 @@ void cTelnet::handle_socket_signal_connected()
     QString func = "onConnect";
     QString nothing = "";
     mpHost->mLuaInterpreter.call(func, nothing );
+    (mpHost->getPythonInterpreter())->call(func);
     mConnectionTime.start();
     if( (mpHost->getLogin().size()>0) && (mpHost->getPass().size()>0))
         mTimerLogin->start(2000);

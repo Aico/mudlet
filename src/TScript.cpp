@@ -108,7 +108,14 @@ void TScript::callEventHandler( TEvent * pE )
 {
     if( isActive() )
     {
-        mpHost->mLuaInterpreter.callEventHandler( mName, pE );
+        if (mScriptLanguage == "PYTHON")
+        {
+            (mpHost->getPythonInterpreter())->callEventHandler( mName, pE );
+        }
+        else
+        {
+            mpHost->mLuaInterpreter.callEventHandler( mName, pE );
+        }
     }
 }
 
@@ -140,19 +147,28 @@ bool TScript::setScript( QString & script )
 
 bool TScript::compileScript()
 {
-    QString error;
-    if( mpHost->mLuaInterpreter.compile( mScript, error ) )
+    if (mScriptLanguage == "PYTHON")
     {
-        mNeedsToBeCompiled = false;
-        mOK_code = true;
-        return true;
+        (mpHost->getPythonInterpreter())->executeScript(mScript);
     }
     else
-    {
-        mOK_code = false;
-        setError( error );
-        return false;
+    { 
+        QString error;
+        if( mpHost->mLuaInterpreter.compile( mScript, error ) )
+        {
+            mNeedsToBeCompiled = false;
+            mOK_code = true;
+            return true;
+        }
+        else
+        {
+            mOK_code = false;
+            setError( error );
+            return false;
+        }
     }
+    
+    return true;
 }
 
 void TScript::execute()
@@ -164,7 +180,14 @@ void TScript::execute()
             return;
         }
     }
-    mpHost->mLuaInterpreter.call( mFuncName, mName );
+    if (mScriptLanguage == "PYTHON")
+    {
+        (mpHost->getPythonInterpreter())->call( mFuncName);
+    }
+    else
+    {
+        mpHost->mLuaInterpreter.call( mFuncName, mName );
+    }
 }
 
 

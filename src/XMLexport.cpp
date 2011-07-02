@@ -396,6 +396,7 @@ bool XMLexport::writeTrigger( TTrigger * pT )
 
 
     writeTextElement( "name", pT->mName );
+    writeTextElement( "scriptlanguage", pT->getScriptLanguage() );
     writeTextElement( "script", pT->mScript );
     writeTextElement( "triggerType", QString::number( pT->mTriggerType ) );
     writeTextElement( "conditonLineDelta", QString::number( pT->mConditionLineDelta ) );
@@ -470,6 +471,7 @@ bool XMLexport::writeAlias( TAlias * pT )
     writeAttribute( "isFolder", pT->mIsFolder ? "yes" : "no" );
 
     writeTextElement( "name", pT->mName );
+    writeTextElement( "scriptlanguage", pT->getScriptLanguage() );
     writeTextElement( "script", pT->mScript );
     writeTextElement( "command", pT->mCommand );
     writeTextElement( "packageName", pT->mPackageName );
@@ -527,6 +529,7 @@ bool XMLexport::writeAction( TAction * pT )
 
     writeTextElement( "name", pT->mName );
     writeTextElement( "packageName", pT->mPackageName );
+    writeTextElement( "scriptlanguage", pT->getScriptLanguage() );
     writeTextElement( "script", pT->mScript );
     writeTextElement( "css", pT->css );
     writeTextElement( "commandButtonUp", pT->mCommandButtonUp );
@@ -593,6 +596,7 @@ bool XMLexport::writeTimer( TTimer * pT )
     writeAttribute( "isTempTimer", pT->mIsTempTimer ? "yes" : "no" );
 
     writeTextElement( "name", pT->mName );
+    writeTextElement( "scriptlanguage", pT->getScriptLanguage() );
     writeTextElement( "script", pT->mScript );
     writeTextElement( "command", pT->mCommand );
     writeTextElement( "packageName", pT->mPackageName );
@@ -648,6 +652,7 @@ bool XMLexport::writeScript( TScript * pT )
 
     writeTextElement( "name", pT->mName );
     writeTextElement( "packageName", pT->mPackageName );
+    writeTextElement( "scriptlanguage", pT->getScriptLanguage() );
     writeTextElement( "script", pT->mScript );
 
     writeStartElement( "eventHandlerList" );
@@ -707,6 +712,7 @@ bool XMLexport::writeKey( TKey * pT )
 
     writeTextElement( "name", pT->mName );
     writeTextElement( "packageName", pT->mPackageName );
+    writeTextElement( "scriptlanguage", pT->getScriptLanguage() );
     writeTextElement( "script", pT->mScript );
     writeTextElement( "command", pT->mCommand );
     writeTextElement( "keyCode", QString::number( pT->mKeyCode ) );

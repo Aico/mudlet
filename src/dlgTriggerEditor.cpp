@@ -28,6 +28,7 @@
 #include <QHeaderView>
 //#include <Qsci/qsciscintilla.h>
 //#include <Qsci/qscilexerlua.h>
+#include <QString>
 #include <QtGui>
 #include <QMainWindow>
 #include <QListWidgetItem>
@@ -59,6 +60,8 @@ const int dlgTriggerEditor::cmAliasView = 3;
 const int dlgTriggerEditor::cmScriptView = 4;
 const int dlgTriggerEditor::cmActionView = 5;
 const int dlgTriggerEditor::cmKeysView = 6;
+
+QString cmtmpvar = "PYTHON"; //TODO: delete when done. 
 
 const QString msgInfoAddAlias = "Alias are input triggers. To make a new alias: <b>1.</b> Define an input trigger pattern with a Perl regular expression. " \
                                 "<b>2.</b> Define a command to send to the MUD in clear text <b><u>instead of the alias pattern</b></u>or write a script for more complicated needs. " \
@@ -2899,6 +2902,7 @@ void dlgTriggerEditor::saveTrigger()
             pT->setRegexCodeList( regexList, regexPropertyList );
 
             pT->setScript( script );
+            pT->setScriptLanguage(getScriptLanguage());
             pT->setIsMultiline( isMultiline );
             pT->mPerlSlashGOption = mpTriggersMainArea->perlSlashGOption->isChecked();
             pT->mFilterTrigger = mpTriggersMainArea->filterTrigger->isChecked();
@@ -3112,6 +3116,7 @@ void dlgTriggerEditor::saveTimer()
             pT->setCommand( command );
             pT->setName( name );
             pT->setScript( script );
+            pT->setScriptLanguage(getScriptLanguage());
            /* if( pT->isOffsetTimer() )
             {
                 pT->setShouldBeActive( false );
@@ -3282,7 +3287,7 @@ void dlgTriggerEditor::saveAlias()
             pT->setCommand( substitution );
             pT->setRegexCode( regex );
             pT->setScript( script );
-
+            pT->setScriptLanguage(getScriptLanguage());
             QIcon icon;
             if( pT->isFolder() )
             {
@@ -3478,6 +3483,7 @@ void dlgTriggerEditor::saveAction()
             pT->setCommandButtonUp( cmdUp );
             pT->setIcon( icon );
             pT->setScript( script );
+            pT->setScriptLanguage(getScriptLanguage());
             pT->setIsPushDownButton( isChecked );
             pT->mLocation = location;
             pT->mOrientation = orientation;
@@ -3667,7 +3673,7 @@ void dlgTriggerEditor::saveScript()
             pT->setName( name );
             pT->setEventHandlerList( handlerList );
             pT->setScript( script );
-
+            pT->setScriptLanguage(getScriptLanguage());
             pT->compile();
             QIcon icon;
             if( pT->isFolder() )
@@ -3828,7 +3834,7 @@ void dlgTriggerEditor::saveKey()
             pT->setName( name );
             pT->setCommand( command );
             pT->setScript( script );
-
+            pT->setScriptLanguage(getScriptLanguage());
             QIcon icon;
             if( pT->isFolder() )
             {
@@ -6655,7 +6661,10 @@ void dlgTriggerEditor::slot_cursorPositionChanged()
     QMainWindow::statusBar()->showMessage( line );
 }
 
-
+QString& dlgTriggerEditor::getScriptLanguage()
+{
+    return cmtmpvar;
+}
 
 
 

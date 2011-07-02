@@ -1424,20 +1424,30 @@ bool TTrigger::setScript( QString & script )
 bool TTrigger::compileScript()
 {
     mFuncName = QString("Trigger")+QString::number( mID );
-    QString code = QString("function ")+ mFuncName + QString("()\n") + mScript + QString("\nend\n");
-    QString error;
-    if( mpLua->compile( code, error ) )
+    if (mScriptLanguage == "PYTHON")
     {
-        mNeedsToBeCompiled = false;
-        mOK_code = true;
-        return true;
+        QString indent = mScript;
+        (mpHost->getPythonInterpreter())->executeScript(QString("def ")+ mFuncName + QString("():\n    ") + indent.replace("\n","\n    "));
     }
     else
     {
-        mOK_code = false;
-        setError( error );
-        return false;
+        QString code = QString("function ")+ mFuncName + QString("()\n") + mScript + QString("\nend\n");
+        QString error;
+        if( mpLua->compile( code, error ) )
+        {
+            mNeedsToBeCompiled = false;
+            mOK_code = true;
+            return true;
+        }
+        else
+        {
+            mOK_code = false;
+            setError( error );
+            return false;
+        }
     }
+    
+    return true;
 }
 
 void TTrigger::execute()
@@ -1459,11 +1469,25 @@ void TTrigger::execute()
     }
     if( mIsMultiline )
     {
-        mpLua->callMulti( mFuncName, mName );
+        if (mScriptLanguage == "PYTHON")
+        {
+            (mpHost->getPythonInterpreter())->callMulti( mFuncName);
+        }
+        else
+        {
+            mpLua->callMulti( mFuncName, mName );
+        }
     }
     else
     {
-        mpLua->call( mFuncName, mName );
+        if (mScriptLanguage == "PYTHON")
+        {
+            (mpHost->getPythonInterpreter())->call( mFuncName);
+        }
+        else
+        {
+            mpLua->call( mFuncName, mName );
+        }   
     }
 }
 

@@ -59,6 +59,8 @@ public:
     void             execute();
     QString          getScript()                     { return mScript; }
     bool             setScript( QString & script );
+    QString          getScriptLanguage()             { return mScriptLanguage; }
+    void             setScriptLanguage( QString & script_language) {mScriptLanguage = script_language;}
     QString          getRegexCode()                  { return mRegexCode; }
     void             setRegexCode( QString );
     void             setCommand( QString command )   { mCommand = command; }
@@ -79,6 +81,7 @@ public:
     QString          mRegexCode;
     pcre *           mpRegex;
     QString          mScript;
+    QString          mScriptLanguage;
     bool             mIsFolder;
     Host *           mpHost;
     bool             mNeedsToBeCompiled;

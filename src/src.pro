@@ -53,6 +53,7 @@ SOURCES += TConsole.cpp \
     TTrigger.cpp \
     TriggerUnit.cpp \
     TLuaInterpreter.cpp \
+    TPythonInterpreter.cpp \
     dlgTriggersMainArea.cpp \
     dlgOptionsAreaTriggers.cpp \
     dlgOptionsAreaTimers.cpp \
@@ -131,6 +132,7 @@ HEADERS += mudlet.h \
     dlgTriggerEditor.h \
     TTrigger.h \
     TLuaInterpreter.h \
+    TPythonInterpreter.h \
     dlgTriggers_main_area.h \
     dlgOptionsAreaTriggers.h \
     dlgTriggerPatternEdit.h \
@@ -251,3 +253,6 @@ INSTALLS += fonts \
 
 OTHER_FILES += \
     mudlet_documentation.txt
+    
+include ( $$PWD/pythonqt/build/common.prf )  
+include ( $$PWD/pythonqt/build/PythonQt.prf )

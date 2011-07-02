@@ -8,6 +8,8 @@ src/Makefile*
 src/object_script*
 src/src.pro.orig
 src/src.pro.user*
+src/qrc_mudlet_alpha.cpp
+*.pyc
 *.o
 moc_*.cpp
 *.cxx

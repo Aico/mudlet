@@ -43,6 +43,7 @@ Host::Host( int port, QString hostname, QString login, QString pass, int id )
 : mTelnet( this )
 , mpConsole( 0 )
 , mLuaInterpreter    ( this, id )
+, mPythonInterpreter (this)
 , mTriggerUnit       ( this )
 , mTimerUnit         ( this )
 , mScriptUnit        ( this )
@@ -168,6 +169,7 @@ Host::Host()
 : mTelnet( this )
 , mpConsole( 0 )
 , mLuaInterpreter    ( this, 0 )
+, mPythonInterpreter (this)
 , mTriggerUnit       ( this )
 , mTimerUnit         ( this )
 , mScriptUnit        ( this )
@@ -935,6 +937,12 @@ bool Host::uninstallPackage( QString packageName )
         writer.exportHost( & file_xml );
         file_xml.close();
     }
+}
+
+bool Host::pythonEnabled() 
+{
+    //TODO fill in method.
+    return true;
 }
 
 #endif
