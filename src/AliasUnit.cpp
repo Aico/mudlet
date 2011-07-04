@@ -278,12 +278,7 @@ bool AliasUnit::processDataStream( QString & data )
     TLuaInterpreter * Lua = mpHost->getLuaInterpreter();
     QString lua_command_string = "command";
     Lua->set_lua_string( lua_command_string, data );
-    if (mpHost->pythonEnabled())
-    {
-        TPythonInterpreter* Python = mpHost->getPythonInterpreter();
-        QString python_command_string = "command";
-        Python->add_python_variable(python_command_string,data);
-    }
+    (mpHost->getPythonInterpreter())->add_python_variable("command",data);
     bool state = false;
     typedef list<TAlias *>::const_iterator I;
     for( I it = mAliasRootNodeList.begin(); it != mAliasRootNodeList.end(); it++)

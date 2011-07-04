@@ -240,6 +240,7 @@ void cTelnet::handle_socket_signal_disconnected()
         postMessage( err );
         postMessage( msg );
         postMessage( spacer );
+        (mpHost->getPythonInterpreter())->call("onDisconnect");
     }
 }
 

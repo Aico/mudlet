@@ -1841,10 +1841,7 @@ void mudlet::slot_connection_dlg_finnished( QString profile, int historyVersion 
     addConsoleForNewHost( pHost );
     pHost->mBlockScriptCompile = false;
     pHost->mLuaInterpreter.loadGlobal();
-    if (pHost->pythonEnabled())
-    {
-        (pHost->getPythonInterpreter())->init();
-    }
+    (pHost->getPythonInterpreter())->init();
     pHost->getScriptUnit()->compileAll();
     pHost->mIsProfileLoadingSequence = false;
 

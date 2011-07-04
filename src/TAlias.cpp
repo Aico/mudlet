@@ -374,7 +374,7 @@ bool TAlias::compileScript()
     if (mScriptLanguage == "PYTHON")
     {
         QString indent = mScript;
-        (mpHost->getPythonInterpreter())->executeScript(QString("def ")+ mFuncName + QString("():\n    ") + indent.replace("\n","\n    "));
+        (mpHost->getPythonInterpreter())->executeScript((mpHost->getPythonInterpreter())->wrapCode(mFuncName,indent,mName));
     }
     else
     { 

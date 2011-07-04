@@ -642,12 +642,7 @@ void TConsole::resizeEvent( QResizeEvent * event )
         QString n = "WindowResizeEvent";
         pLua->call( func, n );
         
-        if (mpHost->pythonEnabled())
-        {
-            TPythonInterpreter * pPython = mpHost->getPythonInterpreter();
-            QString pfunc = "handleWindowResizeEvent";
-            pPython->call(pfunc);
-        }
+        (mpHost->getPythonInterpreter())->call("handleWindowResizeEvent");
 
         TEvent me;
         me.mArgumentList.append( "sysWindowResizeEvent" );
@@ -1119,10 +1114,7 @@ void TConsole::runTriggers( int line )
     mUserCursor.setX( 0 );
     mCurrentLine = buffer.line( line );
     mpHost->getLuaInterpreter()->set_lua_string( cmLuaLineVariable, mCurrentLine );
-    if (mpHost->pythonEnabled())
-    {
-        mpHost->getPythonInterpreter()->add_python_variable(cmLuaLineVariable, mCurrentLine );
-    }
+    mpHost->getPythonInterpreter()->add_python_variable(cmLuaLineVariable, mCurrentLine );
     mCurrentLine.append('\n');
     if( mLogToLogFile )
     {

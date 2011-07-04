@@ -31,6 +31,7 @@
 
 TPythonInterpreter::TPythonInterpreter(Host * pH)
 :mpHost( pH )
+,mpInitialized(false)
 {
     // init PythonQt and Python
     PythonQt::init();
@@ -39,75 +40,99 @@ TPythonInterpreter::TPythonInterpreter(Host * pH)
 
 void TPythonInterpreter::init()
 {   
-    connect(PythonQt::self(),SIGNAL(pythonStdOut(const QString&)),this, SLOT(slotEchoMessage(const QString&)));
-    connect(PythonQt::self(),SIGNAL(pythonStdErr(const QString&)),this, SLOT(slotEchoMessage(const QString&)));
-    
-    mainModule.evalFile("PythonGlobal.py");
+    if (mpHost->pythonEnabled())
+    {
+        connect(PythonQt::self(),SIGNAL(pythonStdOut(const QString&)),this, SLOT(slotEchoMessage(const QString&)));
+        connect(PythonQt::self(),SIGNAL(pythonStdErr(const QString&)),this, SLOT(slotEchoMessage(const QString&)));
+        
+        mainModule.evalFile("PythonGlobal.py");
+        mpInitialized = true;
+    }
 }
 
 void TPythonInterpreter::add_python_variable( const QString & varName, const QVariant & var) {
-    mainModule.addVariable(varName,var);
+    if (mpHost->pythonEnabled())
+    {
+        mainModule.addVariable(varName,var);
+    }
 }
 
 void TPythonInterpreter::callEventHandler( const QString & function, const TEvent * pE ) {
-    QVariantList vl = QVariantList();
-    for( int i=0; i<pE->mArgumentList.size(); i++ )
+    if (mpHost->pythonEnabled())
     {
-        if( pE->mArgumentTypeList[i] == ARGUMENT_TYPE_NUMBER )
+        QVariantList vl = QVariantList();
+        for( int i=0; i<pE->mArgumentList.size(); i++ )
         {
-            vl << pE->mArgumentList[i].toInt();
+            if( pE->mArgumentTypeList[i] == ARGUMENT_TYPE_NUMBER )
+            {
+                vl << pE->mArgumentList[i].toInt();
+            }
+            else
+            {
+                vl << pE->mArgumentList[i];
+            }
         }
-        else
-        {
-            vl << pE->mArgumentList[i];
-        }
+        mainModule.call(function,vl);
     }
-    mainModule.call(function,vl);
 }
 
 void TPythonInterpreter::executeScript( const QString & code ) {
-    mainModule.evalScript(code);
+    if (mpHost->pythonEnabled())
+    {
+        mainModule.evalScript(code);
+    }
 }
 
 void TPythonInterpreter::call(const QString &callable) {
-    std::list<std::string> captureGroupList = (mpHost->getLuaInterpreter())->mCaptureGroupList;
-    if( captureGroupList.size() > 0 )
+    if (mpHost->pythonEnabled())
     {
-        QStringList qCaptureGroupList;
-        std::list< std::string >::iterator mit = captureGroupList.begin();
-        for (; mit!=captureGroupList.end(); mit++)
+        std::list<std::string> captureGroupList = (mpHost->getLuaInterpreter())->mCaptureGroupList;
+        if( captureGroupList.size() > 0 )
         {
-            qCaptureGroupList << QString((*mit).data());
-        }
+            QStringList qCaptureGroupList;
+            std::list< std::string >::iterator mit = captureGroupList.begin();
+            for (; mit!=captureGroupList.end(); mit++)
+            {
+                qCaptureGroupList << QString((*mit).data());
+            }
 
-        add_python_variable("matches",QVariant(qCaptureGroupList));
+            add_python_variable("matches",QVariant(qCaptureGroupList));
+        }
+        mainModule.call(callable);
     }
-    mainModule.call(callable);
 }
 
 void TPythonInterpreter::callMulti( QString & function)
 {
-    std::list< std::list<std::string> > multiCaptureGroupList = (mpHost->getLuaInterpreter())->mMultiCaptureGroupList;
-    if( multiCaptureGroupList.size() > 0 )
+    if (mpHost->pythonEnabled())
     {
-        QList<QVariant> mmatches = QList<QVariant>();
-        QStringList sl;
-        std::list< std::list<std::string> >::iterator mit = multiCaptureGroupList.begin();
-        for( ; mit!=multiCaptureGroupList.end(); mit++)
+        std::list< std::list<std::string> > multiCaptureGroupList = (mpHost->getLuaInterpreter())->mMultiCaptureGroupList;
+        if( multiCaptureGroupList.size() > 0 )
         {
-            sl = QStringList();
-            std::list<std::string>::iterator it = (*mit).begin();
-            for( ; it!=(*mit).end(); it++)
+            QList<QVariant> mmatches = QList<QVariant>();
+            QStringList sl;
+            std::list< std::list<std::string> >::iterator mit = multiCaptureGroupList.begin();
+            for( ; mit!=multiCaptureGroupList.end(); mit++)
             {
-                sl << QString((*it).data());
+                sl = QStringList();
+                std::list<std::string>::iterator it = (*mit).begin();
+                for( ; it!=(*mit).end(); it++)
+                {
+                    sl << QString((*it).data());
+                }
+                mmatches << QVariant(sl);
             }
-            mmatches << QVariant(sl);
+
+            add_python_variable("multimatches",QVariant(mmatches));
         }
 
-        add_python_variable("multimatches",QVariant(mmatches));
+        mainModule.call(function);
     }
+}
 
-    mainModule.call(function);
+QString TPythonInterpreter::wrapCode(QString funcName, QString code, QString name)
+{
+    return QString("def %1():\n    try:\n        %2\n    except:\n        printFixedStackTrace(traceback.format_exc(),'%3')").arg(funcName).arg(code.replace("\n","\n        ")).arg(name);
 }
 
 void TPythonInterpreter::slotEchoMessage(const QString & msg)

@@ -40,6 +40,7 @@ public:
     void executeScript( const QString & code );
     void call(const QString &callable);
     void callMulti( QString & function);
+    QString wrapCode(QString funcName, QString code, QString name);
     
 public slots:
     void slotEchoMessage(const QString & msg);
@@ -47,5 +48,6 @@ public slots:
 private:
     PythonQtObjectPtr mainModule;
     Host * mpHost;
+    bool mpInitialized;
 };
 #endif  
