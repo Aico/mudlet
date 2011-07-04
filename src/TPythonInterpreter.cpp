@@ -22,6 +22,7 @@
 #include "TPythonInterpreter.h"
 #include "Host.h"
 #include "TEvent.h"
+#include "mudlet.h"
 #include <QString>
 #include <QStringList>
 #include <string>
@@ -33,8 +34,14 @@ TPythonInterpreter::TPythonInterpreter(Host * pH)
 {
     // init PythonQt and Python
     PythonQt::init();
-
     mainModule = PythonQt::self()->createUniqueModule();
+}
+
+void TPythonInterpreter::init()
+{   
+    connect(PythonQt::self(),SIGNAL(pythonStdOut(const QString&)),this, SLOT(slotEchoMessage(const QString&)));
+    connect(PythonQt::self(),SIGNAL(pythonStdErr(const QString&)),this, SLOT(slotEchoMessage(const QString&)));
+    
     mainModule.evalFile("PythonGlobal.py");
 }
 
@@ -101,6 +108,11 @@ void TPythonInterpreter::callMulti( QString & function)
     }
 
     mainModule.call(function);
+}
+
+void TPythonInterpreter::slotEchoMessage(const QString & msg)
+{
+    mpHost->mpConsole->echo( const_cast<QString&>(msg) );
 }
 
     

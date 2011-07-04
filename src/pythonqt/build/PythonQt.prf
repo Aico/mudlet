@@ -6,7 +6,7 @@ INCLUDEPATH += $$PWD/../src
 
 # check if debug or release
 CONFIG(debug, debug|release) {
-  DEBUG_EXT = _d 
+  DEBUG_EXT =  
 } else {
   DEBUG_EXT = 
 }

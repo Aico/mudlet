@@ -24,18 +24,25 @@
 #include "PythonQt.h"
 #include "TEvent.h"
 #include <QString>
+#include <QObject>
 
 class Host;
 
-class TPythonInterpreter {
+class TPythonInterpreter : public QObject
+{
+Q_OBJECT
 
 public:
     TPythonInterpreter(Host* pH);
+    void init();
     void add_python_variable( const QString & varName, const QVariant & var);
     void callEventHandler( const QString & function, const TEvent * pE );
     void executeScript( const QString & code );
     void call(const QString &callable);
     void callMulti( QString & function);
+    
+public slots:
+    void slotEchoMessage(const QString & msg);
 
 private:
     PythonQtObjectPtr mainModule;

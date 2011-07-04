@@ -238,3 +238,5 @@ INSTALLS += fonts \
 
 OTHER_FILES += \
     mudlet_documentation.txt
+
+include ( $$PWD/pythonqt/build/PythonQt.prf )
