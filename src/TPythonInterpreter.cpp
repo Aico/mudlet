@@ -132,7 +132,7 @@ void TPythonInterpreter::callMulti( QString & function)
 
 QString TPythonInterpreter::wrapCode(QString funcName, QString code, QString name)
 {
-    return QString("def %1():\n    try:\n        %2\n    except:\n        printFixedStackTrace(traceback.format_exc(),'%3')").arg(funcName).arg(code.replace("\n","\n        ")).arg(name);
+    return QString("def %1():\n    try:\n        'main python code'\n        %2\n    except:\n        printFixedStackTrace(traceback.format_exc(),'%3')").arg(funcName).arg(code.replace("\n","\n        ")).arg(name);
 }
 
 void TPythonInterpreter::slotEchoMessage(const QString & msg)

@@ -191,6 +191,7 @@ public:
     bool               mIsAutologin;
     bool               mIsGoingDown;
     bool               mIsProfileLoadingSequence;
+    bool               mPython;
 
     bool               mIsClosingDown;
     bool               mLF_ON_GA;

@@ -941,8 +941,7 @@ bool Host::uninstallPackage( QString packageName )
 
 bool Host::pythonEnabled() 
 {
-    //TODO fill in method.
-    return true;
+    return mPython;
 }
 
 #endif

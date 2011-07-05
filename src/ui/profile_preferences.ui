@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>770</width>
-    <height>667</height>
+    <height>703</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -38,7 +38,7 @@
       <enum>QTabWidget::Rounded</enum>
      </property>
      <property name="currentIndex">
-      <number>4</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="General">
       <property name="sizePolicy">
@@ -173,7 +173,7 @@
           <item>
            <widget class="QCheckBox" name="acceptServerGUI">
             <property name="text">
-             <string>Allow server to install scrpt packages</string>
+             <string>Allow server to install script packages</string>
             </property>
            </widget>
           </item>
@@ -1703,6 +1703,25 @@ or some other computer model that has a small screen.</string>
         </widget>
        </item>
        <item>
+        <widget class="QGroupBox" name="groupBox_python">
+         <property name="title">
+          <string>Python</string>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_python">
+          <item row="0" column="0">
+           <widget class="QCheckBox" name="mEnablePython">
+            <property name="toolTip">
+             <string>Check to be able to script in python.</string>
+            </property>
+            <property name="text">
+             <string>Enable Python</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
         <spacer name="verticalSpacer_4">
          <property name="orientation">
           <enum>Qt::Vertical</enum>
@@ -1710,7 +1729,7 @@ or some other computer model that has a small screen.</string>
          <property name="sizeHint" stdset="0">
           <size>
            <width>20</width>
-           <height>523</height>
+           <height>423</height>
           </size>
          </property>
         </spacer>

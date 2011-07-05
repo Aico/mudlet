@@ -1,14 +1,17 @@
 import io
 import traceback
 
+line = ''
+command = ''
+
 def onConnect():
-    "place holder"
+    "Run when connection established"
     
 def onDisconnect():
-    "place holder"
+    "Run on disconnect"
     
 def handleWindowResizeEvent():
-    "place holder"
+    "Run when window resizes"
 
 def printFixedStackTrace(trace,funcName):
     """Need to modify the stack trace to correspond

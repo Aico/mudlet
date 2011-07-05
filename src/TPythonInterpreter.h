@@ -41,6 +41,7 @@ public:
     void call(const QString &callable);
     void callMulti( QString & function);
     QString wrapCode(QString funcName, QString code, QString name);
+    bool isInitialized() {return mpInitialized;}
     
 public slots:
     void slotEchoMessage(const QString & msg);

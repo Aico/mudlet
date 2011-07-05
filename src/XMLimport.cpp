@@ -654,6 +654,7 @@ void XMLimport::readHostPackage( Host * pT )
     pT->mShowInfo = ( attributes().value("mShowInfo") == "yes" );
     pT->mAcceptServerGUI = ( attributes().value("mAcceptServerGUI") == "yes" );
     pT->mMapperUseAntiAlias = ( attributes().value("mMapperUseAntiAlias") == "yes" );
+    pT->mPython = ( attributes().value("mPython") == "yes" );
 
     while( ! atEnd() )
     {

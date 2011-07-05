@@ -196,7 +196,6 @@ private:
     void                        addTrigger( bool isFolder );
     void                        addAction( bool isFolder );
     void                        addKey( bool );
-    QString&                    getScriptLanguage();
 
     void                        expand_child_triggers( TTrigger * pTriggerParent, QTreeWidgetItem * pItem );
     void                        expand_child_timers( TTimer * pTimerParent, QTreeWidgetItem * pWidgetItemParent );
@@ -265,6 +264,7 @@ private:
     //QsciDocument                mDocument;
     Host *                      mpHost;
     QList<dlgTriggerPatternEdit *> mTriggerPatternEdit;
+    QString                     mpDefaultLanguage;
 };
 
 #endif
