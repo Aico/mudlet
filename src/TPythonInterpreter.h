@@ -41,6 +41,9 @@ public:
     void call(const QString &callable);
     void callMulti( QString & function);
     QString wrapCode(QString funcName, QString code, QString name);
+    void setAtcpTable( QString & var, QString & value );
+    void setChannel102Table( int & var, int & value );
+    void setGMCPTable(QString & key, QString & string_data);
     bool isInitialized() {return mpInitialized;}
     
 public slots:

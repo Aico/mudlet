@@ -135,6 +135,55 @@ QString TPythonInterpreter::wrapCode(QString funcName, QString code, QString nam
     return QString("def %1():\n    try:\n        'main python code'\n        %2\n    except:\n        printFixedStackTrace(traceback.format_exc(),'%3')").arg(funcName).arg(code.replace("\n","\n        ")).arg(name);
 }
 
+void TPythonInterpreter::setAtcpTable( QString & var, QString & value )
+{
+    if (mpHost->pythonEnabled())
+    {
+        QString pyscript = QString("atcp['%1']='%2'").arg(var).arg(value);
+        executeScript(pyscript);
+    }
+}
+
+void TPythonInterpreter::setChannel102Table( int & var, int & value )
+{
+    if (mpHost->pythonEnabled())
+    {
+        QString pyscript = QString("channel102['%1']='%2'").arg(var).arg(value);
+        executeScript(pyscript);
+    }
+}
+
+void TPythonInterpreter::setGMCPTable(QString & key, QString & string_data)
+{
+    if (mpHost->pythonEnabled())
+    {
+        QStringList tokenList = key.split(".");
+        QString pKey = "";
+        QString keyTemplate = "['%1']";
+        QString pyscript;
+        for( int i = 0; i<tokenList.size(); i++ )
+        {
+            pKey += keyTemplate.arg(tokenList[i]);
+        }
+        if (string_data.isEmpty() || string_data.isNull())
+        {
+            pyscript = QString("try:\n    gmcp%1={}\nexcept SyntaxError:\n    ''").arg(pKey);        
+            executeScript(pyscript);
+        }
+        else if (string_data[0] == '{')
+        {
+            pyscript = QString("try:\n    gmcp%1.update(%2)\nexcept SyntaxError:\n    ''").arg(pKey).arg(string_data);
+            executeScript(pyscript);
+        }
+        else if (!string_data[0].isLetter())
+        {
+            pyscript = QString("try:\n    gmcp%1=%2\nexcept SyntaxError:\n    ''").arg(pKey).arg(string_data);
+            executeScript(pyscript);
+        }
+    }
+}
+
+
 void TPythonInterpreter::slotEchoMessage(const QString & msg)
 {
     mpHost->mpConsole->echo( const_cast<QString&>(msg) );
