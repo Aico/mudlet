@@ -42,6 +42,10 @@ dlgProfilePreferences::dlgProfilePreferences( QWidget * pF, Host * pH )
 
     mMapperUseAntiAlias->setChecked(mpHost->mMapperUseAntiAlias);
     mEnablePython->setChecked(mpHost->mPython);
+    if (!mpHost->mPythonWorking)
+    {
+        mEnablePython->setEnabled(false);
+    }
     acceptServerGUI->setChecked(mpHost->mAcceptServerGUI);
     QString nick = tr("Mudlet%1").arg(QString::number(rand()%10000));
     QFile file( QDir::homePath()+"/.config/mudlet/irc_nick" );

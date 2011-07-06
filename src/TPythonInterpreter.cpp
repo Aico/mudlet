@@ -33,9 +33,18 @@ TPythonInterpreter::TPythonInterpreter(Host * pH)
 :mpHost( pH )
 ,mpInitialized(false)
 {
-    // init PythonQt and Python
-    PythonQt::init();
-    mainModule = PythonQt::self()->createUniqueModule();
+    try
+    {
+        // init PythonQt and Python
+        PythonQt::init();
+        mainModule = PythonQt::self()->createUniqueModule();
+        mpHost->mPythonWorking = true;
+    }
+    catch(...)
+    {
+        mpHost->mPython=false;
+        mpHost->mPythonWorking = false;
+    }    
 }
 
 void TPythonInterpreter::init()

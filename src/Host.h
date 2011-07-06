@@ -192,6 +192,7 @@ public:
     bool               mIsGoingDown;
     bool               mIsProfileLoadingSequence;
     bool               mPython;
+    bool               mPythonWorking;
 
     bool               mIsClosingDown;
     bool               mLF_ON_GA;
