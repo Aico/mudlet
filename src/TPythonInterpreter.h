@@ -53,5 +53,6 @@ private:
     PythonQtObjectPtr mainModule;
     Host * mpHost;
     bool mpInitialized;
+    void runMethod(const QString& msg);
 };
 #endif  
