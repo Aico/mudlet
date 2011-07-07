@@ -149,7 +149,7 @@ void TPythonInterpreter::callMulti( QString & function)
 
 QString TPythonInterpreter::wrapCode(QString funcName, QString code, QString name)
 {
-    return QString("def %1():\n    try:\n        'main python code'\n        %2\n    except:\n        printFixedStackTrace(traceback.format_exc(),'%3')").arg(funcName).arg(code.replace("\n","\n        ")).arg(name);
+    return QString("def %1():\n    try:\n        'main python code'\n        %2\n    except:\n        printFixedStackTrace(traceback.format_exc(),'%3')").arg(funcName).arg(code.replace("\n","\n        ").replace("\t","    ")).arg(name);
 }
 
 void TPythonInterpreter::setAtcpTable( QString & var, QString & value )
@@ -374,23 +374,28 @@ void TPythonInterpreter::runMethod(const QString& msg)
             for (int i=2;i<list.length();++i)
             {
                 l=list[i].split(METHOD_SUBDELIMIT);
-                if (l[1] == ARGUMENT_TYPE_NUMBER)
+                if (l[1].toInt() == ARGUMENT_TYPE_NUMBER)
                 {
                     pE->mArgumentList.append( l[0] );
                     pE->mArgumentTypeList.append( ARGUMENT_TYPE_NUMBER );
                 }
-                else
+                else if (l[1].toInt() == ARGUMENT_TYPE_STRING)
                 {
                     pE->mArgumentList.append( l[0] );
                     pE->mArgumentTypeList.append( ARGUMENT_TYPE_STRING );
+                }
+                else
+                {
+                    QString err1 = "[ ERROR ] Event " + list[2][0] + " argument value not of valid type";
+                    mpHost->mpConsole->print( err1, 150, 0, 0, 0, 0, 0 );
                 }
             }
             mpHost->raiseEvent( pE );
         }
         else
         {
-            QString err = method + " is not a valid method!";
-            mpHost->mpConsole->echo( err );
+            QString err = "[ ERROR ] " + method + " is not a valid python method!";
+            mpHost->mpConsole->print( err, 150, 0, 0, 0, 0, 0 );
         }
     }
     catch(...)
@@ -398,13 +403,13 @@ void TPythonInterpreter::runMethod(const QString& msg)
         QString err;
         if (list.size()>1)
         {
-            err = "Error occured executing " + list[1];
+            err = "[ ERROR ] Error occured executing python method " + list[1];
         }
         else
         {
-            err = "Method Call " + msg + " Mangled.";
+            err = "[ ERROR ] Python method call " + msg + " mangled.";
         }
-        mpHost->mpConsole->echo( err );
+        mpHost->mpConsole->print( err, 150, 0, 0, 0, 0, 0 );
     }
 }
 

@@ -149,7 +149,7 @@ bool TScript::compileScript()
 {
     if (mScriptLanguage == "PYTHON")
     {
-        (mpHost->getPythonInterpreter())->executeScript(mScript);
+        (mpHost->getPythonInterpreter())->executeScript(mScript.replace("\t","    "));
     }
     else
     { 

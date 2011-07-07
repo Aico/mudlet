@@ -115,9 +115,9 @@ def eventArgValue(arg):
     "Method used in raiseEvent."
     try:
         int(arg)
-        return arg + methodsubdelimit + str(ARGUMENT_TYPE_NUMBER)
+        return str(arg) + methodsubdelimit + str(ARGUMENT_TYPE_NUMBER)
     except ValueError:
-        return arg + methodsubdelimit + str(ARGUMENT_TYPE_STRING)
+        return str(arg) + methodsubdelimit + str(ARGUMENT_TYPE_STRING)
     
 
 #Color Table ported from Lua table by Vadim Peretrokin 2009.
