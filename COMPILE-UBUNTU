@@ -1,0 +1,53 @@
+The following instructions describe the steps to compile the mudlet source for Ubuntu.
+
+1. First you need to installed the required dependencies:
+
+a) sudo apt-get install build-essential qt4-dev-tools libqt4-opengl-dev lua5.1 liblua5.1-0-dev liblua5.1-rex-pcre-dev liblua5.1-sql-sqlite3-dev libpcre3-dev libboost1.40-dev zlib1g-dev libyajl-dev libzzip-dev liblua5.1-filesystem* liblua5.1-zip*
+
+2. Download and install QtSDK
+
+a) download the SDK from http://qt.nokia.com/downloads
+
+b) chmod u+x the file to make it executable and then run to install.
+
+3. install pythonqt
+
+a) set your python version:
+cd /path to git clone/mudlet/src/pythonqt/build
+gedit python.prf
+Change the version number in this line: PYTHON_VERSION=2.6 if you are using a newer or older version of python (ie 2.5 or 2.7).
+
+b) go to the pythonqt source dirctory:
+cd /path to git clone/mudlet/src/pythonqt/src
+
+c) qmake
+
+d) make
+
+e) Create pythonqt folder in /usr/lib:
+cd /usr/lib
+sudo mkdir pythonqt
+
+f) move the library across:
+cp /path to git clone/mudlet/src/pythonqt/lib/* /usr/lib/pythonqt/
+
+g) create new ld configuration file:
+sudo gedit /etc/ld.so.conf.d/PythonQt.conf
+
+h) add the below line and save:
+/usr/lib/pythonqt
+
+i) run ldconfig:
+sudo ldconfig
+
+4. compile mudlet
+
+a) go to the mudlet src directory:
+cd /path to git clone/mudlet/src/
+
+b) qmake
+
+c) make
+
+5. Run mudlet:
+./mudlet

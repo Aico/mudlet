@@ -1,5 +1,5 @@
-Compiling Mudlet 2.0
----------------------
+Compiling Mudlet 2.0 with Python
+--------------------------------
 
 Use the Qt-4.6-SDK package from ftp://ftp.trolltech.com/qtsdk/ or http://qt.nokia.com 
 It comes with a binary distribution of the libs a ready made compiler for windows (mingw)  
@@ -21,6 +21,7 @@ required libs to compile Mudlet:
 - Lua File System (LFS)
 - rex_pcre (Lua pcre interface)
 - Lua sql (Lua module for SQL)
+- PythonQt (http://pythonqt.sourceforge.net/)
 
 (NOTE: GNU/Linux: You'll always need the "dev" versions of the required libs if you use packages of your distro.)
 
