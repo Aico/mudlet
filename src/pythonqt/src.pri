@@ -1,6 +1,8 @@
 DEFINES +=  PYTHONQT_EXPORTS
 
 HEADERS +=                    \
+  $$PWD/com_trolltech_qt_core_builtin0.h \
+  $$PWD/com_trolltech_qt_gui_builtin0.h \
   $$PWD/PythonQt.h                  \
   $$PWD/PythonQtStdDecorators.h     \
   $$PWD/PythonQtClassInfo.h         \
@@ -20,9 +22,13 @@ HEADERS +=                    \
   $$PWD/PythonQtQFileImporter.h     \
   $$PWD/PythonQtVariants.h          \
   $$PWD/gui/PythonQtScriptingConsole.h    \
-  $$PWD/PythonQtSystem.h
+  $$PWD/PythonQtSystem.h \
   
 SOURCES +=                    \
+  $$PWD/com_trolltech_qt_core_builtin0.cpp \
+  $$PWD/com_trolltech_qt_core_builtin_init.cpp \
+  $$PWD/com_trolltech_qt_gui_builtin0.cpp \
+  $$PWD/com_trolltech_qt_gui_builtin_init.cpp \
   $$PWD/PythonQtStdDecorators.cpp   \
   $$PWD/PythonQt.cpp                \
   $$PWD/PythonQtClassInfo.cpp       \
@@ -39,5 +45,3 @@ SOURCES +=                    \
   $$PWD/PythonQtClassWrapper.cpp    \
   $$PWD/gui/PythonQtScriptingConsole.cpp \
 
-include($$PWD/../generated_cpp/com_trolltech_qt_core_builtin/com_trolltech_qt_core_builtin.pri)
-include($$PWD/../generated_cpp/com_trolltech_qt_gui_builtin/com_trolltech_qt_gui_builtin.pri)

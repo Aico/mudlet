@@ -9,6 +9,7 @@ src/object_script*
 src/src.pro.orig
 src/src.pro.user*
 src/qrc_mudlet_alpha.cpp
+src/pythonqt/lib/*
 *.pyc
 *.o
 moc_*.cpp

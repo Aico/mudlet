@@ -8,12 +8,12 @@ TARGET   = PythonQt
 TEMPLATE = lib
 
 
-DESTDIR    = ../lib
+DESTDIR    = lib
 
-CONFIG += qt dll
+CONFIG += qt staticlib
 CONFIG -= flat
 
-include ( ../build/common.prf )  
-include ( ../build/python.prf )  
+include ( build/common.prf )  
+include ( build/python.prf )  
 
 include ( src.pri )  

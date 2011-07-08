@@ -52,6 +52,7 @@
 #include "PythonQtQFileImporter.h"
 #include <pydebug.h>
 #include <vector>
+//#include "com_trolltech_qt_core_builtin0.h"
 
 PythonQt* PythonQt::_self = NULL;
 int       PythonQt::_uniqueModuleCount = 0;

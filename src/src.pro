@@ -26,6 +26,7 @@ win32:LIBS += -L"c:\mudlet2_package" \
     -lhunspell \
     -lyajl
 
+LIBS += -Lpythonqt/lib -lPythonQt
 unix:INCLUDEPATH += /usr/include/lua5.1
 
 win32:INCLUDEPATH += "c:\mudlet_package_MINGW\Lua_src\include" \
@@ -42,6 +43,8 @@ unix: {
     BIN_DIR = $$INSTALL_PREFIX/bin
 }
 INCLUDEPATH += irc/include
+INCLUDEPATH += pythonqt
+include ( pythonqt/build/python.prf )
 SOURCES += TConsole.cpp \
     ctelnet.cpp \
     main.cpp \
@@ -253,6 +256,4 @@ INSTALLS += fonts \
 
 OTHER_FILES += \
     mudlet_documentation.txt
-    
-#include ( $$PWD/pythonqt/build/common.prf )  
-include ( $$PWD/pythonqt/build/PythonQt.prf )
+

@@ -39,7 +39,7 @@
 */
 //----------------------------------------------------------------------------------
 
-#include <PythonQt.h>
+#include "PythonQt.h"
 
 QVariant PythonQtObjectPtr::evalScript(const QString& script, int start)
 {
