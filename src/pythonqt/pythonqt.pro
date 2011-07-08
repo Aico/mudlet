@@ -16,4 +16,4 @@ CONFIG -= flat
 include ( build/common.prf )  
 include ( build/python.prf )  
 
-include ( src.pri )  
+include ( pythonqt.pri )  
