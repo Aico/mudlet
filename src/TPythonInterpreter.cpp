@@ -62,7 +62,8 @@ void TPythonInterpreter::init()
         const QVariant& varValueNumber = ARGUMENT_TYPE_NUMBER;
         add_python_variable(varNameString,varValueString);
         add_python_variable(varNameNumber,varValueNumber);
-        mainModule.evalFile("PythonGlobal.py");
+        QString dirPath = QCoreApplication::applicationDirPath();
+        mainModule.evalFile(dirPath + "/PythonGlobal.py");
         mpInitialized = true;
     }
 }
