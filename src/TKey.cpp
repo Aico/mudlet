@@ -37,6 +37,9 @@
 
 using namespace std;
 
+#define LUA     0
+#define PYTHON  1
+
 TKey::TKey( TKey * parent, Host * pHost )
 : Tree<TKey>( parent )
 , mpHost( pHost )
@@ -170,7 +173,7 @@ bool TKey::setScript( QString & script )
 bool TKey::compileScript()
 {
     mFuncName = QString("Key")+QString::number( mID );
-    if (mScriptLanguage == "PYTHON")
+    if (mScriptLanguage == PYTHON)
     {
         QString indent = mScript;
         (mpHost->getPythonInterpreter())->executeScript((mpHost->getPythonInterpreter())->wrapCode(mFuncName,indent,mName));
@@ -209,7 +212,7 @@ void TKey::execute()
             return;
         }
     }
-    if (mScriptLanguage == "PYTHON")
+    if (mScriptLanguage == PYTHON)
     {
         (mpHost->getPythonInterpreter())->call( mFuncName);
     }
@@ -246,4 +249,28 @@ bool TKey::isClone(TKey &b) const
             && mIsFolder == b.mIsFolder
             && mpHost == b.mpHost
             && mNeedsToBeCompiled == b.mNeedsToBeCompiled );
+}
+
+void TKey::setScriptLanguage( QString & script_language)
+{
+    if (script_language == "PYTHON")
+    {
+        mScriptLanguage = PYTHON;
+    }
+    else
+    {
+        mScriptLanguage = LUA;
+    }
+}
+
+QString TKey::getScriptLanguage()
+{
+    if (mScriptLanguage == PYTHON)
+    {
+        return QString("PYTHON");
+    }
+    else
+    {
+        return QString("LUA");
+    }
 }

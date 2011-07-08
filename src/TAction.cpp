@@ -40,6 +40,9 @@
 
 using namespace std;
 
+#define LUA     0
+#define PYTHON  1
+
 TAction::TAction( TAction * parent, Host * pHost )
 : Tree<TAction>( parent )
 , mpToolBar( 0 )
@@ -138,7 +141,7 @@ bool TAction::setScript( QString & script )
 bool TAction::compileScript()
 {
     mFuncName = QString("Action")+QString::number( mID );
-    if (mScriptLanguage == "PYTHON")
+    if (mScriptLanguage == PYTHON)
     {
         QString indent = mScript;
         (mpHost->getPythonInterpreter())->executeScript((mpHost->getPythonInterpreter())->wrapCode(mFuncName,indent,mName));
@@ -189,7 +192,7 @@ void TAction::_execute(QStringList & list)
         }
     }
     mpHost->mpConsole->mButtonState = mButtonState;
-    if (mScriptLanguage == "PYTHON")
+    if (mScriptLanguage == PYTHON)
     {
         (mpHost->getPythonInterpreter())->call( mFuncName);
     }
@@ -377,3 +380,26 @@ bool TAction::isClone( TAction & b ) const
              && mIcon == b.mIcon );
 }
 
+void TAction::setScriptLanguage( QString & script_language)
+{
+    if (script_language == "PYTHON")
+    {
+        mScriptLanguage = PYTHON;
+    }
+    else
+    {
+        mScriptLanguage = LUA;
+    }
+}
+
+QString TAction::getScriptLanguage()
+{
+    if (mScriptLanguage == PYTHON)
+    {
+        return QString("PYTHON");
+    }
+    else
+    {
+        return QString("LUA");
+    }
+}

@@ -62,8 +62,8 @@ public:
     void             execute();
     QString          getScript()                                       { return mScript; }
     bool             setScript( QString & script );
-    QString          getScriptLanguage()                               { return mScriptLanguage; }
-    void             setScriptLanguage( QString & script_language)     {mScriptLanguage = script_language;}
+    QString          getScriptLanguage();
+    void             setScriptLanguage( QString & script_language);
     bool             isFolder()                                        { return mIsFolder; }
     void             setIsFolder( bool b )                             { mIsFolder = b; }
     bool             registerScript();
@@ -80,7 +80,7 @@ private:
                      TScript(){};
     QString          mName;
     QString          mScript;
-    QString          mScriptLanguage;
+    int              mScriptLanguage;
     QString          mFuncName;
     bool             mIsFolder;
     Host *           mpHost;

@@ -36,6 +36,9 @@
 
 using namespace std;
 
+#define LUA     0
+#define PYTHON  1
+
 TTimer::TTimer( TTimer * parent, Host * pHost )
 : Tree<TTimer>( parent )
 , mRegisteredAnonymousLuaFunction( false )
@@ -206,7 +209,7 @@ bool TTimer::setScript( QString & script )
 bool TTimer::compileScript()
 {
     mFuncName = QString("Timer")+QString::number( mID );
-    if (mScriptLanguage == "PYTHON")
+    if (mScriptLanguage == PYTHON)
     {
         QString indent = mScript;
         (mpHost->getPythonInterpreter())->executeScript((mpHost->getPythonInterpreter())->wrapCode(mFuncName,indent,mName));
@@ -257,7 +260,7 @@ void TTimer::execute()
         }
         else
         {
-            if (mScriptLanguage == "PYTHON")
+            if (mScriptLanguage == PYTHON)
             {
                 (mpHost->getPythonInterpreter())->executeScript(mScript);
             }
@@ -302,7 +305,7 @@ void TTimer::execute()
             return;
         }
     }
-    if (mScriptLanguage == "PYTHON")
+    if (mScriptLanguage == PYTHON)
     {
         (mpHost->getPythonInterpreter())->call( mFuncName);
     }
@@ -505,4 +508,28 @@ bool TTimer::isClone( TTimer & b ) const
             && mpHost == b.mpHost
             && mNeedsToBeCompiled == b.mNeedsToBeCompiled
             && mIsTempTimer == b.mIsTempTimer );
+}
+
+void TTimer::setScriptLanguage( QString & script_language)
+{
+    if (script_language == "PYTHON")
+    {
+        mScriptLanguage = PYTHON;
+    }
+    else
+    {
+        mScriptLanguage = LUA;
+    }
+}
+
+QString TTimer::getScriptLanguage()
+{
+    if (mScriptLanguage == PYTHON)
+    {
+        return QString("PYTHON");
+    }
+    else
+    {
+        return QString("LUA");
+    }
 }

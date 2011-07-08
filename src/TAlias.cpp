@@ -36,6 +36,9 @@
 
 using namespace std;
 
+#define LUA     0
+#define PYTHON  1
+
 TAlias::TAlias( TAlias * parent, Host * pHost )
 : Tree<TAlias>( parent )
 , mpHost( pHost )
@@ -371,7 +374,7 @@ bool TAlias::setScript( QString & script )
 bool TAlias::compileScript()
 {
     mFuncName = QString("Alias")+QString::number( mID );
-    if (mScriptLanguage == "PYTHON")
+    if (mScriptLanguage == PYTHON)
     {
         QString indent = mScript;
         (mpHost->getPythonInterpreter())->executeScript((mpHost->getPythonInterpreter())->wrapCode(mFuncName,indent,mName));
@@ -410,7 +413,7 @@ void TAlias::execute()
             return;
         }
     }
-    if (mScriptLanguage == "PYTHON")
+    if (mScriptLanguage == PYTHON)
     {
         (mpHost->getPythonInterpreter())->call( mFuncName);
     }
@@ -420,4 +423,26 @@ void TAlias::execute()
     }
 }
 
+void TAlias::setScriptLanguage( QString & script_language)
+{
+    if (script_language == "PYTHON")
+    {
+        mScriptLanguage = PYTHON;
+    }
+    else
+    {
+        mScriptLanguage = LUA;
+    }
+}
 
+QString TAlias::getScriptLanguage()
+{
+    if (mScriptLanguage == PYTHON)
+    {
+        return QString("PYTHON");
+    }
+    else
+    {
+        return QString("LUA");
+    }
+}
