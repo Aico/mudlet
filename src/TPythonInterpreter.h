@@ -25,6 +25,7 @@
 #include "TEvent.h"
 #include <QString>
 #include <QObject>
+#include <QHash>
 
 class Host;
 
@@ -45,6 +46,7 @@ public:
     void setChannel102Table( int & var, int & value );
     void setGMCPTable(QString & key, QString & string_data);
     bool isInitialized() {return mpInitialized;}
+    static QHash<QString, Host *> pythonHostMap;
     
 public slots:
     void slotEchoMessage(const QString & msg);
@@ -55,4 +57,46 @@ private:
     bool mpInitialized;
     void runMethod(const QString& msg);
 };
+
+class MudletObject {
+public:
+  MudletObject() {}
+  MudletObject(const QString& hash);
+
+  Host * mpHost;
+};
+
+
+class MudletObjectWrapper : public QObject {
+
+  Q_OBJECT
+
+public slots:
+  MudletObject* new_MudletObject(const QString& hash) { return new MudletObject(hash); }
+
+  void delete_MudletObject(MudletObject* o) { delete o; }
+
+  // Python methods.
+  int selectString(MudletObject* o, QString& text, int numMatch, QString& console);
+  void send(MudletObject* o, QString& command, bool echo);
+  void expandAlias( MudletObject* o, QString& command, bool print );
+  void resetFormat( MudletObject* o, QString& console );
+  void setBgColor( MudletObject* o, int r,int g,int b, QString& console );
+  void setFgColor( MudletObject* o, int r,int g,int b, QString& console );
+  bool enableTimer( MudletObject* o, QString& name );
+  bool enableKey( MudletObject* o, QString& name );
+  bool enableTrigger( MudletObject* o, QString& name );
+  bool enableAlias( MudletObject* o, QString& name );
+  bool disableTimer( MudletObject* o, QString& name );
+  bool disableKey( MudletObject* o, QString& name );
+  bool disableTrigger( MudletObject* o, QString& name );
+  bool disableAlias( MudletObject* o, QString& name );
+  int selectCaptureGroup( MudletObject* o, int groupNumber );
+  void replace( MudletObject* o, QString& with, QString& console );
+  void replaceAll( MudletObject* o, QString& what, QString& with, QString& console );
+  void deleteLine( MudletObject* o, QString& console );
+  bool selectSection( MudletObject* o, int from, int length_of_string, QString& console );
+  void raiseEvent( MudletObject* o, QVariantList args );
+};
+
 #endif  

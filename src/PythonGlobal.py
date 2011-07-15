@@ -1,5 +1,8 @@
 import io
 import traceback
+from PythonQt.mudlet import *
+
+mudlet = MudletObject(HOST_HASH)
 
 class NestedDict(dict):
     def __getitem__(self,item):
@@ -14,8 +17,6 @@ command = ''
 atcp = {}
 channel102 = {}
 gmcp=NestedDict()
-methoddelimit='^^MUDLET_DELIMIT^^'
-methodsubdelimit = '^^MUDLET_SUBDELIMIT^^'
 
 def onConnect():
     "Run when connection established"
@@ -44,80 +45,72 @@ def printFixedStackTrace(trace,funcName):
     print '\n'.join(lines)
 
 def send(text,wantPrint=True):
-    print methoddelimit + 'send' + methoddelimit+ text + methoddelimit + ('1' if wantPrint else '0')
+    mudlet.send(text,wantPrint)
     
 def expandAlias(text,wantPrint=True):
-    print methoddelimit + 'expandAlias' + methoddelimit+ text + methoddelimit + ('1' if wantPrint else '0')
+    mudlet.expandAlias(text,wantPrint)
 
 def selectString(text,pos,console='main'):
-    print methoddelimit + 'selectString' + methoddelimit + text + methoddelimit + str(int(pos)) + methoddelimit + console
+    mudlet.selectString(text,pos,console)
     
 def resetFormat(console='main'):
-    print methoddelimit + 'resetFormat' + methoddelimit + console
+    mudlet.resetFormat(console)
 
-def setBgColor(color,console='main'):
+def setBgColor(r,g,b,console='main'): 
+    mudlet.setBgColor(r,g,b,console)
+    
+def setFgColor(r,g,b,console='main'):
+    mudlet.setFgColor(r,g,b,console)
+    
+def bg(color,console='main'):
     code = color_dict[color.strip()]
-    print methoddelimit + 'setBgColor' + methoddelimit + str(code[0]) + methoddelimit + str(code[1]) + methoddelimit + str(code[2]) + methoddelimit + console
+    setBgColor(code[0],code[1],code[2],console)
     
-def setFgColor(color,console='main'):
+def fg(color,console='main'):
     code = color_dict[color.strip()]
-    print methoddelimit + 'setFgColor' + methoddelimit + str(code[0]) + methoddelimit + str(code[1]) + methoddelimit + str(code[2]) + methoddelimit + console
-    
-def bg(color):
-    setBgColor(color)
-    
-def fg(color):
-    setFgColor(color)
+    setFgColor(code[0],code[1],code[2],console)
     
 def enableTimer(timer):
-    print methoddelimit + 'enableTimer' + methoddelimit + timer
+    mudlet.enableTimer(timer)
     
 def enableKey(key):
-    print methoddelimit + 'enableKey' + methoddelimit + key
+    mudlet.enableKey(key)
     
 def enableTrigger(trigger):
-    print methoddelimit + 'enableTrigger' + methoddelimit + trigger
+    mudlet.enableTrigger(trigger)
     
 def enableAlias(alias):
-    print methoddelimit + 'enableAlias' + methoddelimit + alias
+    mudlet.enableAlias(alias)
     
 def disableTimer(timer):
-    print methoddelimit + 'disableTimer' + methoddelimit + timer
+    mudlet.disableTimer(timer)
     
 def disableKey(key):
-    print methoddelimit + 'disableKey' + methoddelimit + key
+    mudlet.disableKey(key)
     
 def disableTrigger(trigger):
-    print methoddelimit + 'disableTrigger' + methoddelimit + trigger
+    mudlet.disableTrigger(trigger)
     
 def disableAlias(alias):
-    print methoddelimit + 'disableAlias' + methoddelimit + alias
+    mudlet.disableAlias(alias)
     
 def selectCaptureGroup(group):
-    print methoddelimit + 'selectCaptureGroup' + methoddelimit + str(int(group))
+    mudlet.selectCaptureGroup(group)
     
 def replace(text,console='main'):
-    print methoddelimit + 'replace' + methoddelimit + text + methoddelimit + console
+    mudlet.replace(text,console)
 
 def replaceAll(what,text,console='main'):
-    print methoddelimit + 'replaceAll' + methoddelimit + what + methoddelimit + text + methoddelimit + console
+    mudlet.replaceAll(what,text,console)
     
 def selectSection(col,length,console='main'):
-    print methoddelimit + 'selectSection' + methoddelimit + str(int(col)) + methoddelimit + str(int(length)) + methoddelimit + console
+    mudlet.selectSection(col,length,console)
     
 def deleteLine(console='main'):
-    print methoddelimit + 'deleteLine' + methoddelimit + console
+    mudlet.deleteLine(console)
     
 def raiseEvent(*arg):
-    print methoddelimit + 'raiseEvent' + methoddelimit + methoddelimit.join(map(eventArgValue,arg))
-    
-def eventArgValue(arg):
-    "Method used in raiseEvent."
-    try:
-        int(arg)
-        return str(arg) + methodsubdelimit + str(ARGUMENT_TYPE_NUMBER)
-    except ValueError:
-        return str(arg) + methodsubdelimit + str(ARGUMENT_TYPE_STRING)
+    mudlet.raiseEvent(arg)
     
 
 #Color Table ported from Lua table by Vadim Peretrokin 2009.

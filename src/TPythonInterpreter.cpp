@@ -25,11 +25,12 @@
 #include "mudlet.h"
 #include <QString>
 #include <QStringList>
+#include <QDateTime>
+#include <QHash>
 #include <string>
 #include <list>
 
-const QString METHOD_DELIMIT = "^^MUDLET_DELIMIT^^";
-const QString METHOD_SUBDELIMIT = "^^MUDLET_SUBDELIMIT^^";
+QHash<QString, Host *> TPythonInterpreter::pythonHostMap;
 
 TPythonInterpreter::TPythonInterpreter(Host * pH)
 :mpHost( pH )
@@ -56,12 +57,13 @@ void TPythonInterpreter::init()
         connect(PythonQt::self(),SIGNAL(pythonStdOut(const QString&)),this, SLOT(slotEchoMessage(const QString&)));
         connect(PythonQt::self(),SIGNAL(pythonStdErr(const QString&)),this, SLOT(slotEchoMessage(const QString&)));
         
-        const QString& varNameString = "ARGUMENT_TYPE_STRING";
-        const QString& varNameNumber = "ARGUMENT_TYPE_NUMBER";
-        const QVariant& varValueString = ARGUMENT_TYPE_STRING;
-        const QVariant& varValueNumber = ARGUMENT_TYPE_NUMBER;
-        add_python_variable(varNameString,varValueString);
-        add_python_variable(varNameNumber,varValueNumber);
+        QString hashString = QDateTime::currentDateTime().toString() + QString(mpHost->mHostID);
+        pythonHostMap[hashString]=mpHost;
+        const QString& varHostHash = "HOST_HASH";
+        const QVariant& varHostValue = hashString;
+        add_python_variable(varHostHash,varHostValue);
+        PythonQt::self()->registerCPPClass("MudletObject", "","mudlet", PythonQtCreateObject<MudletObjectWrapper>);
+        
         QString dirPath = QCoreApplication::applicationDirPath();
         mainModule.evalFile(dirPath + "/PythonGlobal.py");
         mpInitialized = true;
@@ -201,228 +203,210 @@ void TPythonInterpreter::setGMCPTable(QString & key, QString & string_data)
     }
 }
 
-void TPythonInterpreter::runMethod(const QString& msg)
-{
-    QStringList list = msg.split(METHOD_DELIMIT);
-    try
-    {    
-        QString method = list[1];
-        std::string s;
-        if (method == "send")
-        {
-            //s = list[2].toStdString();
-            mpHost->send( list[2], list[3].toInt(), true );
-        }
-        else if (method == "expandAlias")
-        {
-            mpHost->send( list[2], list[3].toInt(), false );
-        }
-        else if (method == "selectString")
-        {
-            if (list[4] == "main")
-            {
-                mpHost->mpConsole->select( list[2], list[3].toInt() );
-            }
-            else
-            {
-                mudlet::self()->selectString( mpHost, list[4], list[2], list[3].toInt() );
-            }
-        }
-        else if (method == "resetFormat")
-        {
-            if (list[2] == "main")
-            {
-                mpHost->mpConsole->reset();
-            }
-            else
-            {
-                mudlet::self()->resetFormat( mpHost, list[2] );
-            }
-        }
-        else if (method == "setBgColor")
-        {
-            if (list[5] == "main")
-            {
-                mpHost->mpConsole->setBgColor( list[2].toInt(), list[3].toInt(), list[4].toInt() );
-            }
-            else
-            {
-                mudlet::self()->setBgColor( mpHost, list[5], list[2].toInt(), list[3].toInt(), list[4].toInt() );
-            }
-        }
-        else if (method == "setFgColor")
-        {
-            if (list[5] == "main")
-            {
-                mpHost->mpConsole->setFgColor( list[2].toInt(), list[3].toInt(), list[4].toInt() );
-            }
-            else
-            {
-                mudlet::self()->setFgColor( mpHost, list[5], list[2].toInt(), list[3].toInt(), list[4].toInt() );
-            }
-        }
-        else if (method == "enableTimer")
-        {
-            mpHost->getTimerUnit()->enableTimer( list[2] );
-        }
-        else if (method == "enableKey")
-        {
-            mpHost->getKeyUnit()->enableKey( list[2] );
-        }
-        else if (method == "enableTrigger")
-        {
-            mpHost->getTriggerUnit()->enableTrigger( list[2] );
-        }
-        else if (method == "enableAlias")
-        {
-            mpHost->getAliasUnit()->enableAlias( list[2] );
-        }
-        else if (method == "disableTimer")
-        {
-            mpHost->getTimerUnit()->disableTimer( list[2] );
-        }
-        else if (method == "disableKey")
-        {
-            mpHost->getKeyUnit()->disableKey( list[2] );
-        }
-        else if (method == "disableTrigger")
-        {
-            mpHost->getTriggerUnit()->disableTrigger( list[2] );
-        }
-        else if (method == "disableAlias")
-        {
-            mpHost->getAliasUnit()->disableAlias( list[2] );
-        }
-        else if (method == "selectCaptureGroup")
-        {
-            int luaNumOfMatch = list[2].toInt();
-            luaNumOfMatch--; //we want capture groups to start with 1 instead of 0
-            if( luaNumOfMatch < static_cast<int>(mpHost->getLuaInterpreter()->mCaptureGroupList.size()) )
-            {
-                TLuaInterpreter * pL = mpHost->getLuaInterpreter();
-                std::list<std::string>::iterator its = pL->mCaptureGroupList.begin();
-                std::list<int>::iterator iti = pL->mCaptureGroupPosList.begin();
-
-                for( int i=0; iti!=pL->mCaptureGroupPosList.end(); ++iti,++i )
-                {
-                    if( i >= luaNumOfMatch ) break;
-                }
-                for( int i=0; its!=pL->mCaptureGroupList.end(); ++its,++i)
-                {
-                    if( i >= luaNumOfMatch ) break;
-                }
-
-                int begin = *iti;
-                std::string & s = *its;
-                int length = s.size();
-                mpHost->mpConsole->selectSection( begin, length );
-            }
-        }
-        else if (method == "replace")
-        {
-            if (list[3] == "main")
-            {
-                mpHost->mpConsole->replace( list[2] );
-            }
-            else
-            {
-                mudlet::self()->replace( mpHost, list[3], list[2] );
-            }
-        }
-        else if (method == "replaceAll")
-        {
-            if (list[4] == "main")
-            {
-                while (mpHost->mpConsole->select( list[2], 1) > -1)
-                {
-                    mpHost->mpConsole->replace( list[3]);
-                }
-            }
-            else
-            {
-                while (mudlet::self()->selectString( mpHost, list[4], list[2], 1 ) > -1)
-                {
-                    mudlet::self()->replace( mpHost, list[4], list[3] );
-                }
-            }
-        }
-        else if (method == "selectSection")
-        {
-            if (list[4] == "main")
-            {
-                mpHost->mpConsole->selectSection( list[2].toInt(), list[3].toInt() );
-            }
-            else
-            {
-                mudlet::self()->selectSection( mpHost, list[4], list[2].toInt(), list[3].toInt() );
-            }
-        }
-        else if (method == "deleteLine")
-        {
-            if (list[2] == "main")
-            {
-                mpHost->mpConsole->skipLine();
-            }
-            else
-            {
-                mudlet::self()->deleteLine( mpHost, list[2] );
-            }
-        }
-        else if (method == "raiseEvent")
-        {
-            TEvent * pE = new TEvent;
-            QStringList l;
-            for (int i=2;i<list.length();++i)
-            {
-                l=list[i].split(METHOD_SUBDELIMIT);
-                if (l[1].toInt() == ARGUMENT_TYPE_NUMBER)
-                {
-                    pE->mArgumentList.append( l[0] );
-                    pE->mArgumentTypeList.append( ARGUMENT_TYPE_NUMBER );
-                }
-                else if (l[1].toInt() == ARGUMENT_TYPE_STRING)
-                {
-                    pE->mArgumentList.append( l[0] );
-                    pE->mArgumentTypeList.append( ARGUMENT_TYPE_STRING );
-                }
-                else
-                {
-                    QString err1 = "[ ERROR ] Event " + list[2][0] + " argument value not of valid type";
-                    mpHost->mpConsole->print( err1, 150, 0, 0, 0, 0, 0 );
-                }
-            }
-            mpHost->raiseEvent( pE );
-        }
-        else
-        {
-            QString err = "[ ERROR ] " + method + " is not a valid python method!";
-            mpHost->mpConsole->print( err, 150, 0, 0, 0, 0, 0 );
-        }
-    }
-    catch(...)
-    {
-        QString err;
-        if (list.size()>1)
-        {
-            err = "[ ERROR ] Error occured executing python method " + list[1];
-        }
-        else
-        {
-            err = "[ ERROR ] Python method call " + msg + " mangled.";
-        }
-        mpHost->mpConsole->print( err, 150, 0, 0, 0, 0, 0 );
-    }
-}
-
 void TPythonInterpreter::slotEchoMessage(const QString & msg)
 {
-    if (msg.startsWith(METHOD_DELIMIT))
+    mpHost->mpConsole->echo( const_cast<QString&>(msg) );
+}
+
+MudletObject::MudletObject(const QString& hash)
+{
+    mpHost = TPythonInterpreter::pythonHostMap[hash];
+}
+
+int MudletObjectWrapper::selectString(MudletObject* o, QString& text, int numMatch, QString& console)
+{
+    if (console == "main")
     {
-        runMethod(msg);
+        return o->mpHost->mpConsole->select( text, numMatch );
     }
     else
     {
-        mpHost->mpConsole->echo( const_cast<QString&>(msg) );
+        return mudlet::self()->selectString( o->mpHost, console, text, numMatch );
     }
 }
-   
+
+void MudletObjectWrapper::send(MudletObject* o, QString& command, bool echo)
+{
+    o->mpHost->send( command,echo, true );
+}
+
+void MudletObjectWrapper::expandAlias( MudletObject* o, QString& command, bool print )
+{
+    o->mpHost->send( command,print, false );
+}
+
+void MudletObjectWrapper::resetFormat( MudletObject* o, QString& console )
+{
+    if (console == "main")
+    {
+        o->mpHost->mpConsole->reset();
+    }
+    else
+    {
+        mudlet::self()->resetFormat( o->mpHost, console );
+    }
+}
+
+void MudletObjectWrapper::setBgColor( MudletObject* o, int r,int g,int b, QString& console )
+{
+    if (console == "main")
+    {
+        o->mpHost->mpConsole->setBgColor( r, g, b );
+    }
+    else
+    {
+        mudlet::self()->setBgColor( o->mpHost, console, r, g, b );
+    }
+}
+
+void MudletObjectWrapper::setFgColor( MudletObject* o, int r,int g,int b, QString& console )
+{
+    if (console == "main")
+    {
+        o->mpHost->mpConsole->setFgColor( r, g, b );
+    }
+    else
+    {
+        mudlet::self()->setFgColor( o->mpHost, console, r, g, b );
+    }
+}
+
+bool MudletObjectWrapper::enableTimer( MudletObject* o, QString& name )
+{
+    return o->mpHost->getTimerUnit()->enableTimer( name );
+}
+
+bool MudletObjectWrapper::enableKey( MudletObject* o, QString& name )
+{
+    return o->mpHost->getKeyUnit()->enableKey( name );
+}
+
+bool MudletObjectWrapper::enableTrigger( MudletObject* o, QString& name )
+{
+    return o->mpHost->getTriggerUnit()->enableTrigger( name );
+}
+
+bool MudletObjectWrapper::enableAlias( MudletObject* o, QString& name )
+{
+    return o->mpHost->getAliasUnit()->enableAlias( name );
+}
+
+bool MudletObjectWrapper::disableTimer( MudletObject* o, QString& name )
+{
+    return o->mpHost->getTimerUnit()->disableTimer( name );
+}
+
+bool MudletObjectWrapper::disableKey( MudletObject* o, QString& name )
+{
+    return o->mpHost->getKeyUnit()->disableKey( name );
+}
+
+bool MudletObjectWrapper::disableTrigger( MudletObject* o, QString& name )
+{
+    return o->mpHost->getTriggerUnit()->disableTrigger( name );
+}
+
+bool MudletObjectWrapper::disableAlias( MudletObject* o, QString& name )
+{
+    return o->mpHost->getAliasUnit()->disableAlias( name );
+}
+
+int MudletObjectWrapper::selectCaptureGroup( MudletObject* o, int groupNumber )
+{
+    int luaNumOfMatch = groupNumber;
+    luaNumOfMatch--; //we want capture groups to start with 1 instead of 0
+    if( luaNumOfMatch < static_cast<int>(o->mpHost->getLuaInterpreter()->mCaptureGroupList.size()) )
+    {
+        TLuaInterpreter * pL = o->mpHost->getLuaInterpreter();
+        std::list<std::string>::iterator its = pL->mCaptureGroupList.begin();
+        std::list<int>::iterator iti = pL->mCaptureGroupPosList.begin();
+
+        for( int i=0; iti!=pL->mCaptureGroupPosList.end(); ++iti,++i )
+        {
+            if( i >= luaNumOfMatch ) break;
+        }
+        for( int i=0; its!=pL->mCaptureGroupList.end(); ++its,++i)
+        {
+            if( i >= luaNumOfMatch ) break;
+        }
+
+        int begin = *iti;
+        std::string & s = *its;
+        int length = s.size();
+        return o->mpHost->mpConsole->selectSection( begin, length );
+    }
+}
+
+void MudletObjectWrapper::replace( MudletObject* o, QString& with, QString& console )
+{
+    if (console == "main")
+    {
+        o->mpHost->mpConsole->replace( with );
+    }
+    else
+    {
+        mudlet::self()->replace( o->mpHost, console, with );
+    }
+}
+
+void MudletObjectWrapper::replaceAll( MudletObject* o, QString& what, QString& with, QString& console )
+{
+    if (console == "main")
+    {
+        while (o->mpHost->mpConsole->select( what, 1) > -1)
+        {
+            o->mpHost->mpConsole->replace( with);
+        }
+    }
+    else
+    {
+        while (mudlet::self()->selectString( o->mpHost, console, what, 1 ) > -1)
+        {
+            mudlet::self()->replace( o->mpHost, console, with );
+        }
+    }
+}
+
+void MudletObjectWrapper::deleteLine( MudletObject* o, QString& console )
+{
+    if (console == "main")
+    {
+        o->mpHost->mpConsole->skipLine();
+    }
+    else
+    {
+        mudlet::self()->deleteLine( o->mpHost, console );
+    }
+}
+
+bool MudletObjectWrapper::selectSection( MudletObject* o, int from, int length_of_string, QString& console )
+{
+    if (console == "main")
+    {
+        return o->mpHost->mpConsole->selectSection( from, length_of_string );
+    }
+    else
+    {
+        return mudlet::self()->selectSection( o->mpHost, console, from, length_of_string );
+    }
+}
+
+void MudletObjectWrapper::raiseEvent( MudletObject* o, QVariantList args )
+{
+    TEvent * pE = new TEvent;
+    for (int i=0;i<args.size();++i)
+    {
+        if (args[i].type() == QVariant::String)
+        {
+            pE->mArgumentList.append( args[i].toString() );
+            pE->mArgumentTypeList.append( ARGUMENT_TYPE_STRING );
+        }
+        else
+        {
+            pE->mArgumentList.append( args[i].toString() );
+            pE->mArgumentTypeList.append( ARGUMENT_TYPE_NUMBER );
+        }
+    }
+    o->mpHost->raiseEvent( pE );
+}
+
