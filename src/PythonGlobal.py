@@ -51,7 +51,7 @@ def expandAlias(text,wantPrint=True):
     mudlet.expandAlias(text,wantPrint)
 
 def selectString(text,pos,console='main'):
-    mudlet.selectString(text,pos,console)
+    return mudlet.selectString(text,pos,console)
     
 def resetFormat(console='main'):
     mudlet.resetFormat(console)
@@ -71,31 +71,31 @@ def fg(color,console='main'):
     setFgColor(code[0],code[1],code[2],console)
     
 def enableTimer(timer):
-    mudlet.enableTimer(timer)
+    return mudlet.enableTimer(timer)
     
 def enableKey(key):
-    mudlet.enableKey(key)
+    return mudlet.enableKey(key)
     
 def enableTrigger(trigger):
-    mudlet.enableTrigger(trigger)
+    return mudlet.enableTrigger(trigger)
     
 def enableAlias(alias):
-    mudlet.enableAlias(alias)
+    return mudlet.enableAlias(alias)
     
 def disableTimer(timer):
-    mudlet.disableTimer(timer)
+    return mudlet.disableTimer(timer)
     
 def disableKey(key):
-    mudlet.disableKey(key)
+    return mudlet.disableKey(key)
     
 def disableTrigger(trigger):
-    mudlet.disableTrigger(trigger)
+    return mudlet.disableTrigger(trigger)
     
 def disableAlias(alias):
-    mudlet.disableAlias(alias)
+    return mudlet.disableAlias(alias)
     
 def selectCaptureGroup(group):
-    mudlet.selectCaptureGroup(group)
+    return mudlet.selectCaptureGroup(group)
     
 def replace(text,console='main'):
     mudlet.replace(text,console)
@@ -104,7 +104,7 @@ def replaceAll(what,text,console='main'):
     mudlet.replaceAll(what,text,console)
     
 def selectSection(col,length,console='main'):
-    mudlet.selectSection(col,length,console)
+    return mudlet.selectSection(col,length,console)
     
 def deleteLine(console='main'):
     mudlet.deleteLine(console)
