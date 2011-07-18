@@ -26,9 +26,6 @@
    <property name="margin">
     <number>0</number>
    </property>
-   <item>
-    <widget class="QPlainTextEdit" name="editor"/>
-   </item>
   </layout>
  </widget>
  <resources/>

@@ -63,6 +63,7 @@ public:
     QString          getScript()                                       { return mScript; }
     bool             setScript( QString & script );
     QString          getScriptLanguage();
+    int              getScriptLanguageCode()                           { return mScriptLanguage;}
     void             setScriptLanguage( QString & script_language);
     bool             isFolder()                                        { return mIsFolder; }
     void             setIsFolder( bool b )                             { mIsFolder = b; }

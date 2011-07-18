@@ -98,6 +98,7 @@ public:
     QString          getScript()                     { return mScript; }
     bool             setScript( QString & script );
     QString          getScriptLanguage();
+    int              getScriptLanguageCode()         { return mScriptLanguage;}
     void             setScriptLanguage( QString & script_language);
     bool             compileScript();
     bool             match( char *, QString &, int line, int posOffset = 0 );

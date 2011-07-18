@@ -26,13 +26,61 @@
 #include "dlgSourceEditorArea.h"
 #include "THighlighter.h"
 
+#define LUA     0
+#define PYTHON  1
+
 dlgSourceEditorArea::dlgSourceEditorArea(QWidget * pF) : QWidget(pF)
 {
     // init generated dialog
     setupUi(this);
+    editor = new PlainTextEdit(this);
+    editor->setObjectName(QString::fromUtf8("editor"));
+    verticalLayout->addWidget(editor);
     highlighter = new THighlighter(editor->document());
     editor->setTabStopWidth(25);
 
 }
 
+PlainTextEdit::PlainTextEdit(QWidget* parent) 
+: QPlainTextEdit(parent) 
+,mScriptLanguage(LUA)
+{}
 
+void PlainTextEdit::keyPressEvent(QKeyEvent * event)
+{
+    if (mScriptLanguage == LUA)
+    {
+        QPlainTextEdit::keyPressEvent(event);
+    }
+    else if (event->key() == Qt::Key_Tab)
+    {
+        textCursor().insertText("    ");
+    }
+    else if (event->key() == Qt::Key_Return)
+    {
+        QString line = textCursor().block().text();
+        int count = 0;
+        QString::iterator i;
+        for (i = line.begin();i != line.end(); i++)
+        {
+            if (*i != ' ') break;
+            count++;
+        }
+        QString replace = "\n";
+        for (int j=0; j<count; ++j)
+        {
+            replace += " ";
+        }
+        textCursor().insertText(replace);
+    }
+        
+    else
+    {
+        QPlainTextEdit::keyPressEvent(event);
+    }
+}
+
+void PlainTextEdit::setScriptLanguage(int lang)
+{
+    mScriptLanguage = lang;
+}

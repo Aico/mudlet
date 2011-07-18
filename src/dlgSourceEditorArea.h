@@ -23,8 +23,11 @@
 
 #include "ui_source_editor_area.h"
 #include <QWidget>
+#include <QKeyEvent>
+#include <QPlainTextEdit>
 
 class THighlighter;
+class PlainTextEdit;
 
 //#include <Qsci/qsciscintilla.h>
 //#include <Qsci/qscilexerlua.h>
@@ -34,9 +37,9 @@ class dlgSourceEditorArea : public QWidget , public Ui::source_editor_area
     Q_OBJECT
         
         public:
-        
         dlgSourceEditorArea(QWidget*);
         THighlighter * highlighter;
+        PlainTextEdit *editor;
     //QsciLexerLua * mpLuaLexer;
     
 signals:
@@ -47,5 +50,19 @@ public slots:
     
 };
 
+class PlainTextEdit : public QPlainTextEdit
+{
+    Q_OBJECT
+    
+    public:
+    PlainTextEdit(QWidget* parent);
+    void keyPressEvent(QKeyEvent * event);
+    
+    public slots:
+    void setScriptLanguage(int);
+    
+    private:
+    int mScriptLanguage;
+};
 #endif
 
