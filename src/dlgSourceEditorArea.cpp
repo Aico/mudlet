@@ -36,7 +36,7 @@ dlgSourceEditorArea::dlgSourceEditorArea(QWidget * pF) : QWidget(pF)
     editor = new PlainTextEdit(this);
     editor->setObjectName(QString::fromUtf8("editor"));
     verticalLayout->addWidget(editor);
-    highlighter = new THighlighter(editor->document());
+    highlighter = new THighlighter((QTextEdit*)editor);
     editor->setTabStopWidth(25);
 
 }

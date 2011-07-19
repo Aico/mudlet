@@ -60,6 +60,7 @@ class PlainTextEdit : public QPlainTextEdit
     
     public slots:
     void setScriptLanguage(int);
+    int getScriptLanguageCode()     {return mScriptLanguage;}
     
     private:
     int mScriptLanguage;

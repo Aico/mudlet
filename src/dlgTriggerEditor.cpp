@@ -2735,8 +2735,8 @@ void dlgTriggerEditor::addScript( bool isFolder )
     if( pParent ) pParent->setExpanded( true );
     mpScriptsMainArea->lineEdit_scripts_name->clear();
     //FIXME mpScriptsMainArea->pattern_textedit->clear();
-    mpSourceEditorArea->editor->setPlainText( script );
     mpSourceEditorArea->editor->setScriptLanguage(pT->getScriptLanguageCode());
+    mpSourceEditorArea->editor->setPlainText( script );
     mCurrentScript = pNewItem;
     treeWidget_scripts->setCurrentItem( pNewItem );
     slot_scripts_clicked( treeWidget_scripts->currentItem(), 0 );
@@ -4109,8 +4109,8 @@ void dlgTriggerEditor::slot_trigger_clicked( QTreeWidgetItem *pItem, int column 
         mpTriggersMainArea->pushButtonBgColor->setPalette( BgColorPalette );
         mpTriggersMainArea->colorizerTrigger->setChecked( pT->isColorizerTrigger() );
         QString script = pT->getScript();
-        mpSourceEditorArea->editor->setPlainText( script );
         mpSourceEditorArea->editor->setScriptLanguage(pT->getScriptLanguageCode());
+        mpSourceEditorArea->editor->setPlainText( script );
         QString lang = pT->getScriptLanguage().toLower();
         lang[0] = lang[0].toUpper();
         mpTriggersMainArea->comboBox_lang->setCurrentIndex(mpTriggersMainArea->comboBox_lang->findText(lang));
@@ -4174,8 +4174,8 @@ void dlgTriggerEditor::slot_alias_clicked( QTreeWidgetItem *pItem, int column )
         mpAliasMainArea->comboBox_lang->setCurrentIndex(mpAliasMainArea->comboBox_lang->findText(lang));
 
         QString script = pT->getScript();
-        mpSourceEditorArea->editor->setPlainText( script );
         mpSourceEditorArea->editor->setScriptLanguage(pT->getScriptLanguageCode());
+        mpSourceEditorArea->editor->setPlainText( script );
         if( ! pT->state() ) showError( pT->getError() );
     }
 }
@@ -4211,8 +4211,8 @@ void dlgTriggerEditor::slot_key_clicked( QTreeWidgetItem *pItem, int column )
         QString lang = pT->getScriptLanguage().toLower();
         lang[0] = lang[0].toUpper();
         mpKeysMainArea->comboBox_lang->setCurrentIndex(mpKeysMainArea->comboBox_lang->findText(lang));
-        mpSourceEditorArea->editor->setPlainText( script );
         mpSourceEditorArea->editor->setScriptLanguage(pT->getScriptLanguageCode());
+        mpSourceEditorArea->editor->setPlainText( script );
         if( ! pT->state() ) showError( pT->getError() );
     }
 }
@@ -4325,8 +4325,8 @@ void dlgTriggerEditor::slot_scripts_clicked( QTreeWidgetItem *pItem, int column 
         }
         mpScriptsMainArea->lineEdit_scripts_name->clear();
         QString script = pT->getScript();
-        mpSourceEditorArea->editor->setPlainText( script );
         mpSourceEditorArea->editor->setScriptLanguage(pT->getScriptLanguageCode());
+        mpSourceEditorArea->editor->setPlainText( script );
         QString lang = pT->getScriptLanguage().toLower();
         lang[0] = lang[0].toUpper();
         mpScriptsMainArea->comboBox_lang->setCurrentIndex(mpScriptsMainArea->comboBox_lang->findText(lang));
@@ -4385,8 +4385,8 @@ void dlgTriggerEditor::slot_timer_clicked( QTreeWidgetItem *pItem, int column )
         mpTimersMainArea->timeEdit_msecs->setTime(t5);
 
         QString script = pT->getScript();
-        mpSourceEditorArea->editor->setPlainText( script );
         mpSourceEditorArea->editor->setScriptLanguage(pT->getScriptLanguageCode());
+        mpSourceEditorArea->editor->setPlainText( script );
         QString lang = pT->getScriptLanguage().toLower();
         lang[0] = lang[0].toUpper();
         mpTimersMainArea->comboBox_lang->setCurrentIndex(mpTimersMainArea->comboBox_lang->findText(lang));
