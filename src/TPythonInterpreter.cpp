@@ -60,8 +60,14 @@ void TPythonInterpreter::init()
         QString hashString = QDateTime::currentDateTime().toString() + QString(mpHost->mHostID);
         pythonHostMap[hashString]=mpHost;
         const QString& varHostHash = "HOST_HASH";
-        const QVariant& varHostValue = hashString;
-        add_python_variable(varHostHash,varHostValue);
+        const QVariant& varHostHashValue = hashString;
+        add_python_variable(varHostHash,varHostHashValue);
+        const QString& varHostName = "HOST_NAME";
+        const QVariant& varHostNameValue = mpHost->getName();
+        add_python_variable(varHostName,varHostNameValue);
+        const QString& varHostLogin = "HOST_LOGIN";
+        const QVariant& varHostLoginValue = mpHost->getLogin();
+        add_python_variable(varHostLogin,varHostLoginValue);
         PythonQt::self()->registerCPPClass("MudletObject", "","mudlet", PythonQtCreateObject<MudletObjectWrapper>);
         
         QString dirPath = QCoreApplication::applicationDirPath();

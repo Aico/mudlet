@@ -1,4 +1,5 @@
 import io
+import site
 import traceback
 from PythonQt.mudlet import *
 

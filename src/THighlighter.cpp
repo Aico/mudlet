@@ -143,6 +143,9 @@ THighlighter::THighlighter( QTextEdit *parent )
     rule.format = quotationFormat;
     highlightingRulesPython.append( rule );
 
+    rule.pattern = QRegExp( "\'[^\']*\'" );
+    highlightingRulesPython.append( rule );
+
     rule.pattern = QRegExp( "\\[\\[[^\\]\\]]*\\]\\]" );
     rule.format = quotationFormat;
     highlightingRulesLua.append( rule );
