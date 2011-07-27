@@ -19,13 +19,16 @@ channel102 = {}
 gmcp=NestedDict()
 
 def onConnect():
-    "Run when connection established"
+    """Run when connection established
+        Placeholder, should reimplement in PythonLocal.py"""
     
 def onDisconnect():
-    "Run on disconnect"
+    """Run on disconnect
+        Placeholder, should reimplement in PythonLocal.py"""
     
 def handleWindowResizeEvent():
-    "Run when window resizes"
+    """Run when window resizes
+        Placeholder, should reimplement in PythonLocal.py"""
 
 def printFixedStackTrace(trace,funcName):
     """Need to modify the stack trace to correspond
@@ -340,3 +343,5 @@ color_dict = {
         'MediumPurple'          : (147, 112, 219),
         'thistle'               : (216, 191, 216)
 }
+
+execfile('PythonLocal.py')
