@@ -112,6 +112,12 @@ def selectSection(col,length,console='main'):
     
 def deleteLine(console='main'):
     mudlet.deleteLine(console)
+
+def reconnect():
+    mudlet.reconnect()
+
+def disconnect():
+    mudlet.disconnect()
     
 def raiseEvent(*arg):
     mudlet.raiseEvent(arg)

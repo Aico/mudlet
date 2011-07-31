@@ -97,6 +97,8 @@ public slots:
   void deleteLine( MudletObject* o, QString& console );
   bool selectSection( MudletObject* o, int from, int length_of_string, QString& console );
   void raiseEvent( MudletObject* o, QVariantList args );
+  void reconnect( MudletObject* o );
+  void disconnect( MudletObject* o );
 };
 
 #endif  

@@ -416,3 +416,13 @@ void MudletObjectWrapper::raiseEvent( MudletObject* o, QVariantList args )
     o->mpHost->raiseEvent( pE );
 }
 
+void MudletObjectWrapper::reconnect( MudletObject* o )
+{
+    o->mpHost->mTelnet.connectIt( o->mpHost->getUrl(), o->mpHost->getPort() );
+}
+
+void MudletObjectWrapper::disconnect( MudletObject* o )
+{
+    o->mpHost->mTelnet.disconnect();
+}
+
