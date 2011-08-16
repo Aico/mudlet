@@ -121,7 +121,8 @@ bool XMLexport::writeHost( Host * pT )
     writeAttribute( "mShowInfo", pT->mShowInfo ? "yes" : "no" );
     writeAttribute( "mAcceptServerGUI", pT->mAcceptServerGUI ? "yes" : "no" );
     writeAttribute( "mMapperUseAntiAlias", pT->mMapperUseAntiAlias ? "yes" : "no" );
-    writeAttribute( "mPython", pT->mPython ? "yes" : "no" );
+    writeAttribute( "mFORCE_MXP_NEGOTIATION_OFF", pT->mFORCE_MXP_NEGOTIATION_OFF ? "yes" : "no" );
+	writeAttribute( "mPython", pT->mPython ? "yes" : "no" );
 
     writeTextElement( "name", pT->mHostName );
     //writeTextElement( "login", pT->mLogin );

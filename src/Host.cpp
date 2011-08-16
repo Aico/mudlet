@@ -141,10 +141,11 @@ Host::Host( int port, QString hostname, QString login, QString pass, int id )
 , mEnableSpellCheck    ( true )
 , mpUnzipDialog        ( 0 )
 , mRoomSize            ( 0.5 )
-, mLineSize            ( 1.0 )
+, mLineSize            ( 5.0 )
 , mServerGUI_Package_version( -1 )
 , mServerGUI_Package_name( "nothing" )
 , mAcceptServerGUI     ( true )
+, mFORCE_MXP_NEGOTIATION_OFF( false )
 {
    // mLogStatus = mudlet::self()->mAutolog;
     QString directoryLogFile = QDir::homePath()+"/.config/mudlet/profiles/";
@@ -267,11 +268,12 @@ Host::Host()
 , mEnableSpellCheck    ( true )
 , mpUnzipDialog        ( 0 )
 , mRoomSize            ( 0.5 )
-, mLineSize            ( 1.0 )
+, mLineSize            ( 5.0 )
 , mShowInfo            ( true )
 , mServerGUI_Package_version( -1 )
 , mServerGUI_Package_name( "nothing" )
 , mAcceptServerGUI     ( true )
+, mFORCE_MXP_NEGOTIATION_OFF( false )
 {
 
     QString directoryLogFile = QDir::homePath()+"/.config/mudlet/profiles/";

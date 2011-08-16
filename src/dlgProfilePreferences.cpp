@@ -40,6 +40,7 @@ dlgProfilePreferences::dlgProfilePreferences( QWidget * pF, Host * pH )
     // init generated dialog
     setupUi(this);
 
+    mFORCE_MXP_NEGOTIATION_OFF->setChecked(mpHost->mFORCE_MXP_NEGOTIATION_OFF);
     mMapperUseAntiAlias->setChecked(mpHost->mMapperUseAntiAlias);
     mEnablePython->setChecked(mpHost->mPython);
     if (!mpHost->mPythonWorking)
@@ -404,7 +405,7 @@ dlgProfilePreferences::dlgProfilePreferences( QWidget * pF, Host * pH )
         mFORCE_GA_OFF->setChecked( pHost->mFORCE_GA_OFF );
         mAlertOnNewData->setChecked( pHost->mAlertOnNewData );
         mMXPMode->setCurrentIndex( pHost->mMXPMode );
-        encoding->setCurrentIndex( pHost->mEncoding );
+        //encoding->setCurrentIndex( pHost->mEncoding );
         mFORCE_SAVE_ON_EXIT->setChecked( pHost->mFORCE_SAVE_ON_EXIT );
         mEnableGMCP->setChecked( pHost->mEnableGMCP );
     }
@@ -1342,7 +1343,8 @@ void dlgProfilePreferences::slot_save_and_exit()
     pHost->mBorderRightWidth = rightBorderWidth->value();
     pHost->commandLineMinimumHeight = commandLineMinimumHeight->value();
     pHost->mMXPMode = mMXPMode->currentIndex();
-    pHost->mEncoding = encoding->currentIndex();
+    //pHost->mEncoding = encoding->currentIndex();
+    pHost->mFORCE_MXP_NEGOTIATION_OFF = mFORCE_MXP_NEGOTIATION_OFF->isChecked();
     mudlet::self()->mMainIconSize = MainIconSize->value();
     mudlet::self()->mTEFolderIconSize = TEFolderIconSize->value();
     pHost->mPython = mEnablePython->isChecked();
