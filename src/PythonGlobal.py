@@ -351,4 +351,63 @@ color_dict = {
         'thistle'               : (216, 191, 216)
 }
 
+# Functions added by KrimMalak.
+
+defaultbrowser="Unselected" #Placing here till I figure out how to make it a Mudlet variable a user can set.
+
+def deselect():
+    selectString("",1)
+    
+def replaceLine(what):
+    '''Does not use insertText like Lua version, but seems to work fine.'''
+    selectString(line, 1)
+    replace(what)
+
+def openURL(url):
+    """This can use some further expanding, but not up to adding stuff to the Settings menu yet.
+       Basically, on my version of Ubuntu I had to explicitly state the browser I wanted.  Would be nice to
+       be able what brower the user wanted to use.  This link lists browsers Python understands to look for: 
+       http://www.python.org/doc//current/library/webbrowser.html#module-webbrowser
+       Status: Functioning"""
+
+    global defaultbrowser
+    if defaultbrowser=="Unselected":
+        defaultbrowser='firefox'
+    browser=webbrowser.get(defaultbrowser)
+    browser.open_new_tab(url)
+
+def sendAll(commands):
+    """Commands need to be passed as a list or tuple.  Status: Complete"""
+    for x in commands:
+        send(x)
+
+
+def display(obj):
+    """Copying function of Lua's display.  Status: Complete-ish 
+       Just need to test it through like."""
+    pprint.pprint(obj,width=60)
+
+
+def cecho(text,consule='main'):
+    """Copying function of Lua's cecho.  Status: Functioning
+       Like to do: Add some Error Handling if needed
+                   Add a cancel tag, like <\color> to reset color
+                   IMPORTANT! Add consule support!                """
+    text=re.split("(<.*?>)",text)
+    for line in text:
+        if re.match("<(.*?)>",line):
+            match=re.match("<(.*?)>",line)
+            if ',' in match.group(1):
+                split_match=match.group(1).split(',')
+                if split_match[0] != '' and split_match[0] in color_dict:
+                    fg(split_match[0])
+                if split_match[1] != '' and split_match[1] in color_dict:
+                    bg(split_match[1])
+            elif match.group(1) in color_dict:
+                fg(match.group(1))
+        else:
+            stdout.write(line)
+    resetFormat()
+
+
 execfile('PythonLocal.py')
