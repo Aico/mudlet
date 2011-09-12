@@ -413,5 +413,29 @@ def cecho(text,consule='main'):
             stdout.write(line)
     resetFormat()
 
+def replaceWildcard(what, replacement):
+    selectCaptureGroup(what)
+    replace(replacement)
+    
+def RGB2Hex(red, green, blue):
+    _hex=hex(red)[2:]+hex(green)[2:]+hex(blue)[2:]
+    print _hex
+
+def showColors(wide=3):
+    pos=1
+    for k in color_dict.keys():
+        v=color_dict[k]
+        lum = (0.2126 * ((float(v[0])/255)**2.2)) + (0.7152 * ((float(v[1])/255)**2.2)) + (0.0722 * ((float(v[2])/255)**2.2))
+        if lum > 0.5:
+            fg="black"
+        else:
+            fg="white"
+        if pos==wide:
+            cecho("<"+fg+","+k+">"+k+" "*(23-len(k))+"<,black>  \n")
+            pos=1
+        else:
+            cecho("<"+fg+","+k+">"+k+" "*(23-len(k))+"<,black>  ")
+            pos=pos+1
+
 
 execfile('PythonLocal.py')
