@@ -2,6 +2,10 @@ import io
 import site
 import traceback
 from PythonQt.mudlet import *
+import re
+import pprint
+from sys import *
+import webbrowser
 
 mudlet = MudletObject(HOST_HASH)
 
