@@ -99,6 +99,7 @@ public slots:
   void raiseEvent( MudletObject* o, QVariantList args );
   void reconnect( MudletObject* o );
   void disconnect( MudletObject* o );
+  int sendGMCP( MudletObject* o, QString& themsg );
 };
 
 #endif  

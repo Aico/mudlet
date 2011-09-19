@@ -426,3 +426,19 @@ void MudletObjectWrapper::disconnect( MudletObject* o )
     o->mpHost->mTelnet.disconnect();
 }
 
+
+int MudletObjectWrapper::sendGMCP( MudletObject* o, QString& themsg )
+{
+    QString _h;
+    _h += TN_IAC;
+    _h += TN_SB;
+    _h += GMCP;
+    _h += themsg;
+    _h += TN_IAC;
+    _h += TN_SE;
+
+    std::string toSend = _h.toStdString();
+
+    o->mpHost->mTelnet.socketOutRaw( toSend );
+    return 0;
+}

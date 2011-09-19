@@ -437,5 +437,7 @@ def showColors(wide=3):
             cecho("<"+fg+","+k+">"+k+" "*(23-len(k))+"<,black>  ")
             pos=pos+1
 
+def sendGMCP(msg):
+    mudlet.sendGMCP(msg)
 
 execfile('PythonLocal.py')
