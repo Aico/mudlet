@@ -387,16 +387,10 @@ def sendAll(commands):
 
 
 def display(obj):
-    """Copying function of Lua's display.  Status: Complete-ish 
-       Just need to test it through like."""
     pprint.pprint(obj,width=60)
 
 
 def cecho(text,consule='main'):
-    """Copying function of Lua's cecho.  Status: Functioning
-       Like to do: Add some Error Handling if needed
-                   Add a cancel tag, like <\color> to reset color
-                   IMPORTANT! Add consule support!                """
     text=re.split("(<.*?>)",text)
     for line in text:
         if re.match("<(.*?)>",line):
@@ -404,13 +398,13 @@ def cecho(text,consule='main'):
             if ',' in match.group(1):
                 split_match=match.group(1).split(',')
                 if split_match[0] != '' and split_match[0] in color_dict:
-                    fg(split_match[0])
+                    fg(split_match[0],consule)
                 if split_match[1] != '' and split_match[1] in color_dict:
-                    bg(split_match[1])
+                    bg(split_match[1],consule)
             elif match.group(1) in color_dict:
-                fg(match.group(1))
+                fg(match.group(1),consule)
         else:
-            stdout.write(line)
+            echo(line,consule)
     resetFormat()
 
 def replaceWildcard(what, replacement):
@@ -439,5 +433,34 @@ def showColors(wide=3):
 
 def sendGMCP(msg):
     mudlet.sendGMCP(msg)
+
+def echo(txt, consule='main'):
+    mudlet.echo(txt, consule)
+
+def echoLink(txt, func, hint, consule='main', customFormat=False):
+    """Status: Incomplete. Tooltip prints wierd and need to figure a way to let
+       the C parts know to exectute func as a python script instead of Lua."""
+    mudlet.echoLink(txt, func, hint, consule, customFormat)
+
+def createBuffer(name):
+    mudlet.createBuffer(name)
+
+def appendBuffer(console='main'):
+    mudlet.appendBuffer(console)
+
+def getLineNumber():
+    return mudlet.getLineNumber()
+
+def copy(console='main'):
+    mudlet.copy(console)
+
+def paste(console='main'):
+    mudlet.paste(console)
+
+def cut():
+    mudlet.cut()
+
+def feedTriggers(txt):
+    mudlet.feedTriggers(txt)
 
 execfile('PythonLocal.py')
