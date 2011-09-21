@@ -99,6 +99,16 @@ public slots:
   void raiseEvent( MudletObject* o, QVariantList args );
   void reconnect( MudletObject* o );
   void disconnect( MudletObject* o );
+  int sendGMCP( MudletObject* o, QString& themsg );
+  int echo( MudletObject* o, QString& themsg, QString& console);
+  int echoLink( MudletObject* o, QString& themsg, QStringList& thefunc, QStringList& tooltip, QString& console, bool customFormat);
+  int createBuffer(MudletObject* o, QString& name);
+  int appendBuffer(MudletObject* o, QString& console);
+  int getLineNumber(MudletObject* o);
+  int copy(MudletObject* o, QString& console);
+  int cut(MudletObject* o);
+  int paste(MudletObject* o, QString& console);
+  int feedTriggers(MudletObject* o, QString& txt);
 };
 
 #endif  
