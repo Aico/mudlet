@@ -426,3 +426,115 @@ void MudletObjectWrapper::disconnect( MudletObject* o )
     o->mpHost->mTelnet.disconnect();
 }
 
+
+int MudletObjectWrapper::sendGMCP( MudletObject* o, QString& themsg )
+{
+    QString _h;
+    _h += TN_IAC;
+    _h += TN_SB;
+    _h += GMCP;
+    _h += themsg;
+    _h += TN_IAC;
+    _h += TN_SE;
+
+    std::string toSend = _h.toStdString();
+
+    o->mpHost->mTelnet.socketOutRaw( toSend );
+    return 0;
+}
+
+int MudletObjectWrapper::echo( MudletObject* o, QString& themsg, QString& console)
+{
+    if (console == "main")
+    {
+        o->mpHost->mpConsole->echo( themsg );
+    }
+    else
+    {
+        mudlet::self()->echoWindow( o->mpHost, console, themsg );
+    }
+    return 0;
+}
+
+int MudletObjectWrapper::echoLink( MudletObject* o, QString& themsg, QStringList& thefunc, QStringList& tooltip, QString& console, bool customFormat)
+{
+    if (console == "main")
+    {
+        o->mpHost->mpConsole->echoLink( themsg, thefunc, tooltip, customFormat );
+    }
+    else
+    {
+        mudlet::self()->echoLink( o->mpHost, console, themsg, thefunc, tooltip, customFormat  );
+    }
+    return 0;
+}
+
+int MudletObjectWrapper::createBuffer(MudletObject* o, QString& name)
+{
+    mudlet::self()->createBuffer( o->mpHost, name );
+    return 0;
+}
+
+int MudletObjectWrapper::appendBuffer(MudletObject* o, QString& console)
+{
+    {
+        if (console == "main")
+        {
+            o->mpHost->mpConsole->appendBuffer();
+        }
+        else
+        {
+            mudlet::self()->appendBuffer( o->mpHost, console );
+        }
+        return 0;
+    }
+}
+
+int MudletObjectWrapper::getLineNumber(MudletObject* o)
+{
+    return o->mpHost->mpConsole->getLineNumber();
+}
+
+int MudletObjectWrapper::copy(MudletObject* o, QString& console)
+{
+    {
+        if (console == "main")
+        {
+            o->mpHost->mpConsole->copy();;
+        }
+        else
+        {
+            mudlet::self()->copy( o->mpHost, console );
+        }
+        return 0;
+    }
+}
+
+int MudletObjectWrapper::cut(MudletObject* o)
+{
+    o->mpHost->mpConsole->getLineNumber();
+    return 0;
+}
+
+
+int MudletObjectWrapper::paste(MudletObject* o, QString& console)
+{
+    {
+        if (console == "main")
+        {
+            o->mpHost->mpConsole->paste();;
+        }
+        else
+        {
+            mudlet::self()->pasteWindow( o->mpHost, console );
+        }
+        return 0;
+    }
+}
+
+int MudletObjectWrapper::feedTriggers(MudletObject* o, QString& txt)
+{
+    std::string toShow = txt.toStdString();
+    o->mpHost->mpConsole->printOnDisplay( toShow );
+    return 0;
+}

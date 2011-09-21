@@ -2,6 +2,10 @@ import io
 import site
 import traceback
 from PythonQt.mudlet import *
+import re
+import pprint
+from sys import *
+import webbrowser
 
 mudlet = MudletObject(HOST_HASH)
 
@@ -350,5 +354,113 @@ color_dict = {
         'MediumPurple'          : (147, 112, 219),
         'thistle'               : (216, 191, 216)
 }
+
+# Functions added by KrimMalak.
+
+defaultbrowser="Unselected" #Placing here till I figure out how to make it a Mudlet variable a user can set.
+
+def deselect():
+    selectString("",1)
+    
+def replaceLine(what):
+    '''Does not use insertText like Lua version, but seems to work fine.'''
+    selectString(line, 1)
+    replace(what)
+
+def openURL(url):
+    """This can use some further expanding, but not up to adding stuff to the Settings menu yet.
+       Basically, on my version of Ubuntu I had to explicitly state the browser I wanted.  Would be nice to
+       be able what brower the user wanted to use.  This link lists browsers Python understands to look for: 
+       http://www.python.org/doc//current/library/webbrowser.html#module-webbrowser
+       Status: Functioning"""
+
+    global defaultbrowser
+    if defaultbrowser=="Unselected":
+        defaultbrowser='firefox'
+    browser=webbrowser.get(defaultbrowser)
+    browser.open_new_tab(url)
+
+def sendAll(commands):
+    """Commands need to be passed as a list or tuple.  Status: Complete"""
+    for x in commands:
+        send(x)
+
+
+def display(obj):
+    pprint.pprint(obj,width=60)
+
+
+def cecho(text,consule='main'):
+    text=re.split("(<.*?>)",text)
+    for line in text:
+        if re.match("<(.*?)>",line):
+            match=re.match("<(.*?)>",line)
+            if ',' in match.group(1):
+                split_match=match.group(1).split(',')
+                if split_match[0] != '' and split_match[0] in color_dict:
+                    fg(split_match[0],consule)
+                if split_match[1] != '' and split_match[1] in color_dict:
+                    bg(split_match[1],consule)
+            elif match.group(1) in color_dict:
+                fg(match.group(1),consule)
+        else:
+            echo(line,consule)
+    resetFormat()
+
+def replaceWildcard(what, replacement):
+    selectCaptureGroup(what)
+    replace(replacement)
+    
+def RGB2Hex(red, green, blue):
+    _hex=hex(red)[2:]+hex(green)[2:]+hex(blue)[2:]
+    print _hex
+
+def showColors(wide=3):
+    pos=1
+    for k in color_dict.keys():
+        v=color_dict[k]
+        lum = (0.2126 * ((float(v[0])/255)**2.2)) + (0.7152 * ((float(v[1])/255)**2.2)) + (0.0722 * ((float(v[2])/255)**2.2))
+        if lum > 0.5:
+            fg="black"
+        else:
+            fg="white"
+        if pos==wide:
+            cecho("<"+fg+","+k+">"+k+" "*(23-len(k))+"<,black>  \n")
+            pos=1
+        else:
+            cecho("<"+fg+","+k+">"+k+" "*(23-len(k))+"<,black>  ")
+            pos=pos+1
+
+def sendGMCP(msg):
+    mudlet.sendGMCP(msg)
+
+def echo(txt, consule='main'):
+    mudlet.echo(txt, consule)
+
+def echoLink(txt, func, hint, consule='main', customFormat=False):
+    """Status: Incomplete. Tooltip prints wierd and need to figure a way to let
+       the C parts know to exectute func as a python script instead of Lua."""
+    mudlet.echoLink(txt, func, hint, consule, customFormat)
+
+def createBuffer(name):
+    mudlet.createBuffer(name)
+
+def appendBuffer(console='main'):
+    mudlet.appendBuffer(console)
+
+def getLineNumber():
+    return mudlet.getLineNumber()
+
+def copy(console='main'):
+    mudlet.copy(console)
+
+def paste(console='main'):
+    mudlet.paste(console)
+
+def cut():
+    mudlet.cut()
+
+def feedTriggers(txt):
+    mudlet.feedTriggers(txt)
 
 execfile('PythonLocal.py')
