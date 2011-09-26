@@ -25,6 +25,7 @@
 #include "mudlet.h"
 #include <QString>
 #include <QStringList>
+#include <QList>
 #include <QDateTime>
 #include <QHash>
 #include <string>
@@ -456,15 +457,60 @@ int MudletObjectWrapper::echo( MudletObject* o, QString& themsg, QString& consol
     return 0;
 }
 
-int MudletObjectWrapper::echoLink( MudletObject* o, QString& themsg, QStringList& thefunc, QStringList& tooltip, QString& console, bool customFormat)
+int MudletObjectWrapper::echoLink( MudletObject* o, QString& themsg, QString& thefunc, QString& tooltip, QString& console, bool customFormat)
 {
+    QStringList func;
+    QStringList tip;
+    func <<  thefunc;
+    tip << tooltip;
+    func.prepend("PYTHON");
+
     if (console == "main")
     {
-        o->mpHost->mpConsole->echoLink( themsg, thefunc, tooltip, customFormat );
+        o->mpHost->mpConsole->echoLink( themsg, func, tip, customFormat );
     }
     else
     {
-        mudlet::self()->echoLink( o->mpHost, console, themsg, thefunc, tooltip, customFormat  );
+        mudlet::self()->echoLink( o->mpHost, console, themsg, func, tip, customFormat  );
+    }
+    return 0;
+}
+
+int MudletObjectWrapper::insertLink(MudletObject* o, QString& themsg, QString& thefunc, QString& tooltip, QString& console)
+{
+    QStringList func;
+    QStringList tip;
+    func <<  thefunc;
+    tip << tooltip;
+    func.prepend("PYTHON");
+
+    if (console == "main")
+    {
+        o->mpHost->mpConsole->insertLink( themsg, func, tip);
+    }
+    else
+    {
+        mudlet::self()->insertLink( o->mpHost, console, themsg, func, tip  );
+    }
+    return 0;
+}
+
+int MudletObjectWrapper::setLink( MudletObject* o,QString& thefunc, QString& tooltip, QString& console)
+{
+    QStringList func;
+    QStringList tip;
+    func <<  thefunc;
+    tip << tooltip;
+    func.prepend("PYTHON");
+    QString linkTxt="";
+
+    if (console == "main")
+    {
+        o->mpHost->mpConsole->setLink( linkTxt, func, tip );
+    }
+    else
+    {
+        mudlet::self()->setLink( o->mpHost, console, linkTxt, func, tip  );
     }
     return 0;
 }
@@ -512,7 +558,7 @@ int MudletObjectWrapper::copy(MudletObject* o, QString& console)
 
 int MudletObjectWrapper::cut(MudletObject* o)
 {
-    o->mpHost->mpConsole->getLineNumber();
+    o->mpHost->mpConsole->cut();
     return 0;
 }
 
@@ -537,4 +583,291 @@ int MudletObjectWrapper::feedTriggers(MudletObject* o, QString& txt)
     std::string toShow = txt.toStdString();
     o->mpHost->mpConsole->printOnDisplay( toShow );
     return 0;
+}
+
+int MudletObjectWrapper::setBold(MudletObject* o, QString& console, bool active)
+{
+    {
+        if (console == "main")
+        {
+            o->mpHost->mpConsole->setBold(active);
+        }
+        else
+        {
+            mudlet::self()->setBold( o->mpHost, console, active );
+        }
+        return 0;
+    }
+}
+
+int MudletObjectWrapper::setItalics(MudletObject* o, QString& console, bool active)
+{
+    {
+        if (console == "main")
+        {
+            o->mpHost->mpConsole->setItalics(active);
+        }
+        else
+        {
+            mudlet::self()->setItalics( o->mpHost, console, active );
+        }
+        return 0;
+    }
+}
+
+int MudletObjectWrapper::setUnderline(MudletObject* o, QString& console, bool active)
+{
+    {
+        if (console == "main")
+        {
+            o->mpHost->mpConsole->setUnderline(active);
+        }
+        else
+        {
+            mudlet::self()->setUnderline( o->mpHost, console, active );
+        }
+        return 0;
+    }
+}
+
+int MudletObjectWrapper::echoPopup(MudletObject* o, QString& themsg, QStringList& func, QStringList& tooltip, QString& console, bool customFormat)
+{
+    func.prepend("PYTHON");
+    tooltip.prepend("");
+    if (console == "main")
+    {
+        o->mpHost->mpConsole->echoLink( themsg, func, tooltip, customFormat );
+    }
+    else
+    {
+        mudlet::self()->echoLink( o->mpHost, console, themsg, func, tooltip, customFormat  );
+    }
+    return 0;
+}
+
+int MudletObjectWrapper::setPopup(MudletObject* o, QStringList& func, QStringList& tip, QString& console)
+{
+    QString linkTxt="";
+    func.prepend("PYTHON");
+    tip.prepend("");
+
+    if (console == "main")
+    {
+        o->mpHost->mpConsole->setLink( linkTxt, func, tip );
+    }
+    else
+    {
+        mudlet::self()->setLink( o->mpHost, console, linkTxt, func, tip  );
+    }
+    return 0;
+}
+
+int MudletObjectWrapper::insertPopup(MudletObject* o, QString& themsg, QStringList& func, QStringList& tooltip, QString& console)
+{
+    func.prepend("PYTHON");
+    tooltip.prepend("");
+
+    if (console == "main")
+    {
+        o->mpHost->mpConsole->insertLink( themsg, func, tooltip);
+    }
+    else
+    {
+        mudlet::self()->insertLink( o->mpHost, console, themsg, func, tooltip  );
+    }
+    return 0;
+}
+
+int MudletObjectWrapper::moveCursor(MudletObject* o, int xpos, int ypos, QString& console)
+{
+    if (console == "main")
+    {
+        o->mpHost->mpConsole->moveCursor( xpos, ypos);
+    }
+    else
+    {
+        mudlet::self()->moveCursor( o->mpHost, console, xpos, ypos  );
+    }
+    return 1;
+}
+
+int MudletObjectWrapper::moveCursorEnd(MudletObject* o, QString& console)
+{
+    if (console == "main")
+    {
+        o->mpHost->mpConsole->moveCursorEnd();
+    }
+    else
+    {
+        mudlet::self()->moveCursorEnd( o->mpHost, console );
+    }
+    return 0;
+}
+
+int MudletObjectWrapper::pasteWindow(MudletObject* o, QString& console)
+{
+    mudlet::self()->pasteWindow( o->mpHost, console );
+    return 0;
+}
+
+int MudletObjectWrapper::selectCurrentLine(MudletObject* o, QString& console)
+{
+    std::string _console = console.toStdString();
+    o->mpHost->mpConsole->selectCurrentLine( _console);
+    return 0;
+}
+
+int MudletObjectWrapper::wrapLine(MudletObject* o, int linenum, QString& console)
+{
+    std::string _console = console.toStdString();
+    o->mpHost->mpConsole->luaWrapLine(_console, linenum);
+    return 0;
+}
+
+QList<int> MudletObjectWrapper::getFgColor(MudletObject* o, QString& console)
+{
+    std::string _console = console.toStdString();
+    std::list<int> result;
+    result = o->mpHost->mpConsole->getFgColor( _console );
+    QList<int> _result = QList<int>::fromStdList(result);
+    return _result;
+}
+
+QList<int> MudletObjectWrapper::getBgColor(MudletObject* o, QString& console)
+{
+    std::string _console = console.toStdString();
+    std::list<int> result;
+    result = o->mpHost->mpConsole->getBgColor( _console );
+    QList<int> _result = QList<int>::fromStdList(result);
+    return _result;
+}
+
+QString MudletObjectWrapper::getCurrentLine(MudletObject* o, QString& console)
+{
+    std::string _console = console.toStdString();
+    QString line = o->mpHost->mpConsole->getCurrentLine( _console );
+    return line;
+}
+
+int MudletObjectWrapper::insertHTML(MudletObject* o, QString& themsg )
+{
+    o->mpHost->mpConsole->insertHTML( themsg);
+    return 0;
+}
+
+int MudletObjectWrapper::insertText(MudletObject* o, QString& themsg, QString& console )
+{
+    if (console == "main")
+    {
+        o->mpHost->mpConsole->insertText( themsg);
+    }
+    else
+    {
+        mudlet::self()->insertText( o->mpHost, console, themsg );
+    }
+    return 0;
+}
+
+bool MudletObjectWrapper::isAnsiFgColor(MudletObject* o, int ansiFg, QString& console)
+{
+    std::string _console = console.toStdString();
+    std::list<int> result;
+    result = o->mpHost->mpConsole->getFgColor( _console );
+    typedef std::list<int>::iterator IT;
+    IT it=result.begin();
+    if( result.size() < 3 ) return false;
+    if( ansiFg < 0 ) return false;
+    if( ansiFg > 16 ) return false;
+
+
+    QColor c;
+    switch( ansiFg )
+    {
+        case 0: c = o->mpHost->mFgColor;  break;
+        case 1: c = o->mpHost->mLightBlack; break;
+        case 2: c = o->mpHost->mBlack; break;
+        case 3: c = o->mpHost->mLightRed; break;
+        case 4: c = o->mpHost->mRed; break;
+        case 5: c = o->mpHost->mLightGreen; break;
+        case 6: c = o->mpHost->mGreen; break;
+        case 7: c = o->mpHost->mLightYellow; break;
+        case 8: c = o->mpHost->mYellow; break;
+        case 9: c = o->mpHost->mLightBlue; break;
+        case 10: c = o->mpHost->mBlue; break;
+        case 11: c = o->mpHost->mLightMagenta; break;
+        case 12: c = o->mpHost->mMagenta; break;
+        case 13: c = o->mpHost->mLightCyan; break;
+        case 14: c = o->mpHost->mCyan; break;
+        case 15: c = o->mpHost->mLightWhite; break;
+        case 16: c = o->mpHost->mWhite; break;
+    }
+
+    int val = *it;
+    if( val == c.red() )
+    {
+        it++;
+        val = *it;
+        if( val == c.green() )
+        {
+            it++;
+            val = *it;
+            if( val == c.blue() )
+            {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+bool MudletObjectWrapper::isAnsiBgColor(MudletObject* o, int ansiBg, QString& console)
+{
+    std::string _console = console.toStdString();
+    std::list<int> result;
+    result = o->mpHost->mpConsole->getBgColor( _console );
+    typedef std::list<int>::iterator IT;
+    IT it=result.begin();
+    if( result.size() < 3 ) return false;
+    if( ansiBg < 0 ) return false;
+    if( ansiBg > 16 ) return false;
+
+
+    QColor c;
+    switch( ansiBg )
+    {
+        case 0: c = o->mpHost->mFgColor;  break;
+        case 1: c = o->mpHost->mLightBlack; break;
+        case 2: c = o->mpHost->mBlack; break;
+        case 3: c = o->mpHost->mLightRed; break;
+        case 4: c = o->mpHost->mRed; break;
+        case 5: c = o->mpHost->mLightGreen; break;
+        case 6: c = o->mpHost->mGreen; break;
+        case 7: c = o->mpHost->mLightYellow; break;
+        case 8: c = o->mpHost->mYellow; break;
+        case 9: c = o->mpHost->mLightBlue; break;
+        case 10: c = o->mpHost->mBlue; break;
+        case 11: c = o->mpHost->mLightMagenta; break;
+        case 12: c = o->mpHost->mMagenta; break;
+        case 13: c = o->mpHost->mLightCyan; break;
+        case 14: c = o->mpHost->mCyan; break;
+        case 15: c = o->mpHost->mLightWhite; break;
+        case 16: c = o->mpHost->mWhite; break;
+    }
+
+    int val = *it;
+    if( val == c.red() )
+    {
+        it++;
+        val = *it;
+        if( val == c.green() )
+        {
+            it++;
+            val = *it;
+            if( val == c.blue() )
+            {
+                return true;
+            }
+        }
+    }
+    return false;
 }

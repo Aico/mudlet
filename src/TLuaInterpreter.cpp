@@ -3478,6 +3478,7 @@ int TLuaInterpreter::setLink( lua_State * L )
     QString _linkText = "";//QString(linkText.c_str());
     QStringList _linkFunction;
     _linkFunction <<  QString(linkFunction.c_str());
+    _linkFunction.prepend("LUA");
     QStringList _linkHint;
     _linkHint << QString(linkHint.c_str());
     if( windowName.size() > 0 )
@@ -3582,6 +3583,8 @@ int TLuaInterpreter::setPopup( lua_State *L )
         return 1;
     }
 
+    _commandList.prepend("LUA");
+    _hintList.prepend("");
     if( a1 == "" )
     {
         pHost->mpConsole->setLink( txt, _commandList, _hintList );
@@ -6276,12 +6279,14 @@ int TLuaInterpreter::insertLink( lua_State *L )
     if( n == 3 )
     {
         command << a2.c_str();
+        command.prepend("LUA");
         hint << a3.c_str();
         pHost->mpConsole->insertLink( QString(a1.c_str()), command, hint );
     }
     else
     {
         command << a3.c_str();
+        command.prepend("LUA");
         hint << a4.c_str();
         mudlet::self()->insertLink( pHost, _name, QString( a2.c_str() ), command, hint );
     }
@@ -6384,6 +6389,8 @@ int TLuaInterpreter::insertPopup( lua_State *L )
         return 1;
     }
 
+    _commandList.prepend("LUA");
+    _hintList.prepend("");
     if( a1 == "" )
     {
         pHost->mpConsole->insertLink( txt, _commandList, _hintList, customFormat );
@@ -6598,6 +6605,8 @@ int TLuaInterpreter::echoPopup( lua_State *L )
         return 1;
     }
 
+    _commandList.prepend("LUA");
+    _hintList.prepend("");
     if( a1 == "" )
     {
         pHost->mpConsole->echoLink( txt, _commandList, _hintList, customFormat );
@@ -6700,6 +6709,7 @@ int TLuaInterpreter::echoLink( lua_State *L )
     {
         txt = a1.c_str();
         func << a2.c_str();
+        func.prepend("LUA");
         hint << a3.c_str();
         pHost->mpConsole->echoLink( txt, func, hint, a5 );
     }
@@ -6707,6 +6717,7 @@ int TLuaInterpreter::echoLink( lua_State *L )
     {
         txt = a2.c_str();
         func << a3.c_str();
+        func.prepend("LUA");
         hint << a4.c_str();
         name = a1.c_str();
         mudlet::self()->echoLink( pHost, name, txt, func, hint, a5 );

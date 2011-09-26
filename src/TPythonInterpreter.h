@@ -101,7 +101,9 @@ public slots:
   void disconnect( MudletObject* o );
   int sendGMCP( MudletObject* o, QString& themsg );
   int echo( MudletObject* o, QString& themsg, QString& console);
-  int echoLink( MudletObject* o, QString& themsg, QStringList& thefunc, QStringList& tooltip, QString& console, bool customFormat);
+  int echoLink( MudletObject* o, QString& themsg, QString& thefunc, QString& tooltip, QString& console, bool customFormat);
+  int insertLink( MudletObject* o, QString& themsg, QString& thefunc, QString& tooltip, QString& console);
+  int setLink( MudletObject* o, QString& thefunc, QString& tooltip, QString& console);
   int createBuffer(MudletObject* o, QString& name);
   int appendBuffer(MudletObject* o, QString& console);
   int getLineNumber(MudletObject* o);
@@ -109,6 +111,24 @@ public slots:
   int cut(MudletObject* o);
   int paste(MudletObject* o, QString& console);
   int feedTriggers(MudletObject* o, QString& txt);
+  int setBold(MudletObject* o, QString& console, bool active);
+  int setItalics(MudletObject* o, QString& console, bool active);
+  int setUnderline(MudletObject* o, QString& console, bool active);
+  int echoPopup(MudletObject* o, QString& themsg, QStringList& func, QStringList& tooltip, QString& console, bool customFormat);
+  int setPopup(MudletObject* o, QStringList& func, QStringList& tip, QString& console);
+  int insertPopup(MudletObject* o, QString& themsg, QStringList& func, QStringList& tooltip, QString& console);
+  int moveCursor(MudletObject* o, int xpos, int ypos, QString& console);
+  int moveCursorEnd(MudletObject* o, QString& console);
+  int pasteWindow(MudletObject* o, QString& console);
+  int selectCurrentLine(MudletObject* o, QString& console);
+  int wrapLine(MudletObject* o, int linenum, QString& console);
+  QList<int> getFgColor(MudletObject* o, QString& console);
+  QList<int> getBgColor(MudletObject* o, QString& console);
+  QString getCurrentLine(MudletObject* o, QString& console);
+  int insertHTML(MudletObject* o, QString& themsg );
+  int insertText(MudletObject* o, QString& themsg, QString& console );
+  bool isAnsiFgColor(MudletObject* o, int ansiFg, QString& console);
+  bool isAnsiBgColor(MudletObject* o, int ansiFg, QString& console);
 };
 
 #endif  

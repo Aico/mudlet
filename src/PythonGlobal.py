@@ -367,7 +367,7 @@ def replaceLine(what):
     selectString(line, 1)
     replace(what)
 
-def openURL(url):
+def openUrl(url):
     """This can use some further expanding, but not up to adding stuff to the Settings menu yet.
        Basically, on my version of Ubuntu I had to explicitly state the browser I wanted.  Would be nice to
        be able what brower the user wanted to use.  This link lists browsers Python understands to look for: 
@@ -438,9 +438,22 @@ def echo(txt, consule='main'):
     mudlet.echo(txt, consule)
 
 def echoLink(txt, func, hint, consule='main', customFormat=False):
-    """Status: Incomplete. Tooltip prints wierd and need to figure a way to let
-       the C parts know to exectute func as a python script instead of Lua."""
     mudlet.echoLink(txt, func, hint, consule, customFormat)
+
+def insertLink(txt, func, hint, consule='main', customFormat=False):
+    mudlet.insertLink(txt, func, hint, consule, customFormat)
+
+def setLink(func, hint, consule='main'):
+    mudlet.setLink(func, hint, consule)
+
+def echoPopup(txt, func, hint, consule='main', customFormat=False):
+    mudlet.echoPopup(txt, func, hint, consule, customFormat)
+
+def setPopup(func,hint,consule='main'):
+    mudlet.setPopup(func,hint,consule)
+
+def insertPopup(txt, func, hint, consule='main'):
+    mudlet.insertPopup(txt, func, hint, consule)
 
 def createBuffer(name):
     mudlet.createBuffer(name)
@@ -462,5 +475,62 @@ def cut():
 
 def feedTriggers(txt):
     mudlet.feedTriggers(txt)
+
+def setBold(doBold,consule='main'):
+    """Consule=The consule you want to set, doBold=True/False for setting
+       bold on or off."""
+    mudlet.setBold(consule,active)
+
+def setUnderline(doUnderline,consule='main'):
+    """Consule=The consule you want to set, doUnderline=True/False for setting
+       Underline on or off."""
+    mudlet.setUnderline(consule,active)
+
+def setItalics(doItalics,consule='main'):
+    """Consule=The consule you want to set, doItalics=True/False for setting
+       Italics on or off."""
+    mudlet.setItalics(consule,active)
+
+def moveCursor(xpos, ypos, consule='main'):
+    """Need insertText to test fuctionality."""
+    mudlet.moveCursor(xpos,ypos,consule)
+
+def moveCursorEnd(consule='main'):
+    mudlet.moveCursorEnd(consule)
+
+def pasteWindow(consule='main'):
+    mudlet.pasteWindow(consule)
+
+def selectCurrentLine(consule='main'):
+    mudlet.selectCurrentLine(consule)
+
+def wrapLine(linenum, consule='main'):
+    mudlet.wrapLine(linenum, consule)
+
+def getFgColor(consule='main'):
+    return mudlet.getFgColor(consule)
+
+def getBgColor(consule='main'):
+    return mudlet.getBgColor(consule)
+
+def insertHTML(txt):
+    mudlet.insertHTML(txt)
+
+def insertText(txt,consule='main'):
+    mudlet.insertText(txt, consule)
+
+def isAnsiFgColor(color, consule='main'):
+    return mudlet.isAnsiFgColor(color, consule)
+
+def isAnsiBgColor(color, consule='main'):
+    return mudlet.isAnsiBgColor(color, consule)
+    
+def getRGB(color):
+    code = color_dict[color.strip()]
+    return code
+
+def getCurrentLine(consule='main'):
+    return mudlet.getCurrentLine(consule)
+    
 
 execfile('PythonLocal.py')
