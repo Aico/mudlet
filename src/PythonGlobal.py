@@ -409,28 +409,6 @@ def cecho(text,consule='main',insert=False):
 	    else: 
 		insertText(line,consule)
     resetFormat()
-def decho(text,consule='main',insert=False):
-    text=re.split("(<.*?>)",text)
-    for line in text:
-        if re.match("<(.*?)>",line):
-            match=re.match("<(.*?)>",line)
-            if ':' in match.group(1):
-                split_match=match.group(1).split(':')
-                if split_match[0] != '':
-                    codes=split_match[0].split(',')
-                    setFgColor(int(codes[0]), int(codes[1]),int(codes[2]),consule)
-                if split_match[1] != '':
-                    codes=split_match[1].split(',')
-                    setBgColor(int(codes[0]), int(codes[1]),int(codes[2]),consule)
-            else:
-                codes=match.group(1).split(',')
-                setFgColor(int(codes[0]), int(codes[1]),int(codes[2]),consule)
-        else:
-            if insert==False: 
-                echo(line,consule) 
-            else: 
-                insertText(line,consule)
-    resetFormat()
 
 def decho(text,consule='main',insert=False):
     text=re.split("(<.*?>)",text)
@@ -627,7 +605,6 @@ def getLastLineNumber(console='main'):
 def getLineCount(console='main'):
     return mudlet.getLineCount(console)
 
-#Need two remaining echos
 def prefix(what, func="None", fg="", bg="", console='main'):
     moveCursor(0,getLineNumber(), console)
     if func=="None":
