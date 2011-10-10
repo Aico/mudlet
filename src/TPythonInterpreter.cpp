@@ -30,6 +30,8 @@
 #include <QHash>
 #include <string>
 #include <list>
+#include <QDir>
+
 
 QHash<QString, Host *> TPythonInterpreter::pythonHostMap;
 
@@ -444,6 +446,46 @@ int MudletObjectWrapper::sendGMCP( MudletObject* o, QString& themsg )
     return 0;
 }
 
+int MudletObjectWrapper::sendATCP( MudletObject* o, QString& themsg )
+{
+    QString _h;
+    _h += TN_IAC;
+    _h += TN_SB;
+    _h += 200;
+    _h += themsg;
+    _h += TN_IAC;
+    _h += TN_SE;
+
+    std::string toSend = _h.toStdString();
+
+    o->mpHost->mTelnet.socketOutRaw( toSend );
+    return 0;
+}
+
+int MudletObjectWrapper::sendTelnetChannel102( MudletObject* o, QString& themsg )
+{
+    QString _h;
+    _h += TN_IAC;
+    _h += TN_SB;
+    _h += 102;
+    _h += themsg;
+    _h += TN_IAC;
+    _h += TN_SE;
+
+    std::string toSend = _h.toStdString();
+
+    o->mpHost->mTelnet.socketOutRaw( toSend );
+    return 0;
+}
+
+#include "dlgIRC.h"
+int MudletObjectWrapper::sendIrc( MudletObject* o, QString& channel, QString& message)
+{
+    if( ! mudlet::self()->mpIRC ) return 0;
+    mudlet::self()->mpIRC->session->cmdMessage( channel, message );
+    return 0;
+}
+
 int MudletObjectWrapper::echo( MudletObject* o, QString& themsg, QString& console)
 {
     if (console == "main")
@@ -561,7 +603,6 @@ int MudletObjectWrapper::cut(MudletObject* o)
     o->mpHost->mpConsole->cut();
     return 0;
 }
-
 
 int MudletObjectWrapper::paste(MudletObject* o, QString& console)
 {
@@ -870,4 +911,685 @@ bool MudletObjectWrapper::isAnsiBgColor(MudletObject* o, int ansiBg, QString& co
         }
     }
     return false;
+}
+
+int MudletObjectWrapper::appendCmdLine(MudletObject* o, QString& appendtxt)
+{
+    QString curText = o->mpHost->mpConsole->mpCommandLine->toPlainText();
+    o->mpHost->mpConsole->mpCommandLine->setPlainText( curText + appendtxt );
+    QTextCursor cur = o->mpHost->mpConsole->mpCommandLine->textCursor();
+    cur.clearSelection();
+    cur.movePosition(QTextCursor::EndOfLine);
+    o->mpHost->mpConsole->mpCommandLine->setTextCursor(cur);
+    return 0;
+}
+
+int MudletObjectWrapper::denyCurrentSend(MudletObject*o)
+{
+    o->mpHost->mAllowToSendCommand = false;
+    return 0;
+}
+
+int MudletObjectWrapper::getLastLineNumber(MudletObject*o, QString& console)
+{
+    int number;
+    if( console == "main" )
+        number = o->mpHost->mpConsole->getLastLineNumber();
+    else
+        number = mudlet::self()->getLastLineNumber( o->mpHost, console );
+    return number;
+}
+
+int MudletObjectWrapper::getLineCount(MudletObject*o, QString& console)
+{
+    if (console == "main")
+    {
+        int lineNumber = o->mpHost->mpConsole->getLineCount();
+        return lineNumber;
+    }
+    else
+    {
+        int lineNumber=mudlet::self()->getLastLineNumber( o->mpHost, console ) + 1;
+        return lineNumber;
+    }
+}
+\
+QStringList MudletObjectWrapper::getLines(MudletObject*o, int From, int To)
+{
+    QStringList strList = o->mpHost->mpConsole->getLines( From, To );
+    return strList;
+}
+
+QString MudletObjectWrapper::getTimeStamp(MudletObject*o, int line, QString& console)
+{
+    if( console == "main" )
+    {
+        if( line > 0 && line < o->mpHost->mpConsole->buffer.timeBuffer.size() )
+        {
+            return o->mpHost->mpConsole->buffer.timeBuffer.at(line).toLatin1().data() ;
+        }
+        else
+        {
+            return "getTimestamp: invalid line number";
+        }
+    }
+    else
+    {
+        QMap<QString, TConsole *> & dockWindowConsoleMap = mudlet::self()->mHostConsoleMap[o->mpHost];
+        if( dockWindowConsoleMap.contains( console ) )
+        {
+            TConsole * pC = dockWindowConsoleMap[console];
+            if( line > 0 && line < pC->buffer.timeBuffer.size() )
+            {
+                return pC->buffer.timeBuffer.at(line).toLatin1().data();
+            }
+            else
+            {
+                QString Error ="getTimestamp: invalid line number";
+                return Error;
+            }
+         }
+    }
+
+}
+
+bool MudletObjectWrapper::isPrompt(MudletObject*o)
+{
+    int userCursorY = o->mpHost->mpConsole->getLineNumber();
+    if( userCursorY < o->mpHost->mpConsole->buffer.promptBuffer.size() && userCursorY >= 0 )
+    {
+        return o->mpHost->mpConsole->buffer.promptBuffer.at( userCursorY );
+    }
+    else
+    {
+        if(o->mpHost->mpConsole->mTriggerEngineMode && o->mpHost->mpConsole->mIsPromptLine )
+            return true;
+        else
+            return false;
+    }
+}
+
+int MudletObjectWrapper::startLogging(MudletObject*o, bool logOn)
+{
+    o->mpHost->mpConsole->mLogToLogFile = ! logOn;
+    o->mpHost->mpConsole->slot_toggleLogging();
+    return 0;
+}
+
+QStringList MudletObjectWrapper::getTime(MudletObject*o, bool return_string, QString& fmt)
+{
+    QStringList tm;
+    QDateTime time = QDateTime::currentDateTime();
+
+    if( return_string )
+    {
+        tm.append( time.toString( fmt ) );
+        return tm;
+    }
+    else
+    {
+        QDate dt = time.date();
+        QTime tm = time.time();
+        QStringList table_return;
+        table_return.append(tm.toString("hh"));
+        table_return.append(tm.toString("mm"));
+        table_return.append(tm.toString("ss"));
+        table_return.append(tm.toString("zzz"));
+        table_return.append(dt.toString("yyyy"));
+        table_return.append(dt.toString("MM"));
+        table_return.append(dt.toString("dd"));
+        return table_return;
+    }
+}
+
+bool MudletObjectWrapper::isActive(MudletObject*o, QString& obj, QString& type)
+{
+    int cnt = 0;
+    type = type.toLower();
+
+    if( type == "timer")
+    {
+        QMap<QString, TTimer *>::const_iterator it1 = o->mpHost->getTimerUnit()->mLookupTable.find( obj );
+        while( it1 != o->mpHost->getTimerUnit()->mLookupTable.end() && it1.key() == obj )
+        {
+            if( it1.value()->isActive() )
+            {
+                cnt++;
+            }
+            it1++;
+        }
+    }
+    else if( type == "trigger")
+    {
+        QMap<QString, TTrigger *>::const_iterator it1 = o->mpHost->getTriggerUnit()->mLookupTable.find( obj );
+        while( it1 != o->mpHost->getTriggerUnit()->mLookupTable.end() && it1.key() == obj )
+        {
+            if( it1.value()->isActive() )
+            {
+                cnt++;
+            }
+            it1++;
+        }
+    }
+    else if( type == "alias")
+    {
+        QMap<QString, TAlias *>::const_iterator it1 = o->mpHost->getAliasUnit()->mLookupTable.find( obj );
+        while( it1 != o->mpHost->getAliasUnit()->mLookupTable.end() && it1.key() == obj )
+        {
+            if( it1.value()->isActive() )
+            {
+                cnt++;
+            }
+            it1++;
+        }
+    }
+    if( cnt == 0)
+    {
+        return false;
+    }
+    else
+    {
+        return true;
+    }
+}
+
+bool MudletObjectWrapper::killAlias(MudletObject*o, QString& obj)
+{
+    return o->mpHost->getAliasUnit()->killAlias( obj );
+}
+
+bool MudletObjectWrapper::killTrigger(MudletObject*o, QString& obj)
+{
+    return o->mpHost->killTrigger( obj );
+}
+
+bool MudletObjectWrapper::killTimer(MudletObject*o, QString& obj)
+{
+    return o->mpHost->killTimer( obj );
+}
+
+int MudletObjectWrapper::exists(MudletObject*o, QString& obj, QString& type)
+{
+    int cnt = 0;
+    type = type.toLower();
+    if( type == "timer")
+    {
+        QMap<QString, TTimer *>::const_iterator it1 = o->mpHost->getTimerUnit()->mLookupTable.find( obj );
+        while( it1 != o->mpHost->getTimerUnit()->mLookupTable.end() && it1.key() == obj )
+        {
+            cnt++;
+            it1++;
+        }
+    }
+    else if( type == "trigger")
+    {
+        QMap<QString, TTrigger *>::const_iterator it1 = o->mpHost->getTriggerUnit()->mLookupTable.find( obj );
+        while( it1 != o->mpHost->getTriggerUnit()->mLookupTable.end() && it1.key() == obj )
+        {
+            cnt++;
+            it1++;
+        }
+    }
+    else if( type == "alias")
+    {
+        QMap<QString, TAlias *>::const_iterator it1 = o->mpHost->getAliasUnit()->mLookupTable.find( obj );
+        while( it1 != o->mpHost->getAliasUnit()->mLookupTable.end() && it1.key() == obj )
+        {
+            cnt++;
+            it1++;
+        }
+    }
+    return cnt;
+}
+
+int MudletObjectWrapper::startTempTimer(MudletObject*o, double timeout, QString & function )
+{
+    QString lang = "PYTHON";
+    QTime time( 0, 0, 0, 0 );
+    int msec = static_cast<int>(timeout * 1000);
+    QTime time2 = time.addMSecs( msec );
+    TTimer * pT;
+    pT = new TTimer( "a", time2, o->mpHost );
+    pT->setTime( time2 );
+    pT->setIsFolder( false );
+    pT->setIsTempTimer( true );
+    pT->registerTimer();
+    pT->setScript( function );
+    pT->setScriptLanguage(lang);
+    int id = pT->getID();
+    pT->setName( QString::number( id ) );//darf erst nach isTempTimer gesetzt werde, damit setName() schneller ist
+    pT->setIsActive( true );
+    pT->enableTimer( id );
+    return id;
+}
+
+int MudletObjectWrapper::startPermTimer(MudletObject*o, QString & name, QString & parent, double timeout, QString & function )
+{
+    QString lang = "PYTHON";
+    QTime time( 0, 0, 0, 0 );
+    int msec = static_cast<int>(timeout * 1000);
+    QTime time2 = time.addMSecs( msec );
+    TTimer * pT;
+    if( parent.isEmpty() )
+    {
+        pT = new TTimer( "a", time2, o->mpHost );
+    }
+    else
+    {
+        TTimer * pP = o->mpHost->getTimerUnit()->findTimer( parent );
+        if( !pP )
+        {
+            return -1;//parent not found
+        }
+        pT = new TTimer( pP, o->mpHost );
+    }
+
+    pT->setTime( time2 );
+    pT->setIsFolder( false );
+    pT->setIsTempTimer( false );
+    pT->registerTimer();
+    pT->setScript( function );
+    pT->setScriptLanguage(lang);
+    int id = pT->getID();
+    pT->setName( name );//darf erst nach isTempTimer gesetzt werde, damit setName() schneller ist
+    pT->setIsActive( false );
+    o->mpHost->mpEditorDialog->mNeedUpdateData = true;
+    return id;
+}
+
+int MudletObjectWrapper::startPermAlias(MudletObject*o, QString & name, QString & parent, QString & regex, QString & function )
+{
+    QString lang = "PYTHON";
+    TAlias * pT;
+
+    if( parent.isEmpty() )
+    {
+        pT = new TAlias("a", o->mpHost );
+    }
+    else
+    {
+        TAlias * pP = o->mpHost->getAliasUnit()->findAlias( parent );
+        if( !pP )
+        {
+            return -1;//parent not found
+        }
+        pT = new TAlias( pP, o->mpHost );
+    }
+    pT->setRegexCode( regex );
+    pT->setIsFolder( false );
+    pT->setScriptLanguage(lang);
+    pT->setIsActive( true );
+    pT->setIsTempAlias( false );
+    pT->registerAlias();
+    pT->setScript( function );
+    int id = pT->getID();
+    pT->setName( name );
+    o->mpHost->mpEditorDialog->mNeedUpdateData = true;
+    return id;
+}
+
+int MudletObjectWrapper::startTempAlias( MudletObject*o, QString & regex, QString & function )
+{
+    QString lang = "PYTHON";
+    TAlias * pT;
+    pT = new TAlias("a", o->mpHost );
+    pT->setRegexCode( regex );
+    pT->setIsFolder( false );
+    pT->setScriptLanguage(lang);
+    pT->setIsActive( true );
+    pT->setIsTempAlias( true );
+    pT->registerAlias();
+    pT->setScript( function );
+    int id = pT->getID();
+    pT->setName( QString::number( id ) );
+    return id;
+}
+
+int MudletObjectWrapper::startTempExactMatchTrigger( MudletObject*o, QString & regex, QString & function )
+{
+    QString lang = "PYTHON";
+    TTrigger * pT;
+    QStringList sList;
+    sList<<regex;
+    QList<int> propertyList;
+    propertyList << REGEX_EXACT_MATCH;
+    pT = new TTrigger("a", sList, propertyList, false, o->mpHost );
+    pT->setIsFolder( false );
+    pT->setScriptLanguage(lang);
+    pT->setIsActive( true );
+    pT->setIsTempTrigger( true );
+    pT->registerTrigger();
+    pT->setScript( function );
+    int id = pT->getID();
+    pT->setName( QString::number( id ) );
+    return id;
+}
+
+int MudletObjectWrapper::startTempBeginOfLineTrigger( MudletObject*o, QString & regex, QString & function )
+{
+    QString lang = "PYTHON";
+    TTrigger * pT;
+    QStringList sList;
+    sList<<regex;
+    QList<int> propertyList;
+    propertyList << REGEX_BEGIN_OF_LINE_SUBSTRING;
+    pT = new TTrigger("a", sList, propertyList, false, o->mpHost );
+    pT->setIsFolder( false );
+    pT->setScriptLanguage(lang);
+    pT->setIsActive( true );
+    pT->setIsTempTrigger( true );
+    pT->registerTrigger();
+    pT->setScript( function );
+    int id = pT->getID();
+    pT->setName( QString::number( id ) );
+    return id;
+}
+
+int MudletObjectWrapper::startTempTrigger( MudletObject*o, QString & regex, QString & function )
+{
+    QString lang = "PYTHON";
+    TTrigger * pT;
+    QStringList sList;
+    sList<<regex;
+    QList<int> propertyList;
+    propertyList << REGEX_SUBSTRING;// substring trigger is default
+    pT = new TTrigger("a", sList, propertyList, false, o->mpHost );
+    pT->setIsFolder( false );
+    pT->setScriptLanguage(lang);
+    pT->setIsActive( true );
+    pT->setIsTempTrigger( true );
+    pT->registerTrigger();
+    pT->setScript( function );
+    int id = pT->getID();
+    pT->setName( QString::number( id ) );
+    return id;
+}
+
+int MudletObjectWrapper::startTempLineTrigger( MudletObject*o,  int from, int howmany, QString & function )
+{
+    QString lang = "PYTHON";
+    TTrigger * pT;
+//    QStringList sList;
+//    QList<int> propertyList;
+//    propertyList << REGEX_SUBSTRING;// substring trigger is default
+//    pT = new TTrigger("a", sList, propertyList, false, mpHost );
+    pT = new TTrigger( 0, o->mpHost );
+    pT->setIsFolder( false );
+    pT->setScriptLanguage(lang);
+    pT->setIsActive( true );
+    pT->setIsTempTrigger( true );
+    pT->setIsLineTrigger( true );
+    pT->setStartOfLineDelta( from );
+    pT->setLineDelta( howmany );
+    pT->registerTrigger();
+    pT->setScript( function );
+    int id = pT->getID();
+    pT->setName( QString::number( id ) );
+    return id;
+}
+
+int MudletObjectWrapper::startTempColorTrigger( MudletObject*o, int fg, int bg, QString & function )
+{
+    QString lang = "PYTHON";
+    TTrigger * pT;
+//    QStringList sList;
+//    QList<int> propertyList;
+//    propertyList << REGEX_SUBSTRING;// substring trigger is default
+//    pT = new TTrigger("a", sList, propertyList, false, mpHost );
+    pT = new TTrigger( 0, o->mpHost );
+    pT->setIsFolder( false );
+    pT->setScriptLanguage(lang);
+    pT->setIsActive( true );
+    pT->setIsTempTrigger( true );
+    pT->setupTmpColorTrigger( fg, bg );
+    pT->registerTrigger();
+    pT->setScript( function );
+    int id = pT->getID();
+    pT->setName( QString::number( id ) );
+    return id;
+}
+
+int MudletObjectWrapper::startTempRegexTrigger( MudletObject*o, QString & regex, QString & function )
+{
+    QString lang = "PYTHON";
+    TTrigger * pT;
+    QStringList sList;
+    sList<<regex;
+
+    QList<int> propertyList;
+    propertyList << REGEX_PERL;// substring trigger is default
+    pT = new TTrigger("a", sList, propertyList, false, o->mpHost );
+    pT->setIsFolder( false );
+    pT->setScriptLanguage(lang);
+    pT->setIsActive( true );
+    pT->setIsTempTrigger( true );
+    pT->registerTrigger();
+    pT->setScript( function );
+    int id = pT->getID();
+    pT->setName( QString::number( id ) );
+    return id;
+}
+
+int MudletObjectWrapper::startPermRegexTrigger( MudletObject*o, QString & name, QString & parent, QStringList & regexList, QString & function )
+{
+    QString lang = "PYTHON";
+    TTrigger * pT;
+    QList<int> propertyList;
+    for( int i=0; i<regexList.size(); i++ )
+    {
+        propertyList << REGEX_PERL;
+    }
+    if( parent.isEmpty() )
+    {
+        pT = new TTrigger( "a", regexList, propertyList, (regexList.size()>1), o->mpHost );
+    }
+    else
+    {
+        TTrigger * pP = o->mpHost->getTriggerUnit()->findTrigger( parent );
+        if( !pP )
+        {
+            return -1;//parent not found
+        }
+        pT = new TTrigger( pP, o->mpHost );
+        pT->setRegexCodeList( regexList, propertyList );
+    }
+    pT->setIsFolder( (regexList.size()==0) );
+    pT->setScriptLanguage(lang);
+    pT->setIsActive( true );
+    pT->setIsTempTrigger( false );
+    pT->registerTrigger();
+    pT->setScript( function );
+    pT->setName( name );
+    o->mpHost->mpEditorDialog->mNeedUpdateData = true;
+    return 1;
+
+}
+
+int MudletObjectWrapper::startPermSubstringTrigger( MudletObject*o, QString & name, QString & parent, QStringList & regexList, QString & function )
+{
+    QString lang = "PYTHON";
+    TTrigger * pT;
+    QList<int> propertyList;
+    for( int i=0; i<regexList.size(); i++ )
+    {
+        propertyList << REGEX_SUBSTRING;
+    }
+    if( parent.isEmpty() )
+    {
+        pT = new TTrigger( "a", regexList, propertyList, (regexList.size()>1), o->mpHost );
+    }
+    else
+    {
+        TTrigger * pP = o->mpHost->getTriggerUnit()->findTrigger( parent );
+        if( !pP )
+        {
+            return -1;//parent not found
+        }
+        pT = new TTrigger( pP, o->mpHost );
+        pT->setRegexCodeList( regexList, propertyList );
+    }
+    pT->setIsFolder( (regexList.size()==0) );
+    pT->setScriptLanguage(lang);
+    pT->setIsActive( true );
+    pT->setIsTempTrigger( false );
+    pT->registerTrigger();
+    pT->setScript( function );
+    pT->setName( name );
+    o->mpHost->mpEditorDialog->mNeedUpdateData = true;
+    return 1;
+
+}
+
+int MudletObjectWrapper::startPermBeginOfLineStringTrigger(  MudletObject*o, QString & name, QString & parent, QStringList & regexList, QString & function )
+{
+    QString lang = "PYTHON";
+    TTrigger * pT;
+    QList<int> propertyList;
+    for( int i=0; i<regexList.size(); i++ )
+    {
+        propertyList << REGEX_BEGIN_OF_LINE_SUBSTRING;
+    }
+    if( parent.isEmpty() )
+    {
+        pT = new TTrigger( "a", regexList, propertyList, (regexList.size()>1), o->mpHost );
+    }
+    else
+    {
+        TTrigger * pP = o->mpHost->getTriggerUnit()->findTrigger( parent );
+        if( !pP )
+        {
+            return -1;//parent not found
+        }
+        pT = new TTrigger( pP, o->mpHost );
+        pT->setRegexCodeList( regexList, propertyList );
+    }
+    pT->setIsFolder( (regexList.size()==0) );
+    pT->setScriptLanguage(lang);
+    pT->setIsActive( true );
+    pT->setIsTempTrigger( false );
+    pT->registerTrigger();
+    pT->setScript( function );
+    pT->setName( name );
+    o->mpHost->mpEditorDialog->mNeedUpdateData = true;
+    return 1;
+
+}
+
+int MudletObjectWrapper::setTriggerStayOpen( MudletObject*o, QString& name, double lines )
+{
+    o->mpHost->getTriggerUnit()->setTriggerStayOpen( name, static_cast<int>(lines) );
+    return 0;
+}
+
+double MudletObjectWrapper::createStopWatch( MudletObject*o )
+{
+    return o->mpHost->createStopWatch();
+}
+
+double MudletObjectWrapper::stopStopWatch( MudletObject*o, int watchID )
+{
+    return o->mpHost->stopStopWatch( watchID );
+}
+
+bool MudletObjectWrapper::resetStopWatch( MudletObject*o, int watchID )
+{
+    return o->mpHost->resetStopWatch( watchID );
+}
+
+bool MudletObjectWrapper::startStopWatch( MudletObject*o, int watchID )
+{
+    return o->mpHost->startStopWatch( watchID );
+}
+
+double MudletObjectWrapper::getStopWatchTime( MudletObject*o, int watchID )
+{
+    double time = o->mpHost->getStopWatchTime( watchID );
+    return time;
+}
+
+QString MudletObjectWrapper::getMudletHomeDir( MudletObject*o )
+{
+    QString home = QDir::homePath();
+    home.append( "/.config/mudlet/profiles/" );
+    QString name = o->mpHost->getName();
+    home.append( name );
+    QString erg = QDir::toNativeSeparators( home );
+    return erg.toLatin1().data();
+}
+
+double MudletObjectWrapper::getNetworkLatency( MudletObject*o )
+{
+    return o->mpHost->mTelnet.networkLatency;
+}
+
+int MudletObjectWrapper::resetProfile( MudletObject*o )
+{
+    o->mpHost->mResetProfile = true;
+    return 0;
+}
+
+int MudletObjectWrapper::connectToServer( MudletObject*o, int port, QString&  url)
+{
+    o->mpHost->mTelnet.connectIt( url, port );
+    return 0;
+}
+
+int MudletObjectWrapper::downloadFile( MudletObject*o, QString& path, QString& url )
+{
+    QNetworkReply * reply = o->mpHost->mLuaInterpreter.mpFileDownloader->get( QNetworkRequest( QUrl( url ) ) );
+    o->mpHost->mLuaInterpreter.downloadMap[reply] = path;
+    return 0;
+}
+
+#include <QFileDialog>
+
+QString MudletObjectWrapper::invokeFileDialog( MudletObject*o, bool dir,  QString& title)
+{
+    if( ! dir )
+    {
+        QString fileName = QFileDialog::getExistingDirectory(0, title,
+                                                        QDir::currentPath() );
+        return fileName.toLatin1().data();
+    }
+    else
+    {
+        QString fileName = QFileDialog::getOpenFileName(0, title,
+                                                        QDir::currentPath() );
+        return fileName.toLatin1().data();
+    }
+}
+
+int MudletObjectWrapper::loadRawFile( MudletObject*o, QString& SendTxt )
+{
+    std::string _SendTxt = SendTxt.toStdString();
+    o->mpHost->mpConsole->loadRawFile( _SendTxt );
+    return 0;
+}
+
+#ifdef Q_OS_LINUX
+    #include <phonon>
+#else
+    #include <Phonon>
+#endif
+
+int MudletObjectWrapper::playSoundFile( MudletObject*o, QString& sound )
+{
+    //QSound::play( QString( luaSendText.c_str() ) );
+    if( QDir::homePath().contains('\\') )
+    {
+        sound.replace('/', "\\");
+    }
+    else
+    {
+        sound.replace('\\', "/");
+    }
+    mudlet::self()->playSound( sound );
+    return 0;
+}
+
+int MudletObjectWrapper::sendSocket( MudletObject*o, QString& txt )
+{
+    std::string _txt = txt.toStdString();
+    o->mpHost->mTelnet.socketOutRaw( _txt );
+    return 0;
 }

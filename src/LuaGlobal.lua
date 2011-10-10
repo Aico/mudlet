@@ -323,7 +323,7 @@ end
 -- Echo something after your line
 function suffix(what, func, fg, bg, window)
         local length = string.len(line)
-        moveCursor(window or "main", length-1, getLineNumber())
+        moveCursor(window or "main", length, getLineNumber())
         if func and (func == cecho or func == decho or func == hecho) then
                 func(what, fg, bg, true, window)
         else

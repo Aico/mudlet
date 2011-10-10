@@ -314,6 +314,7 @@ void Host::resetProfile()
     mEventMap.clear();
     mLuaInterpreter.initLuaGlobals();
     mLuaInterpreter.loadGlobal();
+    mPythonInterpreter.init();
     mBlockScriptCompile = false;
 
 
