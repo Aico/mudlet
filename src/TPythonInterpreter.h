@@ -26,6 +26,9 @@
 #include <QString>
 #include <QObject>
 #include <QHash>
+#include <QNetworkAccessManager>
+#include <QNetworkReply>
+
 
 class Host;
 
@@ -35,6 +38,8 @@ Q_OBJECT
 
 public:
     TPythonInterpreter(Host* pH);
+    QNetworkAccessManager * mpFileDownloader;
+    QMap<QNetworkReply *, QString> downloadMap;
     void init();
     void add_python_variable( const QString & varName, const QVariant & var);
     void callEventHandler( const QString & function, const TEvent * pE );
@@ -100,8 +105,13 @@ public slots:
   void reconnect( MudletObject* o );
   void disconnect( MudletObject* o );
   int sendGMCP( MudletObject* o, QString& themsg );
+  int sendATCP( MudletObject* o, QString& themsg );
+  int sendTelnetChannel102( MudletObject* o, QString& themsg );
+  int sendIrc( MudletObject* o, QString& channel, QString& message);
   int echo( MudletObject* o, QString& themsg, QString& console);
-  int echoLink( MudletObject* o, QString& themsg, QStringList& thefunc, QStringList& tooltip, QString& console, bool customFormat);
+  int echoLink( MudletObject* o, QString& themsg, QString& thefunc, QString& tooltip, QString& console, bool customFormat);
+  int insertLink( MudletObject* o, QString& themsg, QString& thefunc, QString& tooltip, QString& console);
+  int setLink( MudletObject* o, QString& thefunc, QString& tooltip, QString& console);
   int createBuffer(MudletObject* o, QString& name);
   int appendBuffer(MudletObject* o, QString& console);
   int getLineNumber(MudletObject* o);
@@ -109,6 +119,67 @@ public slots:
   int cut(MudletObject* o);
   int paste(MudletObject* o, QString& console);
   int feedTriggers(MudletObject* o, QString& txt);
+  int setBold(MudletObject* o, QString& console, bool active);
+  int setItalics(MudletObject* o, QString& console, bool active);
+  int setUnderline(MudletObject* o, QString& console, bool active);
+  int echoPopup(MudletObject* o, QString& themsg, QStringList& func, QStringList& tooltip, QString& console, bool customFormat);
+  int setPopup(MudletObject* o, QStringList& func, QStringList& tip, QString& console);
+  int insertPopup(MudletObject* o, QString& themsg, QStringList& func, QStringList& tooltip, QString& console);
+  int moveCursor(MudletObject* o, int xpos, int ypos, QString& console);
+  int moveCursorEnd(MudletObject* o, QString& console);
+  int pasteWindow(MudletObject* o, QString& console);
+  int selectCurrentLine(MudletObject* o, QString& console);
+  int wrapLine(MudletObject* o, int linenum, QString& console);
+  QList<int> getFgColor(MudletObject* o, QString& console);
+  QList<int> getBgColor(MudletObject* o, QString& console);
+  QString getCurrentLine(MudletObject* o, QString& console);
+  int insertHTML(MudletObject* o, QString& themsg );
+  int insertText(MudletObject* o, QString& themsg, QString& console );
+  bool isAnsiFgColor(MudletObject* o, int ansiFg, QString& console);
+  bool isAnsiBgColor(MudletObject* o, int ansiFg, QString& console);
+  //Start of new commit
+  int appendCmdLine(MudletObject* o, QString& appendtxt);
+  int denyCurrentSend(MudletObject*o);
+  int getLastLineNumber(MudletObject*o, QString& console);
+  int getLineCount(MudletObject*o, QString& console);
+  QStringList getLines(MudletObject*o, int From, int To);
+  QStringList getTime(MudletObject*o, bool return_string, QString& fmt);
+  QString getTimeStamp(MudletObject*o, int line, QString& console);
+  bool isPrompt(MudletObject*o);
+  int startLogging(MudletObject*o, bool logOn);
+  bool isActive(MudletObject*o, QString& obj, QString& type);
+  bool killAlias(MudletObject*o, QString& obj);
+  bool killTimer(MudletObject*o, QString& obj);
+  bool killTrigger(MudletObject*o, QString& obj);
+  int exists(MudletObject*o, QString& obj, QString& type);
+  int startTempTimer(MudletObject*o, double timeout, QString & function );
+  int startPermTimer(MudletObject*o, QString & name, QString & parent, double timeout, QString & function );
+  int startPermAlias(MudletObject*o, QString & name, QString & parent, QString & regex, QString & function );
+  int startTempAlias( MudletObject*o, QString & regex, QString & function );
+  int startTempExactMatchTrigger( MudletObject*o, QString & regex, QString & function );
+  int startTempBeginOfLineTrigger( MudletObject*o, QString & regex, QString & function );
+  int startTempTrigger( MudletObject*o, QString & regex, QString & function );
+  int startTempLineTrigger( MudletObject*o,  int from, int howmany, QString & function );
+  int startTempColorTrigger( MudletObject*o, int fg, int bg, QString & function );
+  int startTempRegexTrigger( MudletObject*o, QString & regex, QString & function );
+  int startPermRegexTrigger( MudletObject*o, QString & name, QString & parent, QStringList & regexList, QString & function );
+  int startPermSubstringTrigger( MudletObject*o, QString & name, QString & parent, QStringList & regexList, QString & function );
+  int startPermBeginOfLineStringTrigger(  MudletObject*o, QString & name, QString & parent, QStringList & regexList, QString & function );
+  int setTriggerStayOpen( MudletObject*o, QString& name, double lines );
+  double createStopWatch( MudletObject*o );
+  double stopStopWatch( MudletObject*o, int watchID );
+  bool resetStopWatch( MudletObject*o, int watchID );
+  bool startStopWatch( MudletObject*o, int watchID );
+  double getStopWatchTime( MudletObject*o, int watchID );
+  QString getMudletHomeDir( MudletObject*o );
+  double getNetworkLatency( MudletObject*o );
+  int resetProfile( MudletObject*o );
+  int connectToServer( MudletObject*o, int port, QString&  url);
+  int downloadFile( MudletObject*o, QString& path, QString& url );
+  QString invokeFileDialog( MudletObject*o, bool dir,  QString& title);
+  int loadRawFile( MudletObject*o, QString& SendTxt );
+  int playSoundFile( MudletObject*o, QString& sound );
+  int sendSocket( MudletObject*o, QString& txt );
 };
 
 #endif  

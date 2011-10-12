@@ -1145,53 +1145,55 @@ void TTextEdit::mouseMoveEvent( QMouseEvent * event )
 
 void TTextEdit::contextMenuEvent ( QContextMenuEvent * event )
 {
-//    int x = event->x() / mFontWidth;
-//    int y = ( event->y() / mFontHeight ) + imageTopLine();
-//    if( y < static_cast<int>(mpBuffer->buffer.size()) )
-//    {
-//        if( x < static_cast<int>(mpBuffer->buffer[y].size()) )
-//        {
-//            if( mpBuffer->buffer[y][x].link > 0 )
-//            {
-//                QStringList command = mpBuffer->mLinkStore[mpBuffer->buffer[y][x].link];
-//                QStringList hint = mpBuffer->mHintStore[mpBuffer->buffer[y][x].link];
-//                if( command.size() > 1 )
-//                {
-//                    QMenu * popup = new QMenu( this );
-//                    for( int i=0; i<command.size(); i++ )
-//                    {
-//                        QAction * pA;
-//                        if( i < hint.size() )
-//                        {
-//                            pA = popup->addAction( hint[i] );
-//                            mPopupCommands[hint[i]] = command[i];
-//                        }
-//                        else
-//                        {
-//                            pA = popup->addAction( command[i] );
-//                            mPopupCommands[command[i]] = command[i];
-//                        }
-//                        connect( pA, SIGNAL(triggered()), this, SLOT(slot_popupMenu()));
-//                    }
-//                    popup->popup( event->globalPos() );
-//                }
-//                mIsCommandPopup = true;
-//                return;
-//            }
-//        }
-//    }
-//    mIsCommandPopup = false;
+/*
+    int x = event->x() / mFontWidth;
+    int y = ( event->y() / mFontHeight ) + imageTopLine();
+    if( y < static_cast<int>(mpBuffer->buffer.size()) )
+    {
+        if( x < static_cast<int>(mpBuffer->buffer[y].size()) )
+        {
+            if( mpBuffer->buffer[y][x].link > 0 )
+            {
+                QStringList command = mpBuffer->mLinkStore[mpBuffer->buffer[y][x].link];
+                QStringList hint = mpBuffer->mHintStore[mpBuffer->buffer[y][x].link];
+                mPopupLanguage=command[0];
+                if( command.size() > 1 )
+                {
+                    QMenu * popup = new QMenu( this );
+                    for( int i=1; i<command.size(); i++ )
+                    {
+                        QAction * pA;
+                        if( i < hint.size() )
+                        {
+                            pA = popup->addAction( hint[i] );
+                            mPopupCommands[hint[i]] = command[i];
+                        }
+                        else
+                        {
+                            pA = popup->addAction( command[i] );
+                            mPopupCommands[command[i]] =command[i];
+                        }
+                        connect( pA, SIGNAL(triggered()), this, SLOT(slot_popupMenu()));
+                    }
+                    popup->popup( event->globalPos() );
+                }
+                mIsCommandPopup = true;
+                return;
+            }
+        }
+    }
+    mIsCommandPopup = false;
 
-//    QAction * action = new QAction("copy", this );
-//    action->setStatusTip(tr("copy selected text to clipboard"));
-//    connect( action, SIGNAL(triggered()), this, SLOT(slot_copySelectionToClipboard()));
-//    QAction * action2 = new QAction("copy as HTML", this );
-//    action->setStatusTip(tr("copy selected text in HTML format with colors for usage in web browsers"));
-//    connect( action2, SIGNAL(triggered()), this, SLOT(slot_copySelectionToClipboardHTML()));
-//    QMenu * popup = new QMenu( this );
-//    popup->addAction( action );
-//    popup->addAction( action2 );
-//    popup->popup( mapToGlobal( event->pos() ), action );
+    QAction * action = new QAction("copy", this );
+    action->setStatusTip(tr("copy selected text to clipboard"));
+    connect( action, SIGNAL(triggered()), this, SLOT(slot_copySelectionToClipboard()));
+    QAction * action2 = new QAction("copy as HTML", this );
+    action->setStatusTip(tr("copy selected text in HTML format with colors for usage in web browsers"));
+    connect( action2, SIGNAL(triggered()), this, SLOT(slot_copySelectionToClipboardHTML()));
+    QMenu * popup = new QMenu( this );
+    popup->addAction( action );
+    popup->addAction( action2 );
+    popup->popup( mapToGlobal( event->pos() ), action );*/
     event->accept();
     return;
 }
@@ -1208,7 +1210,14 @@ void TTextEdit::slot_popupMenu()
     {
         cmd = mPopupCommands[pA->text()];
     }
-    mpHost->mLuaInterpreter.compileAndExecuteScript( cmd );
+    if( mPopupLanguage == "LUA")
+    {
+        mpHost->mLuaInterpreter.compileAndExecuteScript( cmd );
+    }
+    if( mPopupLanguage == "PYTHON")
+    {
+        mpHost->mPythonInterpreter.executeScript(cmd);
+    }
 }
 
 void TTextEdit::mousePressEvent( QMouseEvent * event )
@@ -1251,9 +1260,20 @@ void TTextEdit::mousePressEvent( QMouseEvent * event )
                 if( mpBuffer->buffer[y][x].link > 0 )
                 {
                     QStringList command = mpBuffer->mLinkStore[mpBuffer->buffer[y][x].link];
-                    QString func = command.at(0);
-                    mpHost->mLuaInterpreter.compileAndExecuteScript( func );
-                    return;
+                    QString func = command.at(1);
+                    QString lang = command.at(0);
+
+                    if( lang == "LUA" )
+                    {
+                        mpHost->mLuaInterpreter.compileAndExecuteScript( func );
+                        return;
+                    }
+                    if( lang == "PYTHON" )
+                    {
+                        mpHost->mPythonInterpreter.executeScript(func);
+                        return;
+                    }
+
                 }
             }
         }
@@ -1286,10 +1306,11 @@ void TTextEdit::mousePressEvent( QMouseEvent * event )
                 {
                     QStringList command = mpBuffer->mLinkStore[mpBuffer->buffer[y][x].link];
                     QStringList hint = mpBuffer->mHintStore[mpBuffer->buffer[y][x].link];
+                    mPopupLanguage=command[0];
                     if( command.size() > 1 )
                     {
                         QMenu * popup = new QMenu( this );
-                        for( int i=0; i<command.size(); i++ )
+                        for( int i=1; i<command.size(); i++ )
                         {
                             QAction * pA;
                             if( i < hint.size() )

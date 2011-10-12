@@ -367,7 +367,7 @@ def replaceLine(what):
     selectString(line, 1)
     replace(what)
 
-def openURL(url):
+def openUrl(url):
     """This can use some further expanding, but not up to adding stuff to the Settings menu yet.
        Basically, on my version of Ubuntu I had to explicitly state the browser I wanted.  Would be nice to
        be able what brower the user wanted to use.  This link lists browsers Python understands to look for: 
@@ -390,7 +390,7 @@ def display(obj):
     pprint.pprint(obj,width=60)
 
 
-def cecho(text,consule='main'):
+def cecho(text,consule='main',insert=False):
     text=re.split("(<.*?>)",text)
     for line in text:
         if re.match("<(.*?)>",line):
@@ -404,8 +404,61 @@ def cecho(text,consule='main'):
             elif match.group(1) in color_dict:
                 fg(match.group(1),consule)
         else:
-            echo(line,consule)
+            if insert==False: 
+		echo(line,consule) 
+	    else: 
+		insertText(line,consule)
     resetFormat()
+
+def decho(text,consule='main',insert=False):
+    text=re.split("(<.*?>)",text)
+    for line in text:
+        if re.match("<(.*?)>",line):
+            match=re.match("<(.*?)>",line)
+            if ':' in match.group(1):
+                split_match=match.group(1).split(':')
+                if split_match[0] != '':
+                    codes=split_match[0].split(',')
+                    setFgColor(int(codes[0]), int(codes[1]),int(codes[2]),consule)
+                if split_match[1] != '':
+                    codes=split_match[1].split(',')
+                    setBgColor(int(codes[0]), int(codes[1]),int(codes[2]),consule)
+            else:
+                codes=match.group(1).split(',')
+                setFgColor(int(codes[0]), int(codes[1]),int(codes[2]),consule)
+        else:
+            if insert==False: 
+                echo(line,consule) 
+            else: 
+                insertText(line,consule)
+    resetFormat()
+
+def hecho(text,consule='main',insert=False):
+    text=re.split("(\|c\w{6},\w{6}|\|c\w{6})",text)
+    for line in text:
+        if re.match("\|c\w{6},\w{6}|\|c\w{6}",line):
+            m=re.match("(\|c\w{6},\w{6}|\|c\w{6})",line)
+            if ',' in m.group(1):
+                split_match=m.group(1).split(',')
+                if split_match[0] != '':
+                    codes=split_match[0]
+                    codes=codes[2:4],codes[4:6],codes[6:8]
+                    setFgColor(int(codes[0],16), int(codes[1],16),int(codes[2],16),consule)
+                if split_match[1] != '':
+                    codes=split_match[1]
+                    codes=codes[0:2],codes[2:4],codes[4:6]
+                    setBgColor(int(codes[0],16), int(codes[1],16),int(codes[2],16),consule)
+            else:
+                codes=m.group(1)
+                codes=codes[2:4],codes[4:6],codes[6:8]
+                setFgColor(int(codes[0],16), int(codes[1],16),int(codes[2],16),consule)
+        else:
+            if insert==False: 
+                echo(line,consule) 
+            else: 
+                insertText(line,consule)
+    resetFormat()
+
 
 def replaceWildcard(what, replacement):
     selectCaptureGroup(what)
@@ -434,13 +487,35 @@ def showColors(wide=3):
 def sendGMCP(msg):
     mudlet.sendGMCP(msg)
 
+def sendATCP(msg):
+    mudlet.sendATCP(msg)
+
+def sendTelnetChannel102(msg):
+    mudlet.sendTelnetChannel102(msg)
+
+def sendIrc(channel, msg):
+    mudlet.sendIrc(channel, msg)
+
 def echo(txt, consule='main'):
     mudlet.echo(txt, consule)
 
 def echoLink(txt, func, hint, consule='main', customFormat=False):
-    """Status: Incomplete. Tooltip prints wierd and need to figure a way to let
-       the C parts know to exectute func as a python script instead of Lua."""
     mudlet.echoLink(txt, func, hint, consule, customFormat)
+
+def insertLink(txt, func, hint, consule='main', customFormat=False):
+    mudlet.insertLink(txt, func, hint, consule, customFormat)
+
+def setLink(func, hint, consule='main'):
+    mudlet.setLink(func, hint, consule)
+
+def echoPopup(txt, func, hint, consule='main', customFormat=False):
+    mudlet.echoPopup(txt, func, hint, consule, customFormat)
+
+def setPopup(func,hint,consule='main'):
+    mudlet.setPopup(func,hint,consule)
+
+def insertPopup(txt, func, hint, consule='main'):
+    mudlet.insertPopup(txt, func, hint, consule)
 
 def createBuffer(name):
     mudlet.createBuffer(name)
@@ -462,5 +537,222 @@ def cut():
 
 def feedTriggers(txt):
     mudlet.feedTriggers(txt)
+
+def setBold(doBold,consule='main'):
+    """Consule=The consule you want to set, doBold=True/False for setting
+       bold on or off."""
+    mudlet.setBold(consule,active)
+
+def setUnderline(doUnderline,consule='main'):
+    """Consule=The consule you want to set, doUnderline=True/False for setting
+       Underline on or off."""
+    mudlet.setUnderline(consule,active)
+
+def setItalics(doItalics,consule='main'):
+    """Consule=The consule you want to set, doItalics=True/False for setting
+       Italics on or off."""
+    mudlet.setItalics(consule,active)
+
+def moveCursor(xpos, ypos, consule='main'):
+    mudlet.moveCursor(xpos,ypos,consule)
+
+def moveCursorEnd(consule='main'):
+    mudlet.moveCursorEnd(consule)
+
+def pasteWindow(consule='main'):
+    mudlet.pasteWindow(consule)
+
+def selectCurrentLine(consule='main'):
+    mudlet.selectCurrentLine(consule)
+
+def wrapLine(linenum, consule='main'):
+    mudlet.wrapLine(linenum, consule)
+
+def getFgColor(consule='main'):
+    return mudlet.getFgColor(consule)
+
+def getBgColor(consule='main'):
+    return mudlet.getBgColor(consule)
+
+def insertHTML(txt):
+    mudlet.insertHTML(txt)
+
+def insertText(txt,consule='main'):
+    mudlet.insertText(txt, consule)
+
+def isAnsiFgColor(color, consule='main'):
+    return mudlet.isAnsiFgColor(color, consule)
+
+def isAnsiBgColor(color, consule='main'):
+    return mudlet.isAnsiBgColor(color, consule)
+    
+def getRGB(color):
+    code = color_dict[color.strip()]
+    return code
+
+def getCurrentLine(consule='main'):
+    return mudlet.getCurrentLine(consule)
+    
+def appendCmdLine(txt):
+    mudlet.appendCmdLine(txt)
+    
+def denyCurrentSend():
+    mudlet.denyCurrentSend()
+    
+def getLastLineNumber(console='main'):
+    return mudlet.getLastLineNumber(console)
+    
+def getLineCount(console='main'):
+    return mudlet.getLineCount(console)
+
+def prefix(what, func="None", fg="", bg="", console='main'):
+    moveCursor(0,getLineNumber(), console)
+    if func=="None":
+        insertText(what,console)
+    elif func=='cecho':
+        cecho("<"+fg+","+bg+">"+what,console,insert=True)
+    elif func=='decho':
+        decho("<"+str(fg[0])+","+str(fg[1])+","+str(fg[2])+":"+str(bg[0])+","+str(bg[1])+","+str(bg[2])+">"+what,console,insert=True)
+    elif func=='hecho':
+        hecho("|c"+fg+","+bg+what,console,insert=True)
+
+def suffix(what, func="None", fg="", bg="", console='main'):
+    length = len(line)
+    moveCursor(length, getLineNumber(), console)
+    if func=="None":
+        insertText(what,console)
+    elif func=='cecho':
+        cecho("<"+fg+","+bg+">"+what,console,insert=True)
+    elif func=='decho':
+        decho("<"+str(fg[0])+","+str(fg[1])+","+str(fg[2])+":"+str(bg[0])+","+str(bg[1])+","+str(bg[2])+">"+what,console,insert=True)
+    elif func=='hecho':
+        hecho("|c"+fg+","+bg+what,console,insert=True)
+
+def getLines(From,To):
+    return mudlet.getLines(From,To)
+
+def getTime(return_string,fmt="yyyy.MM.dd hh:mm:ss.zzz"):
+    if return_string==True:
+	time=mudlet.getTime(return_string,fmt)[0]
+	time=str(time)
+        return time
+    else:
+	time=dict(zip(("hour","min",'sec','msec','year','month','day'),mudlet.getTime(return_string,fmt)))
+        return time
+
+def getTimeStamp(line,console='main'):
+    return mudlet.getTimeStamp(line,console)
+
+def isPrompt():
+    return mudlet.isPrompt()
+
+def startLogging(logOn):
+    mudlet.startLogging(logOn)
+
+def isActive(obj, objType):
+    return mudlet.isActive(obj,objType)
+
+def killAlias(obj):
+    return mudlet.killAlias(obj)
+
+def killTrigger(obj):
+    return mudlet.killTrigger(obj)
+
+def killTimer(obj):
+    return mudlet.killTimer(obj)
+
+def exists(obj, objType):
+    return mudlet.exists(obj, objType)
+
+def setTriggerStayOpen(name,numOfLines):
+    mudlet.setTriggerStayOpen(name,numOfLines)
+
+def showMultimatches():
+    echo("\n-------------------------------------------------------");
+    echo("\nThe table multimatches[n][m] contains:");
+    echo("\n-------------------------------------------------------");
+    for i in range(0,len(multimatches)):
+        echo("\nregex " + str(i) + " captured: (multimatches["+ str(i) +"][1-n])");
+        for i2 in range(0,len(multimatches[i])):
+                echo("\n          key="+str(i2)+" value="+multimatches[i][i2]);
+    echo("\n-------------------------------------------------------\n");
+
+def createStopWatch():
+    return mudlet.createStopWatch()
+
+def stopStopWatch( ID ):
+    return mudlet.stopStopWatch( ID )
+
+def startStopWatch( ID ):
+    return mudlet.startStopWatch( ID )
+
+def resetStopWatch( ID ):
+    return mudlet.startStopWatch( ID )
+
+def getStopWatchTime( ID ):
+    return mudlet.getStopWatchTime( ID )
+
+def getMudletHomeDir():
+    return mudlet.getMudletHomeDir()
+
+def getNetworkLatency():
+    return mudlet.getNetworkLatency()
+
+def resetProfile():
+    mudlet.resetProfile()
+
+def connectToServer(port, url):
+    mudlet.connectToServer(port, url)
+
+def downloadFile(path, url):
+    mudlet.downloadFile(path, url)
+
+def invokeFileDialog(directory, title):
+    return mudlet.invokeFileDialog(directory, title)
+
+def loadRawFile(the_file):
+    mudlet.loadRawFile(the_file)
+
+def playSoundFile(sound):
+    mudlet.playSoundFile(sound)
+
+def sendSocket(txt):
+    mudlet.sendSocket(txt)
+
+def permTimer(name,folder,time,func):
+    return mudlet.startPermTimer(name,folder,time,func)
+
+def tempBeginOfLineTrigger(regex,func):
+    return mudlet.startTempBeginOfLineTrigger(regex,func)
+
+def tempTimer(time, func):
+    return mudlet.startTempTimer(time, func)
+
+def permAlias(name,folder,regex,func):
+    return mudlet.startPermAlias(name,folder,regex,func)
+
+def tempAlias(regex,func):
+    return mudlet.startTempAlias(regex,func)
+
+def tempExactMatchTrigger(regex,func):
+    return mudlet.startTempExactMatchTrigger(regex,func)
+
+def tempTrigger(regex,func):
+    return mudlet.startTempTrigger(regex,func)
+
+def tempLineTrigger(_from, howmany, func):
+    return mudlet.startTempLineTrigger(_from, howmany, func)
+
+def tempColorTrigger(fg, bg, func):
+    return mudlet.startTempColorTrigger(fg, bg, func)
+
+def permRegexTrigger(name,folder,regexlist,func):
+    return mudlet.startPermRegexTrigger(name,folder,regexlist,func)
+
+def permSubstringTrigger(name,folder,regexlist,func):
+    return mudlet.startPermSubstringTrigger(name,folder,regexlist,func)
+
+def permBeginOfLineStringTrigger(name,folder,regexlist,func):
+    return mudlet.startPermBeginOfLineStringTrigger(name,folder,regexlist,func)
 
 execfile('PythonLocal.py')
