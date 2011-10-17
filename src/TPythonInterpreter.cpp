@@ -1593,3 +1593,251 @@ int MudletObjectWrapper::sendSocket( MudletObject*o, QString& txt )
     o->mpHost->mTelnet.socketOutRaw( _txt );
     return 0;
 }
+
+QList<int> MudletObjectWrapper::calcFontSize( MudletObject*o, int size )
+{
+   QFont font = QFont("Bitstream Vera Sans Mono", size, QFont::Courier);
+   int width = QFontMetrics( font ).width( QChar('W') );
+   int fontDescent = QFontMetrics( font ).descent();
+   int fontAscent = QFontMetrics( font ).ascent();
+   int height = fontDescent+fontAscent;
+   QList<int> return_table;
+   return_table.append(width);
+   return_table.append(height);
+   return return_table;
+}
+
+void MudletObjectWrapper::clearUserWindow( MudletObject*o, QString& console )
+{
+    mudlet::self()->clearWindow( o->mpHost, console );
+}
+
+bool MudletObjectWrapper::createLabel( MudletObject*o, QString& name, int x, int y, int width, int height, bool fillBackground )
+{
+    return mudlet::self()->createLabel( o->mpHost, name, x, y, width, height, fillBackground );
+}
+
+bool MudletObjectWrapper::createMiniConsole( MudletObject*o, QString& name, int x, int y, int width, int height )
+{
+    return mudlet::self()->createMiniConsole( o->mpHost, name, x, y, width, height );
+}
+
+void MudletObjectWrapper::echoUserWindow( MudletObject*o, QString& console, QString& txt )
+{
+    mudlet::self()->echoWindow( o->mpHost, console, txt );
+}
+
+int MudletObjectWrapper::getButtonState( MudletObject*o )
+{
+    int state;
+    state = o->mpHost->mpConsole->getButtonState();
+    return state;
+}
+
+int MudletObjectWrapper::getMainConsoleWidth( MudletObject*o )
+{
+    int fw = QFontMetrics(o->mpHost->mDisplayFont).width("W");
+    fw *= o->mpHost->mWrapAt + 1;
+    return fw;
+}
+
+QList<int> MudletObjectWrapper::getMainWindowSize( MudletObject*o )
+{
+    QSize size = o->mpHost->mpConsole->mpMainFrame->size();
+    QList<int> return_table;
+    return_table.append(size.width());
+    return_table.append(size.height()-o->mpHost->mpConsole->mpCommandLine->height());
+    return return_table;
+}
+
+bool MudletObjectWrapper::hasFocus( MudletObject*o )
+{
+    return o->mpHost->mpConsole->hasFocus();//FIXME
+}
+
+void MudletObjectWrapper::hideToolBar( MudletObject*o, QString& toolbar )
+{
+    o->mpHost->getActionUnit()->hideToolBar( toolbar );
+}
+
+void MudletObjectWrapper::showToolBar( MudletObject*o, QString& toolbar )
+{
+    o->mpHost->getActionUnit()->showToolBar( toolbar );
+}
+
+bool MudletObjectWrapper::hideUserWindow( MudletObject*o, QString& console )
+{
+    return o->mpHost->mpConsole->hideWindow( console );
+}
+
+void MudletObjectWrapper::moveWindow( MudletObject*o, QString& console, double x, double y )
+{
+    mudlet::self()->moveWindow( o->mpHost, console, static_cast<int>(x), static_cast<int>(y) );
+}
+
+void MudletObjectWrapper::openUserWindow( MudletObject*o, QString& name )
+{
+    mudlet::self()->openWindow( o->mpHost, name );
+}
+
+bool MudletObjectWrapper::showUserWindow( MudletObject*o, QString& name )
+{
+    return o->mpHost->mpConsole->showWindow( name );
+}
+
+void MudletObjectWrapper::resizeUserWindow( MudletObject*o, QString& name, double x, double y )
+{
+    mudlet::self()->resizeWindow( o->mpHost, name, static_cast<int>(x), static_cast<int>(y) );
+}
+
+void MudletObjectWrapper::setBackgroundColor(  MudletObject*o, QString& name, double r, double g, double b, double alpha)
+{
+    mudlet::self()->setBackgroundColor( o->mpHost, name, static_cast<int>(r), static_cast<int>(g), static_cast<int>(b), static_cast<int>(alpha) );
+}
+
+void MudletObjectWrapper::setBackgroundImage( MudletObject*o, QString& name, QString& path)
+{
+    mudlet::self()->setBackgroundImage( o->mpHost, name, path );
+}
+
+void MudletObjectWrapper::setBorderTop( MudletObject*o, int size )
+{
+    o->mpHost->mBorderTopHeight = size;
+    int x,y;
+    x = o->mpHost->mpConsole->width();
+    y = o->mpHost->mpConsole->height();
+    QSize s = QSize(x,y);
+    QResizeEvent event(s, s);
+    QApplication::sendEvent( o->mpHost->mpConsole, &event);
+}
+
+void MudletObjectWrapper::setBorderBottom( MudletObject*o, int size )
+{
+    o->mpHost->mBorderBottomHeight = size;
+    int x,y;
+    x = o->mpHost->mpConsole->width();
+    y = o->mpHost->mpConsole->height();
+    QSize s = QSize(x,y);
+    QResizeEvent event(s, s);
+    QApplication::sendEvent( o->mpHost->mpConsole, &event);
+}
+
+void MudletObjectWrapper::setBorderLeft( MudletObject*o, int size )
+{
+    o->mpHost->mBorderLeftWidth = size;
+    int x,y;
+    x = o->mpHost->mpConsole->width();
+    y = o->mpHost->mpConsole->height();
+    QSize s = QSize(x,y);
+    QResizeEvent event(s, s);
+    QApplication::sendEvent( o->mpHost->mpConsole, &event);
+}
+
+void MudletObjectWrapper::setBorderRight( MudletObject*o, int size )
+{
+    o->mpHost->mBorderRightWidth = size;
+    int x,y;
+    x = o->mpHost->mpConsole->width();
+    y = o->mpHost->mpConsole->height();
+    QSize s = QSize(x,y);
+    QResizeEvent event(s, s);
+    QApplication::sendEvent( o->mpHost->mpConsole, &event);
+}
+
+void MudletObjectWrapper::setConsoleBufferSize( MudletObject*o, QString& console, int limit, int delete_batch )
+{
+    if( console == "main" )
+    {
+        o->mpHost->mpConsole->buffer.setBufferSize( limit, delete_batch );
+    }
+    else
+    {
+        mudlet::self()->setConsoleBufferSize( o->mpHost, console, limit, delete_batch );
+    }
+}
+
+void MudletObjectWrapper::setMainWindowSize( MudletObject*o, int w, int h)
+{
+    mudlet::self()->resize( w, h );
+}
+
+void MudletObjectWrapper::setMiniConsoleFontSize( MudletObject*o, QString& console, int size )
+{
+    std::string _console=console.toStdString();
+    o->mpHost->mpConsole->setMiniConsoleFontSize( _console, size );
+}
+
+bool MudletObjectWrapper::setTextFormat( MudletObject*o, QString& console,
+                                   double r1, double g1, double b1,
+                                   double r2, double g2 ,double b2,
+                                   double bold, double underline, double italics)
+{
+    if( console == "main" )
+    {
+        TConsole * pC = o->mpHost->mpConsole;
+        pC->mFormatCurrent.bgR = r1;
+        pC->mFormatCurrent.bgG = g1;
+        pC->mFormatCurrent.bgB = b1;
+        pC->mFormatCurrent.fgR = r2;
+        pC->mFormatCurrent.fgG = g2;
+        pC->mFormatCurrent.fgB = b2;
+        pC->mFormatCurrent.bold = bold;
+        pC->mFormatCurrent.underline = underline;
+        pC->mFormatCurrent.italics = italics;
+        return true;
+    }
+    else
+    {
+        mudlet::self()->setTextFormat( o->mpHost, console, static_cast<int>(r1), static_cast<int>(g1), static_cast<int>(b1), static_cast<int>(r2),static_cast<int>(g2), static_cast<int>(b2), static_cast<bool>(bold), static_cast<bool>(underline), static_cast<bool>(italics) );
+    }
+
+    return false;
+}
+
+bool MudletObjectWrapper::setWindowWrap( MudletObject*o, QString & console, int & wrap )
+{
+    if( console == "main" )
+    {
+        o->mpHost->mpConsole->setWrapAt( wrap );
+        return true;
+    }
+    else
+    {
+        return mudlet::self()->setWindowWrap( o->mpHost, console, wrap );
+    }
+}
+
+void MudletObjectWrapper::setWindowWrapIndent( MudletObject*o, QString & console, int & wrap )
+{
+    mudlet::self()->setWindowWrapIndent( o->mpHost, console, wrap );
+}
+
+//FIXME: Arguements might need to be phrased for numbers too.
+void MudletObjectWrapper::setLabelClickCallback( MudletObject*o, QString & label, QString &func, QString& args  )
+{
+    bool isNumber;
+    int number = args.toInt(&isNumber, 10);
+    TEvent * pE = new TEvent;
+    if( ! args.isEmpty())
+    {
+        if(isNumber & number != 0)
+        {
+            pE->mArgumentList.append( args );
+            pE->mArgumentTypeList.append( ARGUMENT_TYPE_NUMBER );
+        }
+        else
+        {
+            pE->mArgumentList.append( args );
+            pE->mArgumentTypeList.append( ARGUMENT_TYPE_STRING );
+        }
+    }
+    QString lang = "PYTHON";
+    mudlet::self()->setLabelClickCallback( o->mpHost, label, func, lang, pE );
+}
+
+void MudletObjectWrapper::setLabelStyleSheet( MudletObject*o, QString & label, QString & sheet )
+{
+    std::string _label = label.toStdString();
+    std::string _sheet = sheet.toStdString();
+    o->mpHost->mpConsole->setLabelStyleSheet( _label, _sheet );
+}

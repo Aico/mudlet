@@ -390,7 +390,7 @@ def display(obj):
     pprint.pprint(obj,width=60)
 
 
-def cecho(text,consule='main',insert=False):
+def cecho(text,console='main',insert=False):
     text=re.split("(<.*?>)",text)
     for line in text:
         if re.match("<(.*?)>",line):
@@ -398,19 +398,19 @@ def cecho(text,consule='main',insert=False):
             if ',' in match.group(1):
                 split_match=match.group(1).split(',')
                 if split_match[0] != '' and split_match[0] in color_dict:
-                    fg(split_match[0],consule)
+                    fg(split_match[0],console)
                 if split_match[1] != '' and split_match[1] in color_dict:
-                    bg(split_match[1],consule)
+                    bg(split_match[1],console)
             elif match.group(1) in color_dict:
-                fg(match.group(1),consule)
+                fg(match.group(1),console)
         else:
             if insert==False: 
-		echo(line,consule) 
+		echo(line,console) 
 	    else: 
-		insertText(line,consule)
+		insertText(line,console)
     resetFormat()
 
-def decho(text,consule='main',insert=False):
+def decho(text,console='main',insert=False):
     text=re.split("(<.*?>)",text)
     for line in text:
         if re.match("<(.*?)>",line):
@@ -419,21 +419,21 @@ def decho(text,consule='main',insert=False):
                 split_match=match.group(1).split(':')
                 if split_match[0] != '':
                     codes=split_match[0].split(',')
-                    setFgColor(int(codes[0]), int(codes[1]),int(codes[2]),consule)
+                    setFgColor(int(codes[0]), int(codes[1]),int(codes[2]),console)
                 if split_match[1] != '':
                     codes=split_match[1].split(',')
-                    setBgColor(int(codes[0]), int(codes[1]),int(codes[2]),consule)
+                    setBgColor(int(codes[0]), int(codes[1]),int(codes[2]),console)
             else:
                 codes=match.group(1).split(',')
-                setFgColor(int(codes[0]), int(codes[1]),int(codes[2]),consule)
+                setFgColor(int(codes[0]), int(codes[1]),int(codes[2]),console)
         else:
             if insert==False: 
-                echo(line,consule) 
+                echo(line,console) 
             else: 
-                insertText(line,consule)
+                insertText(line,console)
     resetFormat()
 
-def hecho(text,consule='main',insert=False):
+def hecho(text,console='main',insert=False):
     text=re.split("(\|c\w{6},\w{6}|\|c\w{6})",text)
     for line in text:
         if re.match("\|c\w{6},\w{6}|\|c\w{6}",line):
@@ -443,20 +443,20 @@ def hecho(text,consule='main',insert=False):
                 if split_match[0] != '':
                     codes=split_match[0]
                     codes=codes[2:4],codes[4:6],codes[6:8]
-                    setFgColor(int(codes[0],16), int(codes[1],16),int(codes[2],16),consule)
+                    setFgColor(int(codes[0],16), int(codes[1],16),int(codes[2],16),console)
                 if split_match[1] != '':
                     codes=split_match[1]
                     codes=codes[0:2],codes[2:4],codes[4:6]
-                    setBgColor(int(codes[0],16), int(codes[1],16),int(codes[2],16),consule)
+                    setBgColor(int(codes[0],16), int(codes[1],16),int(codes[2],16),console)
             else:
                 codes=m.group(1)
                 codes=codes[2:4],codes[4:6],codes[6:8]
-                setFgColor(int(codes[0],16), int(codes[1],16),int(codes[2],16),consule)
+                setFgColor(int(codes[0],16), int(codes[1],16),int(codes[2],16),console)
         else:
             if insert==False: 
-                echo(line,consule) 
+                echo(line,console) 
             else: 
-                insertText(line,consule)
+                insertText(line,console)
     resetFormat()
 
 
@@ -464,9 +464,6 @@ def replaceWildcard(what, replacement):
     selectCaptureGroup(what)
     replace(replacement)
     
-def RGB2Hex(red, green, blue):
-    _hex=hex(red)[2:]+hex(green)[2:]+hex(blue)[2:]
-    print _hex
 
 def showColors(wide=3):
     pos=1
@@ -496,26 +493,26 @@ def sendTelnetChannel102(msg):
 def sendIrc(channel, msg):
     mudlet.sendIrc(channel, msg)
 
-def echo(txt, consule='main'):
-    mudlet.echo(txt, consule)
+def echo(txt, console='main'):
+    mudlet.echo(txt, console)
 
-def echoLink(txt, func, hint, consule='main', customFormat=False):
-    mudlet.echoLink(txt, func, hint, consule, customFormat)
+def echoLink(txt, func, hint, console='main', customFormat=False):
+    mudlet.echoLink(txt, func, hint, console, customFormat)
 
-def insertLink(txt, func, hint, consule='main', customFormat=False):
-    mudlet.insertLink(txt, func, hint, consule, customFormat)
+def insertLink(txt, func, hint, console='main', customFormat=False):
+    mudlet.insertLink(txt, func, hint, console, customFormat)
 
-def setLink(func, hint, consule='main'):
-    mudlet.setLink(func, hint, consule)
+def setLink(func, hint, console='main'):
+    mudlet.setLink(func, hint, console)
 
-def echoPopup(txt, func, hint, consule='main', customFormat=False):
-    mudlet.echoPopup(txt, func, hint, consule, customFormat)
+def echoPopup(txt, func, hint, console='main', customFormat=False):
+    mudlet.echoPopup(txt, func, hint, console, customFormat)
 
-def setPopup(func,hint,consule='main'):
-    mudlet.setPopup(func,hint,consule)
+def setPopup(func,hint,console='main'):
+    mudlet.setPopup(func,hint,console)
 
-def insertPopup(txt, func, hint, consule='main'):
-    mudlet.insertPopup(txt, func, hint, consule)
+def insertPopup(txt, func, hint, console='main'):
+    mudlet.insertPopup(txt, func, hint, console)
 
 def createBuffer(name):
     mudlet.createBuffer(name)
@@ -538,60 +535,60 @@ def cut():
 def feedTriggers(txt):
     mudlet.feedTriggers(txt)
 
-def setBold(doBold,consule='main'):
-    """Consule=The consule you want to set, doBold=True/False for setting
+def setBold(doBold,console='main'):
+    """console=The console you want to set, doBold=True/False for setting
        bold on or off."""
-    mudlet.setBold(consule,active)
+    mudlet.setBold(console,active)
 
-def setUnderline(doUnderline,consule='main'):
-    """Consule=The consule you want to set, doUnderline=True/False for setting
+def setUnderline(doUnderline,console='main'):
+    """console=The console you want to set, doUnderline=True/False for setting
        Underline on or off."""
-    mudlet.setUnderline(consule,active)
+    mudlet.setUnderline(console,active)
 
-def setItalics(doItalics,consule='main'):
-    """Consule=The consule you want to set, doItalics=True/False for setting
+def setItalics(doItalics,console='main'):
+    """console=The console you want to set, doItalics=True/False for setting
        Italics on or off."""
-    mudlet.setItalics(consule,active)
+    mudlet.setItalics(console,active)
 
-def moveCursor(xpos, ypos, consule='main'):
-    mudlet.moveCursor(xpos,ypos,consule)
+def moveCursor(xpos, ypos, console='main'):
+    mudlet.moveCursor(xpos,ypos,console)
 
-def moveCursorEnd(consule='main'):
-    mudlet.moveCursorEnd(consule)
+def moveCursorEnd(console='main'):
+    mudlet.moveCursorEnd(console)
 
-def pasteWindow(consule='main'):
-    mudlet.pasteWindow(consule)
+def pasteWindow(console='main'):
+    mudlet.pasteWindow(console)
 
-def selectCurrentLine(consule='main'):
-    mudlet.selectCurrentLine(consule)
+def selectCurrentLine(console='main'):
+    mudlet.selectCurrentLine(console)
 
-def wrapLine(linenum, consule='main'):
-    mudlet.wrapLine(linenum, consule)
+def wrapLine(linenum, console='main'):
+    mudlet.wrapLine(linenum, console)
 
-def getFgColor(consule='main'):
-    return mudlet.getFgColor(consule)
+def getFgColor(console='main'):
+    return mudlet.getFgColor(console)
 
-def getBgColor(consule='main'):
-    return mudlet.getBgColor(consule)
+def getBgColor(console='main'):
+    return mudlet.getBgColor(console)
 
 def insertHTML(txt):
     mudlet.insertHTML(txt)
 
-def insertText(txt,consule='main'):
-    mudlet.insertText(txt, consule)
+def insertText(txt,console='main'):
+    mudlet.insertText(txt, console)
 
-def isAnsiFgColor(color, consule='main'):
-    return mudlet.isAnsiFgColor(color, consule)
+def isAnsiFgColor(color, console='main'):
+    return mudlet.isAnsiFgColor(color, console)
 
-def isAnsiBgColor(color, consule='main'):
-    return mudlet.isAnsiBgColor(color, consule)
+def isAnsiBgColor(color, console='main'):
+    return mudlet.isAnsiBgColor(color, console)
     
 def getRGB(color):
-    code = color_dict[color.strip()]
-    return code
+    r,g,b = color_dict[color.strip()]
+    return r,g,b
 
-def getCurrentLine(consule='main'):
-    return mudlet.getCurrentLine(consule)
+def getCurrentLine(console='main'):
+    return mudlet.getCurrentLine(console)
     
 def appendCmdLine(txt):
     mudlet.appendCmdLine(txt)
@@ -754,5 +751,187 @@ def permSubstringTrigger(name,folder,regexlist,func):
 
 def permBeginOfLineStringTrigger(name,folder,regexlist,func):
     return mudlet.startPermBeginOfLineStringTrigger(name,folder,regexlist,func)
+
+def clearUserWindow(console):
+    mudlet.clearUserWindow(console)
+
+clearWindow=clearUserWindow
+clearConsole=clearUserWindow
+
+def createLabel(name, xpos, ypos, width, height, fillBackground):
+    return mudlet.createLabel(name, xpos, ypos, width, height, fillBackground)
+
+def createMiniConsole(name, xpos, ypos, width, height):
+    return mudlet.createMiniConsole(name, xpos, ypos, width, height)
+
+def echoUserWindow(console, txt):
+    mudlet.echoUserWindow(console, txt)
+
+def getButtonState():
+    return mudlet.getButtonState()
+
+def getMainConsoleWidth():
+    return mudlet.getMainConsoleWidth()
+
+def getMainWindowSize():
+    return mudlet.getMainWindowSize()
+
+def calcFontSize(size):
+    return mudlet.calcFontSize(size)
+
+def hasFocus():
+    return mudlet.hasFocus()
+
+def hideToolBar(name):
+    mudlet.hideToolBar(name)
+
+def showToolBar(name):
+    mudlet.showToolBar(name)
+
+def moveWindow(console, xpos, ypos):
+    mudlet.moveWindow(console, xpos, ypos)
+
+moveUserWindow=moveWindow
+
+def hideWindow(console):
+    return mudlet.hideUserWindow(console)
+
+hideUserWindow=hideWindow
+
+def showWindow(console):
+    return mudlet.showUserWindow(console)
+
+showUserWindow=showWindow
+
+def openUserWindow(name):
+    mudlet.openUserWindow(name)
+
+openWindow=openUserWindow
+
+def resizeUserWindow(name, x, y):
+    mudlet.resizeUserWindow(name, x, y)
+
+resizeWindow=resizeUserWindow
+
+def setBackgroundColor(console, r, g, b, alpha):
+    mudlet.setBackgroundColor(console, r, g, b, alpha)
+
+def setBackgroundImage(console, path):
+    mudlet.setBackgroundImage(console, path)
+
+def setBorderTop(size):
+    mudlet.setBorderTop(size)
+
+def setBorderBottom(size):
+    mudlet.setBorderBottom(size)
+
+def setBorderLeft(size):
+    mudlet.setBorderLeft(size)
+
+def setBorderRight(size):
+    mudlet.setBorderRight(size)
+
+def setConsoleBufferSize(console, limit, delete_batch):
+    mudlet.setConsoleBufferSize(console, limit, delete_batch)
+
+def setMainWindowSize(wide, height):
+    mudlet.setMainWindowSize(wide, height)
+
+def setMiniConsoleFontSize(console, size):
+    mudlet.setMiniConsoleFontSize(console, size)
+
+def setTextFormat(console, fR, fG, fB, bR, bG ,bB, bold, underline, italics):
+    return mudlet.setTextFormat(console, fR, fG, fB, bR, bG ,bB, bold, underline, italics)
+
+def setWindowWrap(console, wrap):
+    return mudlet.setWindowWrap(console, wrap)
+
+def setWindowWrapIndent(console, indent):
+    mudlet.setWindowWrapIndent(console, indent)
+
+def createConsole(consoleName, fontSize, charsPerLine, numberOfLines, Xpos, Ypos):
+   createMiniConsole(consoleName,0,0,1,1)
+   setMiniConsoleFontSize(consoleName, fontSize)
+   x,y = calcFontSize( fontSize )
+   resizeWindow(consoleName, x*charsPerLine, y*numberOfLines)
+   setWindowWrap(consoleName, Xpos)
+   moveWindow(consoleName, Xpos, Ypos)
+   setBackgroundColor(consoleName,0,0,0,0)
+   setFgColor(255,255,255,consoleName)
+
+#Dict holding information about Gauges.
+gaugesTable={}
+
+def createGauge(gaugeName, width, height, Xpos, Ypos, gaugeText, color1, color2="", color3=""):
+        createLabel(gaugeName+"_back",0,0,0,0,1)
+        if color2=="":
+                red, green, blue = getRGB(color1)
+                setBackgroundColor(gaugeName+"_back", red , green, blue, 100)
+        else:
+                setBackgroundColor(gaugeName+"_back", color1 ,color2, color3, 100)
+        moveWindow(gaugeName+"_back", Xpos, Ypos)
+        resizeWindow(gaugeName+"_back", width, height)
+        showWindow(gaugeName+"_back")
+        createLabel(gaugeName,0,0,0,0,1)
+        if color2 == "":
+                red, green, blue = getRGB(color1)
+                setBackgroundColor(gaugeName, red , green, blue, 255)
+        else:
+                setBackgroundColor(gaugeName, color1 ,color2, color3, 255)
+        moveWindow(gaugeName, Xpos, Ypos)
+        resizeWindow(gaugeName, width, height)
+        showWindow(gaugeName)
+
+        gaugesTable[gaugeName] = {"width" : width, "height" : height, "xpos" : Xpos, "ypos" : Ypos,"text" : gaugeText, "color1" : color1, "color2" : color2, "color3" : color3}
+
+        if gaugeText != "":
+                setGaugeText(gaugeName,gaugeText, "black")
+        else:
+                setGaugeText(label=gaugeName)
+
+def moveGauge(gaugeName, newX, newY):
+        #assert(gaugesTable[gaugeName], "moveGauge: no such gauge exists.")
+        #assert(newX and newY, "moveGauge: need to have both X and Y dimensions.")
+        moveWindow(gaugeName, newX, newY)
+        moveWindow(gaugeName+"_back", newX, newY)
+        gaugesTable[gaugeName]["xpos"], gaugesTable[gaugeName]["ypos"] = newX, newY
+
+def resizeGauge(gaugeName, width, height):
+    #assert(gaugesTable[gaugeName], "resizeGauge: no such gauge exists.")
+    #assert(width and height, "resizeGauge: need to have both width and height.")
+    resizeWindow(gaugeName, width, height)
+    resizeWindow(gaugeName+"_back", width, height)
+    gaugesTable[gaugeName]["width"], gaugesTable[gaugeName]["height"] = width, height
+
+def setGaugeStyleSheet(gaugeName, css):
+    #assert(gaugesTable[gaugeName], "setGaugeStyleSheet: no such gauge exists.")
+    setLabelStyleSheet(gaugeName, css)
+    setLabelStyleSheet(gaugeName+"_back", css)
+
+def RGB2Hex(red, green, blue):
+    _hex="%0.2X" % red+"%0.2X" % green+"%0.2X" % blue
+    return _hex
+
+def setGaugeText(gaugeName, gaugeText="", color1="", color2="", color3=""):
+        #assert(gaugesTable[gaugeName], "setGauge: no such gauge exists.")
+        red,green,blue = 0,0,0
+        l_labelText = gaugeText
+        if color1 != "":
+                if color2 == "":
+                        red, green, blue = getRGB(color1)
+                else:
+                        red, green, blue = color1, color2, color3
+        l_EchoString = "<font color=#"+str(RGB2Hex(red,green,blue))+">"+l_labelText+"</font>"
+        echo(l_EchoString,gaugeName)
+        echo(l_EchoString,gaugeName+"_back")
+        gaugesTable[gaugeName]["text"] = l_EchoString
+        gaugesTable[gaugeName]["color1"], gaugesTable[gaugeName]["color2"], gaugesTable[gaugeName]["color3"] = color1, color2, color3
+
+def setLabelClickCallback(label,func,args=""):
+    mudlet.setLabelClickCallback(label,func,args)
+
+def setLabelStyleSheet(label,sheet):
+    mudlet.setLabelStyleSheet(label,sheet)
+
 
 execfile('PythonLocal.py')

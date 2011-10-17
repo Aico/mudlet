@@ -137,7 +137,6 @@ public slots:
   int insertText(MudletObject* o, QString& themsg, QString& console );
   bool isAnsiFgColor(MudletObject* o, int ansiFg, QString& console);
   bool isAnsiBgColor(MudletObject* o, int ansiFg, QString& console);
-  //Start of new commit
   int appendCmdLine(MudletObject* o, QString& appendtxt);
   int denyCurrentSend(MudletObject*o);
   int getLastLineNumber(MudletObject*o, QString& console);
@@ -180,6 +179,40 @@ public slots:
   int loadRawFile( MudletObject*o, QString& SendTxt );
   int playSoundFile( MudletObject*o, QString& sound );
   int sendSocket( MudletObject*o, QString& txt );
+  //Start of new commit
+  QList<int> calcFontSize( MudletObject*o, int size );
+  void clearUserWindow( MudletObject*o, QString& console );
+  bool createLabel( MudletObject*o, QString& name, int x, int y, int width, int height, bool fillBackground );
+  bool createMiniConsole( MudletObject*o, QString& name, int x, int y, int width, int height );
+  void echoUserWindow( MudletObject*o, QString& console, QString& txt );
+  int getButtonState( MudletObject*o );
+  int getMainConsoleWidth( MudletObject*o );
+  QList<int> getMainWindowSize( MudletObject*o );
+  bool hasFocus( MudletObject*o );
+  void hideToolBar( MudletObject*o, QString& toolbar );
+  void showToolBar( MudletObject*o, QString& toolbar );
+  bool hideUserWindow( MudletObject*o, QString& console );
+  void moveWindow( MudletObject*o, QString& console, double x, double y );
+  void openUserWindow( MudletObject*o, QString& name );
+  bool showUserWindow( MudletObject*o, QString& name );
+  void resizeUserWindow( MudletObject*o, QString& name, double x, double y );
+  void setBackgroundColor(  MudletObject*o, QString& name, double r, double g, double b, double alpha);
+  void setBackgroundImage( MudletObject*o, QString& name, QString& path);
+  void setBorderTop( MudletObject*o, int size );
+  void setBorderBottom( MudletObject*o, int size );
+  void setBorderLeft( MudletObject*o, int size );
+  void setBorderRight( MudletObject*o, int size );
+  void setConsoleBufferSize( MudletObject*o, QString& console, int limit, int delete_batch );
+  void setMainWindowSize( MudletObject*o, int w, int h);
+  void setMiniConsoleFontSize( MudletObject*o, QString& console, int size );
+  bool setTextFormat( MudletObject*o, QString& console,
+                                     double r1, double g1, double b1,
+                                     double r2, double g2 ,double b2,
+                                     double bold, double underline, double italics);
+  bool setWindowWrap( MudletObject*o, QString & console, int & wrap );
+  void setWindowWrapIndent( MudletObject*o, QString & console, int & wrap );
+  void setLabelClickCallback( MudletObject*o, QString & label, QString & func, QString& args  );
+  void setLabelStyleSheet( MudletObject*o, QString & label, QString & sheet );
 };
 
 #endif  

@@ -90,7 +90,7 @@ public:
    bool                          setBackgroundColor( Host *, QString & name, int r, int g, int b, int alpha );
    bool                          setBackgroundImage( Host *, QString & name, QString & path );
    bool                          setTextFormat( Host *, QString & name, int, int, int, int, int, int, bool, bool, bool );
-   bool                          setLabelClickCallback( Host *, QString &, QString &, TEvent * );
+   bool                          setLabelClickCallback( Host *, QString &, QString &, QString &, TEvent * );
    bool                          moveWindow( Host *, QString & name, int, int );
    void                          deleteLine( Host *, QString & name );
    void                          insertText( Host *, QString & name, QString );
