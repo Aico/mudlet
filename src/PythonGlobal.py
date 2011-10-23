@@ -933,5 +933,17 @@ def setLabelClickCallback(label,func,args=""):
 def setLabelStyleSheet(label,sheet):
     mudlet.setLabelStyleSheet(label,sheet)
 
+def setGauge(name,value,maxValue,txt=""):
+        #assert(gaugesTable[gaugeName], "setGauge: no such gauge exists.")
+        #assert(currentValue and maxValue, "setGauge: need to have both current and max values.")
+
+        resizeWindow(name, gaugesTable[name].width/100*((100/maxValue)*value), gaugesTable[name].height)
+
+        # if we wanted to change the text, we do it
+        if gaugeText != "" :
+                echo(name+"_back", txt)
+                echo(name, txt)
+                gaugesTable[name].text = txt
+    
 
 execfile('PythonLocal.py')

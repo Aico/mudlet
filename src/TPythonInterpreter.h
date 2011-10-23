@@ -179,7 +179,6 @@ public slots:
   int loadRawFile( MudletObject*o, QString& SendTxt );
   int playSoundFile( MudletObject*o, QString& sound );
   int sendSocket( MudletObject*o, QString& txt );
-  //Start of new commit
   QList<int> calcFontSize( MudletObject*o, int size );
   void clearUserWindow( MudletObject*o, QString& console );
   bool createLabel( MudletObject*o, QString& name, int x, int y, int width, int height, bool fillBackground );

@@ -90,7 +90,7 @@ void TPythonInterpreter::callEventHandler( const QString & function, const TEven
     if (mpHost->pythonEnabled())
     {
         QVariantList vl = QVariantList();
-        for( int i=0; i<pE->mArgumentList.size(); i++ )
+        for( int i=2; i<pE->mArgumentList.size(); i++ )
         {
             if( pE->mArgumentTypeList[i] == ARGUMENT_TYPE_NUMBER )
             {
@@ -505,15 +505,15 @@ int MudletObjectWrapper::echoLink( MudletObject* o, QString& themsg, QString& th
     QStringList tip;
     func <<  thefunc;
     tip << tooltip;
-    func.prepend("PYTHON");
+    QString lang = "PYTHON";
 
     if (console == "main")
     {
-        o->mpHost->mpConsole->echoLink( themsg, func, tip, customFormat );
+        o->mpHost->mpConsole->echoLink( themsg, func, tip, lang, customFormat );
     }
     else
     {
-        mudlet::self()->echoLink( o->mpHost, console, themsg, func, tip, customFormat  );
+        mudlet::self()->echoLink( o->mpHost, console, themsg, func, tip, lang, customFormat  );
     }
     return 0;
 }
@@ -524,15 +524,15 @@ int MudletObjectWrapper::insertLink(MudletObject* o, QString& themsg, QString& t
     QStringList tip;
     func <<  thefunc;
     tip << tooltip;
-    func.prepend("PYTHON");
+    QString lang = "PYTHON";
 
     if (console == "main")
     {
-        o->mpHost->mpConsole->insertLink( themsg, func, tip);
+        o->mpHost->mpConsole->insertLink( themsg, func, tip, lang);
     }
     else
     {
-        mudlet::self()->insertLink( o->mpHost, console, themsg, func, tip  );
+        mudlet::self()->insertLink( o->mpHost, console, themsg, func, tip, lang  );
     }
     return 0;
 }
@@ -543,16 +543,16 @@ int MudletObjectWrapper::setLink( MudletObject* o,QString& thefunc, QString& too
     QStringList tip;
     func <<  thefunc;
     tip << tooltip;
-    func.prepend("PYTHON");
+    QString lang = "PYTHON";
     QString linkTxt="";
 
     if (console == "main")
     {
-        o->mpHost->mpConsole->setLink( linkTxt, func, tip );
+        o->mpHost->mpConsole->setLink( linkTxt, func, tip, lang );
     }
     else
     {
-        mudlet::self()->setLink( o->mpHost, console, linkTxt, func, tip  );
+        mudlet::self()->setLink( o->mpHost, console, linkTxt, func, tip, lang  );
     }
     return 0;
 }
@@ -673,48 +673,43 @@ int MudletObjectWrapper::setUnderline(MudletObject* o, QString& console, bool ac
 
 int MudletObjectWrapper::echoPopup(MudletObject* o, QString& themsg, QStringList& func, QStringList& tooltip, QString& console, bool customFormat)
 {
-    func.prepend("PYTHON");
-    tooltip.prepend("");
+    QString lang = "PYTHON";
     if (console == "main")
     {
-        o->mpHost->mpConsole->echoLink( themsg, func, tooltip, customFormat );
+        o->mpHost->mpConsole->echoLink( themsg, func, tooltip, lang, customFormat );
     }
     else
     {
-        mudlet::self()->echoLink( o->mpHost, console, themsg, func, tooltip, customFormat  );
+        mudlet::self()->echoLink( o->mpHost, console, themsg, func, tooltip, lang, customFormat  );
     }
     return 0;
 }
 
 int MudletObjectWrapper::setPopup(MudletObject* o, QStringList& func, QStringList& tip, QString& console)
 {
+    QString lang = "PYTHON";
     QString linkTxt="";
-    func.prepend("PYTHON");
-    tip.prepend("");
-
     if (console == "main")
     {
-        o->mpHost->mpConsole->setLink( linkTxt, func, tip );
+        o->mpHost->mpConsole->setLink( linkTxt, func, tip, lang );
     }
     else
     {
-        mudlet::self()->setLink( o->mpHost, console, linkTxt, func, tip  );
+        mudlet::self()->setLink( o->mpHost, console, linkTxt, func, tip, lang  );
     }
     return 0;
 }
 
 int MudletObjectWrapper::insertPopup(MudletObject* o, QString& themsg, QStringList& func, QStringList& tooltip, QString& console)
 {
-    func.prepend("PYTHON");
-    tooltip.prepend("");
-
+    QString lang = "PYTHON";
     if (console == "main")
     {
-        o->mpHost->mpConsole->insertLink( themsg, func, tooltip);
+        o->mpHost->mpConsole->insertLink( themsg, func, tooltip, lang);
     }
     else
     {
-        mudlet::self()->insertLink( o->mpHost, console, themsg, func, tooltip  );
+        mudlet::self()->insertLink( o->mpHost, console, themsg, func, tooltip, lang  );
     }
     return 0;
 }

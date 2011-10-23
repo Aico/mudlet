@@ -1446,7 +1446,7 @@ void TConsole::reset()
     mFormatCurrent.underline = false;
 }
 
-void TConsole::insertLink( QString text, QStringList & func, QStringList & hint, QPoint P, bool customFormat )
+void TConsole::insertLink( QString text, QStringList & func, QStringList & hint, QPoint P, QString & lang,bool customFormat )
 {
     int x = P.x();
     int y = P.y();
@@ -1483,7 +1483,7 @@ void TConsole::insertLink( QString text, QStringList & func, QStringList & hint,
                 TChar _f = TChar(0,0,255,mBgColor.red(), mBgColor.green(), mBgColor.blue(), false, false, true );
                 buffer.insertInLine( P, text, _f );
             }
-            buffer.applyLink( P, P2, text, func, hint );
+            buffer.applyLink( P, P2, text, func, hint, lang );
             console->needUpdate( mUserCursor.y(), mUserCursor.y()+1 );
         }
         else if( y >= mEngineCursor )
@@ -1495,7 +1495,7 @@ void TConsole::insertLink( QString text, QStringList & func, QStringList & hint,
                 TChar _f = TChar(0,0,255,mBgColor.red(), mBgColor.green(), mBgColor.blue(), false, false, true );
                 buffer.insertInLine( P, text, _f );
             }
-            buffer.applyLink( P, P2, text, func, hint );
+            buffer.applyLink( P, P2, text, func, hint, lang );
         }
         return;
     }
@@ -1504,11 +1504,11 @@ void TConsole::insertLink( QString text, QStringList & func, QStringList & hint,
         if( ( buffer.buffer.size() == 0 && buffer.buffer[0].size() == 0 ) || mUserCursor == buffer.getEndPos() )
         {
             if( customFormat )
-                buffer.addLink( mTriggerEngineMode, text, func, hint, mFormatCurrent );
+                buffer.addLink( mTriggerEngineMode, text, func, hint, mFormatCurrent, lang );
             else
             {
                 TChar _f = TChar(0,0,255,mBgColor.red(), mBgColor.green(), mBgColor.blue(), false, false, true );
-                buffer.addLink( mTriggerEngineMode, text, func, hint, _f );
+                buffer.addLink( mTriggerEngineMode, text, func, hint, _f, lang );
             }
 
             /*buffer.append( text,
@@ -1541,7 +1541,7 @@ void TConsole::insertLink( QString text, QStringList & func, QStringList & hint,
                                      _f );
             }
 
-            buffer.applyLink( P, P2, text, func, hint );
+            buffer.applyLink( P, P2, text, func, hint, lang );
             if( text.indexOf("\n") != -1 )
             {
                 int y_tmp = mUserCursor.y();
@@ -1732,9 +1732,9 @@ void TConsole::insertText( QString msg )
     insertText( msg, mUserCursor );
 }
 
-void TConsole::insertLink( QString text, QStringList & func, QStringList & hint, bool customFormat )
+void TConsole::insertLink( QString text, QStringList & func, QStringList & hint, QString & lang,bool customFormat)
 {
-    insertLink( text, func, hint, mUserCursor, customFormat );
+    insertLink( text, func, hint, mUserCursor, lang, customFormat );
 }
 
 void TConsole::insertHTML( QString text )
@@ -2048,9 +2048,9 @@ bool TConsole::selectSection( int from, int to )
     return true;
 }
 
-void TConsole::setLink( QString & linkText, QStringList & linkFunction, QStringList & linkHint )
+void TConsole::setLink( QString & linkText, QStringList & linkFunction, QStringList & linkHint, QString & lang )
 {
-    buffer.applyLink( P_begin, P_end, linkText, linkFunction, linkHint );
+    buffer.applyLink( P_begin, P_end, linkText, linkFunction, linkHint, lang );
 }
 
 void TConsole::setBold( bool b )
@@ -2150,21 +2150,21 @@ void TConsole::printCommand( QString & msg )
     }
 }
 
-void TConsole::echoLink( QString & text, QStringList & func, QStringList & hint, bool customFormat )
+void TConsole::echoLink( QString & text, QStringList & func, QStringList & hint, QString & lang, bool customFormat )
 {
     if( customFormat )
-        buffer.addLink( mTriggerEngineMode, text, func, hint, mFormatCurrent );
+        buffer.addLink( mTriggerEngineMode, text, func, hint, mFormatCurrent, lang );
     else
     {
         if( ! mIsSubConsole && ! mIsDebugConsole )
         {
             TChar f = TChar(0, 0, 255, mpHost->mBgColor.red(), mpHost->mBgColor.green(), mpHost->mBgColor.blue(), false, false, true);
-            buffer.addLink( mTriggerEngineMode, text, func, hint, f );
+            buffer.addLink( mTriggerEngineMode, text, func, hint, f, lang );
         }
         else
         {
             TChar f = TChar(0, 0, 255, mBgColor.red(), mBgColor.green(), mBgColor.blue(), false, false, true);
-            buffer.addLink( mTriggerEngineMode, text, func, hint, f );
+            buffer.addLink( mTriggerEngineMode, text, func, hint, f, lang );
         }
     }
 }
