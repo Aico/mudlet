@@ -1209,13 +1209,13 @@ void TTextEdit::slot_popupMenu()
     {
         cmd = mPopupCommands[pA->text()];
     }
-    if( mPopupLanguage == "LUA")
-    {
-        mpHost->mLuaInterpreter.compileAndExecuteScript( cmd );
-    }
     if( mPopupLanguage == "PYTHON")
     {
         mpHost->mPythonInterpreter.executeScript(cmd);
+    }
+    else
+    {
+        mpHost->mLuaInterpreter.compileAndExecuteScript( cmd );
     }
 }
 
@@ -1262,14 +1262,14 @@ void TTextEdit::mousePressEvent( QMouseEvent * event )
                     QString func = command.at(0);
                     QString lang = mpBuffer->mLanguageStore[mpBuffer->buffer[y][x].link];
 
-                    if( lang == "LUA" )
-                    {
-                        mpHost->mLuaInterpreter.compileAndExecuteScript( func );
-                        return;
-                    }
                     if( lang == "PYTHON" )
                     {
                         mpHost->mPythonInterpreter.executeScript(func);
+                        return;
+                    }
+                    else
+                    {
+                        mpHost->mLuaInterpreter.compileAndExecuteScript( func );
                         return;
                     }
 
