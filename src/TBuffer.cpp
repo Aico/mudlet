@@ -320,7 +320,7 @@ int TBuffer::getLastLineNumber()
     }
 }
 
-void TBuffer::addLink( bool trigMode, QString & text, QStringList & command, QStringList & hint, TChar format )
+void TBuffer::addLink( bool trigMode, QString & text, QStringList & command, QStringList & hint, TChar format, QString & lang )
 {
     mLinkID++;
     if( mLinkID > 1000 )
@@ -329,6 +329,7 @@ void TBuffer::addLink( bool trigMode, QString & text, QStringList & command, QSt
     }
     mLinkStore[mLinkID] = command;
     mHintStore[mLinkID] = hint;
+    mLanguageStore[mLinkID] = lang;
     if( ! trigMode )
     {
         append( text,
@@ -3333,7 +3334,7 @@ bool TBuffer::applyFormat( QPoint & P_begin, QPoint & P_end, TChar & format )
         return false;
 }
 
-bool TBuffer::applyLink( QPoint & P_begin, QPoint & P_end, QString linkText, QStringList & linkFunction, QStringList & linkHint )
+bool TBuffer::applyLink( QPoint & P_begin, QPoint & P_end, QString linkText, QStringList & linkFunction, QStringList & linkHint, QString & lang )
 {
     int x1 = P_begin.x();
     int x2 = P_end.x();
@@ -3377,6 +3378,7 @@ bool TBuffer::applyLink( QPoint & P_begin, QPoint & P_end, QString linkText, QSt
                         }
                         mLinkStore[mLinkID] = linkFunction;
                         mHintStore[mLinkID] = linkHint;
+                        mLanguageStore[mLinkID] = lang;
                     }
                     buffer[y][x].link = linkID;
                     x++;

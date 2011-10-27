@@ -38,7 +38,14 @@ void TLabel::mousePressEvent( QMouseEvent * event )
     {
         if( mpHost )
         {
-            mpHost->getLuaInterpreter()->callEventHandler( mScript, mpParameters );
+            if(mScriptLanguage == "LUA")
+            {
+                mpHost->getLuaInterpreter()->callEventHandler( mScript, mpParameters );
+            }
+            if(mScriptLanguage == "PYTHON")
+            {
+                mpHost->getPythonInterpreter()->callEventHandler( mScript, mpParameters );
+            }
         }
         event->accept();
         return;
