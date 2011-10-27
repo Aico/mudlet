@@ -1155,12 +1155,12 @@ void TTextEdit::contextMenuEvent ( QContextMenuEvent * event )
             if( mpBuffer->buffer[y][x].link > 0 )
             {
                 QStringList command = mpBuffer->mLinkStore[mpBuffer->buffer[y][x].link];
-                QStringList hint = mpBuffer->mHintStore[mpBuffer->buffer[y][x].link];
-                mPopupLanguage=command[0];
+                QStringList hint = mpBuffer->mHintStore[mpBuffer->buffer[y][x].link];                
+                mPopupLanguage=mpBuffer->mLanguageStore[mpBuffer->buffer[y][x].link];
                 if( command.size() > 1 )
                 {
                     QMenu * popup = new QMenu( this );
-                    for( int i=1; i<command.size(); i++ )
+                    for( int i=0; i<command.size(); i++ )
                     {
                         QAction * pA;
                         if( i < hint.size() )
@@ -1210,13 +1210,13 @@ void TTextEdit::slot_popupMenu()
     {
         cmd = mPopupCommands[pA->text()];
     }
-    if( mPopupLanguage == "LUA")
-    {
-        mpHost->mLuaInterpreter.compileAndExecuteScript( cmd );
-    }
     if( mPopupLanguage == "PYTHON")
     {
         mpHost->mPythonInterpreter.executeScript(cmd);
+    }
+    else
+    {
+        mpHost->mLuaInterpreter.compileAndExecuteScript( cmd );
     }
 }
 
@@ -1260,17 +1260,17 @@ void TTextEdit::mousePressEvent( QMouseEvent * event )
                 if( mpBuffer->buffer[y][x].link > 0 )
                 {
                     QStringList command = mpBuffer->mLinkStore[mpBuffer->buffer[y][x].link];
-                    QString func = command.at(1);
-                    QString lang = command.at(0);
+                    QString func = command.at(0);
+                    QString lang = mpBuffer->mLanguageStore[mpBuffer->buffer[y][x].link];
 
-                    if( lang == "LUA" )
-                    {
-                        mpHost->mLuaInterpreter.compileAndExecuteScript( func );
-                        return;
-                    }
                     if( lang == "PYTHON" )
                     {
                         mpHost->mPythonInterpreter.executeScript(func);
+                        return;
+                    }
+                    else
+                    {
+                        mpHost->mLuaInterpreter.compileAndExecuteScript( func );
                         return;
                     }
 
@@ -1306,11 +1306,11 @@ void TTextEdit::mousePressEvent( QMouseEvent * event )
                 {
                     QStringList command = mpBuffer->mLinkStore[mpBuffer->buffer[y][x].link];
                     QStringList hint = mpBuffer->mHintStore[mpBuffer->buffer[y][x].link];
-                    mPopupLanguage=command[0];
+                    mPopupLanguage=mpBuffer->mLanguageStore[mpBuffer->buffer[y][x].link];
                     if( command.size() > 1 )
                     {
                         QMenu * popup = new QMenu( this );
-                        for( int i=1; i<command.size(); i++ )
+                        for( int i=0; i<command.size(); i++ )
                         {
                             QAction * pA;
                             if( i < hint.size() )

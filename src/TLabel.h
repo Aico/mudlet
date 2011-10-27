@@ -36,11 +36,12 @@ Q_OBJECT
 public:
 
                   TLabel( QWidget * pW=0 );
-void              setScript( Host * pHost, QString & func, TEvent * args ){ mpHost = pHost; mScript = func; mpParameters = args; }
+void              setScript( Host * pHost, QString & func, QString & lang, TEvent * args ){ mpHost = pHost; mScript = func; mScriptLanguage=lang; mpParameters = args; }
 void              mousePressEvent( QMouseEvent *  );
 
 Host *            mpHost;
 QString           mScript;
+QString           mScriptLanguage;
 TEvent *          mpParameters;
 public slots:
 
