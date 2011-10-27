@@ -2,7 +2,7 @@ The following instructions describe the steps to compile the mudlet source for U
 
 1. First you need to installed the required dependencies:
 
-a) sudo apt-get install build-essential qt4-dev-tools libqt4-opengl-dev lua5.1 liblua5.1-0-dev liblua5.1-rex-pcre-dev liblua5.1-sql-sqlite3-dev libpcre3-dev libboost1.40-dev zlib1g-dev libyajl-dev libzzip-dev liblua5.1-filesystem* liblua5.1-zip* libphonon-dev python-dev
+a) sudo apt-get install build-essential qt4-dev-tools libqt4-opengl-dev lua5.1 liblua5.1-0-dev liblua5.1-rex-pcre-dev liblua5.1-sql-sqlite3-dev libpcre3-dev libboost1.40-dev zlib1g-dev libyajl-dev libzzip-dev liblua5.1-filesystem* liblua5.1-zip* libphonon-dev python-dev hunspell libhunspell*
 
 2. Download and install QtSDK
 
@@ -12,12 +12,20 @@ b) chmod u+x the file to make it executable and then run to install.
 
 3. compile mudlet
 
-a) go to the mudlet base directory where mudlet.pro is:
+a) If you are using a version of Python different than 2.6 you need to edit this file:
+src/pythonqt/build/python.prf
+and replace with your Python version number.
+
+b) For Ubuntu 11.10 only create the following link:
+ln -s /usr/lib/x86_64-linux-gnu/liblua5.1.so /usr/local/lib/liblua.so
+replacing the 64bit part with 32 if your system is 32bit.
+
+c) go to the mudlet base directory where mudlet.pro is:
 cd /path to git clone/mudlet
 
-b) qmake
+d) qmake
 
-c) make
+e) make
 
 4. Run mudlet:
 cd src
