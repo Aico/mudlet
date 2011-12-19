@@ -31,6 +31,8 @@
 
 
 class Host;
+class TMapLabel;
+class TRoom;
 
 class TPythonInterpreter : public QObject
 {
@@ -61,6 +63,14 @@ private:
     Host * mpHost;
     bool mpInitialized;
     void runMethod(const QString& msg);
+    QMap<QString,QVariant> convertQMap(const QMap<int,int> map);
+    QMap<QString,QVariant> convertQMap(const QMap<int,QString> map);
+    QMap<QString,QVariant> convertQMap(const QMap<int,QColor> map);
+    QMap<QString,QVariant> convertQMap(const QMap<QString,int> map);
+    QMap<QString,QVariant> mapLabelsToQVariant(const QMap<qint32,QMap<qint32,TMapLabel> > map);
+    QMap<QString,QVariant> mapLabelToQVariant(const TMapLabel label);
+    QMap<QString,QVariant> convertQMap(const QMap<int,TRoom *> map);
+    QMap<QString,QVariant> roomToQVariant(const TRoom room);
 };
 
 class MudletObject {

@@ -31,6 +31,8 @@
 #include <string>
 #include <list>
 #include <QDir>
+#include <QMapIterator>
+#include <QMap>
 
 
 QHash<QString, Host *> TPythonInterpreter::pythonHostMap;
@@ -71,12 +73,158 @@ void TPythonInterpreter::init()
         const QString& varHostLogin = "HOST_LOGIN";
         const QVariant& varHostLoginValue = mpHost->getLogin();
         add_python_variable(varHostLogin,varHostLoginValue);
+        const QString& varEnvColors = "HOST_ENV_COLORS";
+        const QVariant& varEnvColorsValue = convertQMap(mpHost->mpMap->envColors);
+        add_python_variable(varEnvColors,varEnvColorsValue);
+        const QString& varAreaNamesMap = "HOST_AREA_NAMES_MAP";
+        const QVariant& varAreaNamesMapValue = convertQMap(mpHost->mpMap->areaNamesMap);
+        add_python_variable(varAreaNamesMap,varAreaNamesMapValue);
+        const QString& varCustomEnvColors = "HOST_CUSTOM_ENV_COLORS";
+        const QVariant& varCustomEnvColorsValue = convertQMap(mpHost->mpMap->customEnvColors);
+        add_python_variable(varCustomEnvColors,varCustomEnvColorsValue);
+        const QString& varMapHash = "HOST_MAP_HASH_TABLE";
+        const QVariant& varMapHashValue = convertQMap(mpHost->mpMap->hashTable);
+        add_python_variable(varMapHash,varMapHashValue);
+        const QString& varMapLabels = "HOST_MAP_LABELS";
+        const QVariant& varMapLabelsValue = mapLabelsToQVariant(mpHost->mpMap->mapLabels);
+        add_python_variable(varMapLabels,varMapLabelsValue);
+        const QString& varRooms = "HOST_ROOMS";
+        const QVariant& varRoomsValue = convertQMap(mpHost->mpMap->rooms);
+        add_python_variable(varRooms,varRoomsValue);
+
         PythonQt::self()->registerCPPClass("MudletObject", "","mudlet", PythonQtCreateObject<MudletObjectWrapper>);
         
         QString dirPath = QCoreApplication::applicationDirPath();
         mainModule.evalFile(dirPath + "/PythonGlobal.py");
         mpInitialized = true;
     }
+}
+
+QMap<QString,QVariant> TPythonInterpreter::convertQMap(const QMap<int,int> map) {
+    QMap<QString,QVariant> result;
+    QMapIterator<int, int> i(map);
+    while (i.hasNext()) {
+        i.next();
+        result[QString(i.key())]=QVariant(i.value());
+    }
+
+    return result;
+}
+
+QMap<QString,QVariant> TPythonInterpreter::convertQMap(const QMap<int,QString> map) {
+    QMap<QString,QVariant> result;
+    QMapIterator<int, QString> i(map);
+    while (i.hasNext()) {
+        i.next();
+        result[QString(i.key())]=QVariant(i.value());
+    }
+
+    return result;
+}
+
+QMap<QString,QVariant> TPythonInterpreter::convertQMap(const QMap<int,QColor> map) {
+    QMap<QString,QVariant> result;
+    QMapIterator<int, QColor> i(map);
+    while (i.hasNext()) {
+        i.next();
+        result[QString(i.key())]=(QVariant)i.value();
+    }
+
+    return result;
+}
+
+QMap<QString,QVariant> TPythonInterpreter::convertQMap(const QMap<QString,int> map) {
+    QMap<QString,QVariant> result;
+    QMapIterator<QString,int> i(map);
+    while (i.hasNext()) {
+        i.next();
+        result[i.key()]=QVariant(i.value());
+    }
+
+    return result;
+}
+
+QMap<QString,QVariant> TPythonInterpreter::convertQMap(const QMap<int,TRoom *> map) {
+    QMap<QString,QVariant> result;
+    QMapIterator<int,TRoom *> i(map);
+    while (i.hasNext()) {
+        i.next();
+        result[QString(i.key())]=roomToQVariant(*(i.value()));
+    }
+
+    return result;
+}
+
+QMap<QString,QVariant> TPythonInterpreter::mapLabelsToQVariant(const QMap<qint32,QMap<qint32,TMapLabel> > map) {
+    QMap<QString,QVariant> result;
+    QMapIterator<qint32,QMap<qint32,TMapLabel> > i(map);
+    while (i.hasNext()) {
+        i.next();
+        QMap<QString,QVariant> labels;
+        QMapIterator<qint32,TMapLabel> j(i.value());
+        while (j.hasNext()) {
+            j.next();
+            labels[QString((int)j.key())]=mapLabelToQVariant(j.value());
+        }
+        result[QString((int)i.key())]=QVariant(labels);
+    }
+    return result;
+}
+
+QMap<QString,QVariant> TPythonInterpreter::mapLabelToQVariant(const TMapLabel label) {
+    QMap<QString,QVariant> result;
+    if (!label.pos.isNull()) {
+        result["pos"]=QVariant(label.pos);
+    }
+    if (!label.pointer.isNull()) {
+        result["pointer"]=QVariant(label.pointer);
+    }
+    if (!label.size.isNull()) {
+        result["size"]=QVariant(label.size);
+    }
+    if (!label.text.isNull()) {
+        result["text"]=QVariant(label.text);
+    }
+    if (label.fgColor.isValid()) {
+        result["fgColor"]=(QVariant)label.fgColor;
+    }
+    if (label.bgColor.isValid()) {
+        result["bgColor"]=(QVariant)label.bgColor;
+    }
+    if (!label.pix.isNull()) {
+        result["pix"]=(QVariant)label.pix;
+    }
+    return result;
+}
+
+QMap<QString,QVariant> TPythonInterpreter::roomToQVariant(const TRoom room) {
+    QMap<QString,QVariant> result;
+    result["id"]=QVariant(room.id);
+    result["area"]=QVariant(room.area);
+    result["x"]=QVariant(room.x);
+    result["y"]=QVariant(room.y);
+    result["z"]=QVariant(room.z);
+    result["north"]=QVariant(room.north);
+    result["northeast"]=QVariant(room.northeast);
+    result["east"]=QVariant(room.east);
+    result["southeast"]=QVariant(room.southeast);
+    result["south"]=QVariant(room.south);
+    result["southwest"]=QVariant(room.southwest);
+    result["west"]=QVariant(room.west);
+    result["northwest"]=QVariant(room.northwest);
+    result["up"]=QVariant(room.up);
+    result["down"]=QVariant(room.down);
+    result["in"]=QVariant(room.in);
+    result["out"]=QVariant(room.out);
+    result["environment"]=QVariant(room.environment);
+    result["weight"]=QVariant(room.weight);
+    result["isLocked"]=QVariant(room.isLocked);
+    result["c"]=QVariant((int)room.c);
+    result["highlight"]=QVariant(room.highlight);
+    result["highlightColor"]=(QVariant)room.highlightColor;
+    result["rendered"]=QVariant(room.rendered);
+    
+    return result;
 }
 
 void TPythonInterpreter::add_python_variable( const QString & varName, const QVariant & var) {
