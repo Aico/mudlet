@@ -155,6 +155,27 @@ QMap<QString,QVariant> TPythonInterpreter::convertQMap(const QMap<int,TRoom *> m
     return result;
 }
 
+QMap<QString,QVariant> TPythonInterpreter::convertQMap(const QMap<QString,QString> map) {
+    QMap<QString,QVariant> result;
+    QMapIterator<QString,QString> i(map);
+    while (i.hasNext()) {
+        i.next();
+        result[i.key()]=QVariant(i.value());
+    }
+
+    return result;
+}
+
+QList<QVariant> TPythonInterpreter::convertQList(const QList<int> list) {
+    QList<QVariant> result;
+    QListIterator<int> i(list);
+    while (i.hasNext()) {
+        result.append(QVariant(i.next()));
+    }
+
+    return result;
+}
+
 QMap<QString,QVariant> TPythonInterpreter::mapLabelsToQVariant(const QMap<qint32,QMap<qint32,TMapLabel> > map) {
     QMap<QString,QVariant> result;
     QMapIterator<qint32,QMap<qint32,TMapLabel> > i(map);
@@ -220,6 +241,11 @@ QMap<QString,QVariant> TPythonInterpreter::roomToQVariant(const TRoom room) {
     result["weight"]=QVariant(room.weight);
     result["isLocked"]=QVariant(room.isLocked);
     result["c"]=QVariant((int)room.c);
+    if (!room.name.isNull()) {
+        result["name"]=QVariant(room.name);
+    }
+    result["userData"]=QVariant(convertQMap(room.userData));
+    result["exitLocks"]=QVariant(convertQList(room.exitLocks));
     result["highlight"]=QVariant(room.highlight);
     result["highlightColor"]=(QVariant)room.highlightColor;
     result["rendered"]=QVariant(room.rendered);

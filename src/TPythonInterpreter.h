@@ -70,6 +70,8 @@ private:
     QMap<QString,QVariant> mapLabelsToQVariant(const QMap<qint32,QMap<qint32,TMapLabel> > map);
     QMap<QString,QVariant> mapLabelToQVariant(const TMapLabel label);
     QMap<QString,QVariant> convertQMap(const QMap<int,TRoom *> map);
+    QMap<QString,QVariant> convertQMap(const QMap<QString,QString> map);
+    QList<QVariant> convertQList(const QList<int> list);
     QMap<QString,QVariant> roomToQVariant(const TRoom room);
 };
 

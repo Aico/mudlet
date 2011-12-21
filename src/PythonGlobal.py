@@ -9,32 +9,6 @@ import webbrowser
 
 mudlet = MudletObject(HOST_HASH)
 
-class NestedDict(dict):
-    def __getitem__(self,item):
-        try:
-            return dict.__getitem__(self,item)
-        except KeyError:
-            self[item] = type(self)()
-            return self[item]
-
-line = ''
-command = ''
-atcp = {}
-channel102 = {}
-gmcp=NestedDict()
-
-def onConnect():
-    """Run when connection established
-        Placeholder, should reimplement in PythonLocal.py"""
-    
-def onDisconnect():
-    """Run on disconnect
-        Placeholder, should reimplement in PythonLocal.py"""
-    
-def handleWindowResizeEvent():
-    """Run when window resizes
-        Placeholder, should reimplement in PythonLocal.py"""
-
 def printFixedStackTrace(trace,funcName):
     """Need to modify the stack trace to correspond
      to the lines numbers in the mudlet editor."""
@@ -51,6 +25,90 @@ def printFixedStackTrace(trace,funcName):
     replace[2] = ' in ' + scripttype + ': ' + funcName
     lines[1] = ','.join(replace)
     print '\n'.join(lines)
+
+class NestedDict(dict):
+    def __getitem__(self,item):
+        try:
+            return dict.__getitem__(self,item)
+        except KeyError:
+            self[item] = type(self)()
+            return self[item]
+            
+class Mapper:
+    def __init__(self):
+        self.envColors = Mapper.EnvColors()
+        self.rooms = Mapper.Rooms()
+        self.areaNamesMap = Mapper.AreaNamesMap()
+        self.customEnvColors = Mapper.CustomEnvColors()
+        self.hashTable = Mapper.HashTable()
+        self.mapLabels = Mapper.MapLabels()
+        
+    class EnvColors(dict):
+        def __init__(self):
+            super(Mapper.EnvColors,self).__init__()
+            for key,value in HOST_ENV_COLORS.iteritems():
+                self[ord(key)]=value
+            
+        def __setitem__(self,key,value):
+            super(Mapper.EnvColors,self).__setitem__(key,value)
+            
+    class Rooms(dict):
+        def __init__(self):
+            super(Mapper.Rooms,self).__init__()
+            for key,value in HOST_ROOMS.iteritems():
+                room = {}
+                for room_key,room_value in value.iteritems():
+                    room[str(room_key)]=room_value
+                self[ord(key)]=room
+                
+    class AreaNamesMap(dict):
+        def __init__(self):
+            super(Mapper.AreaNamesMap,self).__init__()
+            for key,value in HOST_AREA_NAMES_MAP.iteritems():
+                self[ord(key)]=value
+                
+    class CustomEnvColors(dict):
+        def __init__(self):
+            super(Mapper.CustomEnvColors,self).__init__()
+            for key,value in HOST_CUSTOM_ENV_COLORS.iteritems():
+                self[ord(key)]=value
+                
+    class HashTable(dict):
+        def __init__(self):
+            super(Mapper.HashTable,self).__init__()
+            for key,value in HOST_MAP_HASH_TABLE.iteritems():
+                self[str(key)]=value
+                
+    class MapLabels(dict):
+        def __init__(self):
+            super(Mapper.MapLabels,self).__init__()
+            for key,value in HOST_MAP_LABELS.iteritems():
+                labelmap = {}
+                for map_key,map_value in value.iteritems():
+                    label = {}
+                    for label_key,label_value in map_value.iteritems():
+                        label[str(label_key)] = label_value
+                    labelmap[ord(map_key)]=label
+                self[ord(key)]=labelmap
+
+line = ''
+command = ''
+atcp = {}
+channel102 = {}
+gmcp=NestedDict()
+mapper = Mapper()
+
+def onConnect():
+    """Run when connection established
+        Placeholder, should reimplement in PythonLocal.py"""
+    
+def onDisconnect():
+    """Run on disconnect
+        Placeholder, should reimplement in PythonLocal.py"""
+    
+def handleWindowResizeEvent():
+    """Run when window resizes
+        Placeholder, should reimplement in PythonLocal.py"""
 
 def send(text,wantPrint=True):
     mudlet.send(text,wantPrint)
