@@ -25,6 +25,7 @@
 #include "TEvent.h"
 #include <QString>
 #include <QObject>
+#include <QColor>
 #include <QHash>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
@@ -192,6 +193,18 @@ public slots:
   int loadRawFile( MudletObject*o, QString& SendTxt );
   int playSoundFile( MudletObject*o, QString& sound );
   int sendSocket( MudletObject*o, QString& txt );
+  //Mapper Functions.
+  int setCustomEnvColor( MudletObject* o, int id, QColor c);
+  int removeCustomEnvColor( MudletObject* o, int id);
+  int updateRoom( MudletObject* o, QMap<QString, QVariant> map);
+  int deleteRoom( MudletObject* o, int id);
+  int setRoomUserData( MudletObject* o, int roomID, QString key, QString value );
+  int update2DMapperNow( MudletObject* o);
+  int toggleHighlight( MudletObject* o, int roomID, bool highlight);
+  int setAreaName( MudletObject* o, int id, QString name );
+  int deleteArea( MudletObject* o, int id );
+  int updateMapLabel( MudletObject* o, int area, QString text, float x, float y, QColor fg, QColor bg, int id );
+  int deleteMapLabel( MudletObject* o, int area, int labelID  );
 };
 
 #endif  

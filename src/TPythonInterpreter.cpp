@@ -23,6 +23,7 @@
 #include "Host.h"
 #include "TEvent.h"
 #include "mudlet.h"
+#include "dlgMapper.h"
 #include <QString>
 #include <QStringList>
 #include <QList>
@@ -82,15 +83,16 @@ void TPythonInterpreter::init()
         const QString& varCustomEnvColors = "HOST_CUSTOM_ENV_COLORS";
         const QVariant& varCustomEnvColorsValue = convertQMap(mpHost->mpMap->customEnvColors);
         add_python_variable(varCustomEnvColors,varCustomEnvColorsValue);
-        const QString& varMapHash = "HOST_MAP_HASH_TABLE";
-        const QVariant& varMapHashValue = convertQMap(mpHost->mpMap->hashTable);
-        add_python_variable(varMapHash,varMapHashValue);
+        //const QString& varMapHash = "HOST_MAP_HASH_TABLE";
+        //const QVariant& varMapHashValue = convertQMap(mpHost->mpMap->hashTable);
+        //add_python_variable(varMapHash,varMapHashValue);
         const QString& varMapLabels = "HOST_MAP_LABELS";
         const QVariant& varMapLabelsValue = mapLabelsToQVariant(mpHost->mpMap->mapLabels);
         add_python_variable(varMapLabels,varMapLabelsValue);
         const QString& varRooms = "HOST_ROOMS";
         const QVariant& varRoomsValue = convertQMap(mpHost->mpMap->rooms);
         add_python_variable(varRooms,varRoomsValue);
+        
 
         PythonQt::self()->registerCPPClass("MudletObject", "","mudlet", PythonQtCreateObject<MudletObjectWrapper>);
         
@@ -147,10 +149,16 @@ QMap<QString,QVariant> TPythonInterpreter::convertQMap(const QMap<QString,int> m
 QMap<QString,QVariant> TPythonInterpreter::convertQMap(const QMap<int,TRoom *> map) {
     QMap<QString,QVariant> result;
     QMapIterator<int,TRoom *> i(map);
+    int count = 0;
     while (i.hasNext()) {
         i.next();
+        count += 1;
+        if (i.key() == 99999) {
+            std::cout << " found key 99999 with values: " <<  std::endl;
+        }
         result[QString(i.key())]=roomToQVariant(*(i.value()));
     }
+    std::cout << count << " :count" << std::endl;
 
     return result;
 }
@@ -248,6 +256,8 @@ QMap<QString,QVariant> TPythonInterpreter::roomToQVariant(const TRoom room) {
     result["exitLocks"]=QVariant(convertQList(room.exitLocks));
     result["highlight"]=QVariant(room.highlight);
     result["highlightColor"]=(QVariant)room.highlightColor;
+    result["highlightColor2"]=(QVariant)room.highlightColor2;
+    result["highlightRadius"]=QVariant(room.highlightRadius);
     result["rendered"]=QVariant(room.rendered);
     
     return result;
@@ -1765,5 +1775,137 @@ int MudletObjectWrapper::sendSocket( MudletObject*o, QString& txt )
 {
     std::string _txt = txt.toStdString();
     o->mpHost->mTelnet.socketOutRaw( _txt );
+    return 0;
+}
+
+//Mapper Functions.
+
+int MudletObjectWrapper::setCustomEnvColor( MudletObject* o, int id, QColor c)
+{
+    o->mpHost->mpMap->customEnvColors[id] = c;
+    return 0;
+}
+
+int MudletObjectWrapper::removeCustomEnvColor( MudletObject* o, int id)
+{
+    (o->mpHost->mpMap->customEnvColors).remove(id);
+    return 0;
+}
+
+int MudletObjectWrapper::updateRoom( MudletObject* o, QMap<QString, QVariant> map)
+{
+    TRoom * room = new TRoom();
+    room->id=map["id"].toInt();
+    room->area=map["area"].toInt();
+    room->x=map["x"].toInt();
+    room->y=map["y"].toInt();
+    room->z=map["z"].toInt();
+    room->north=map["north"].toInt();
+    room->northeast=map["northeast"].toInt();
+    room->east=map["east"].toInt();
+    room->southeast=map["southeast"].toInt();
+    room->south=map["south"].toInt();
+    room->southwest=map["southwest"].toInt();
+    room->west=map["west"].toInt();
+    room->northwest=map["northwest"].toInt();
+    room->up=map["up"].toInt();
+    room->down=map["down"].toInt();
+    room->in=map["in"].toInt();
+    room->out=map["out"].toInt();
+    room->environment=map["environment"].toInt();
+    room->weight=map["weight"].toInt();
+    room->isLocked=map["isLocked"].toInt();
+    room->c=(qint8)map["c"].toInt();
+    room->name=map["name"].toInt();
+    
+    QMap<QString,QString> udata;
+    QMapIterator<QString,QVariant> udatai(map["userData"].value<QMap<QString,QVariant> >());
+    while (udatai.hasNext()) {
+        udatai.next();
+        udata[udatai.key()]=udatai.value().value<QString>();
+    }
+    room->userData = udata;
+    
+    QList<int> exlocks;
+    QListIterator<QVariant> exlocksi(map["exitLocks"].value<QList<QVariant> >());
+    while (exlocksi.hasNext()) {
+        exlocks.append(exlocksi.next().toInt());
+    }
+    room->exitLocks = exlocks;
+    
+    room->highlight=map["highlight"].toBool();
+    room->highlightColor=map["highlightColor"].value<QColor>();
+    room->highlightColor2=map["highlightColor2"].value<QColor>();
+    room->highlightRadius=map["highlightRadius"].toFloat();
+    room->rendered=map["rendered"].toBool();
+
+    o->mpHost->mpMap->rooms.insert(map["id"].toInt(),room);
+    o->mpHost->mpMap->mMapGraphNeedsUpdate = true;
+    return 0;
+}
+
+int MudletObjectWrapper::deleteRoom( MudletObject* o, int id)
+{
+    if( o->mpHost->mpMap->rooms.contains( id ) )
+    {
+       o->mpHost->mpMap->deleteRoom( id );
+       o->mpHost->mpMap->mMapGraphNeedsUpdate = false;
+    }
+    return 0;
+}
+
+int MudletObjectWrapper::setRoomUserData( MudletObject* o, int roomID, QString key, QString value )
+{
+    if( o->mpHost->mpMap->rooms.contains( roomID ) )
+    {
+        o->mpHost->mpMap->rooms[roomID]->userData[key] = value;
+        return 0;
+    }
+    else
+    {
+        return 1;
+    }
+}
+
+int MudletObjectWrapper::update2DMapperNow( MudletObject* o)
+{
+    if( o->mpHost->mpMap->mpMapper )
+            if( o->mpHost->mpMap->mpMapper->mp2dMap )
+                o->mpHost->mpMap->mpMapper->mp2dMap->update();
+        return 0;
+}
+
+int MudletObjectWrapper::toggleHighlight( MudletObject* o, int roomID, bool highlight)
+{
+    if( ! o->mpHost->mpMap->rooms.contains( roomID ) ) return 1;
+    o->mpHost->mpMap->rooms[roomID]->highlight = highlight;
+    return 0;
+}
+
+int MudletObjectWrapper::setAreaName( MudletObject* o, int id, QString name )
+{
+    o->mpHost->mpMap->areaNamesMap[id] = name;
+    return 0;
+}
+
+int MudletObjectWrapper::deleteArea( MudletObject* o, int id )
+{
+    if( o->mpHost->mpMap->areas.contains( id ) )
+    {
+        o->mpHost->mpMap->deleteArea( id );
+        o->mpHost->mpMap->mMapGraphNeedsUpdate = false;
+    }
+    return 0;
+}
+
+int MudletObjectWrapper::updateMapLabel( MudletObject* o, int area, QString text, float x, float y, QColor fg, QColor bg, int id )
+{
+    o->mpHost->mpMap->updateMapLabel(area, text, x, y, fg, bg, id );
+    return 0;
+}
+
+int MudletObjectWrapper::deleteMapLabel( MudletObject* o, int area, int labelID  )
+{
+    o->mpHost->mpMap->deleteMapLabel( area, labelID );
     return 0;
 }

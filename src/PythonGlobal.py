@@ -1,7 +1,10 @@
 import io
 import site
 import traceback
+import PythonQt
 from PythonQt.mudlet import *
+from PythonQt.QtGui import QColor,QPixmap
+from PythonQt.QtCore import QPointF,QSizeF
 import re
 import pprint
 from sys import *
@@ -40,17 +43,20 @@ class Mapper:
         self.rooms = Mapper.Rooms()
         self.areaNamesMap = Mapper.AreaNamesMap()
         self.customEnvColors = Mapper.CustomEnvColors()
-        self.hashTable = Mapper.HashTable()
+        #self.hashTable = Mapper.HashTable()
         self.mapLabels = Mapper.MapLabels()
         
     class EnvColors(dict):
         def __init__(self):
             super(Mapper.EnvColors,self).__init__()
             for key,value in HOST_ENV_COLORS.iteritems():
-                self[ord(key)]=value
-            
+                super(Mapper.EnvColors,self).__setitem__(ord(key),value)
+                
         def __setitem__(self,key,value):
-            super(Mapper.EnvColors,self).__setitem__(key,value)
+            raise Exception('envColors dict is immutable.')
+            
+        def __delitem__(self, key):
+            raise Exception('envColors dict is immutable.')
             
     class Rooms(dict):
         def __init__(self):
@@ -59,25 +65,89 @@ class Mapper:
                 room = {}
                 for room_key,room_value in value.iteritems():
                     room[str(room_key)]=room_value
-                self[ord(key)]=room
+                super(Mapper.Rooms,self).__setitem__(ord(key),Mapper.Room(room,self))                
+                
+        def __setitem__(self,key,value):
+            if key > 65000:
+                #TODO create support for keys > 65000.
+                raise Exception('key cannot be higher than 65000')
+            if type(value) == Mapper.Room:
+                super(Mapper.Room,value).__setitem__('id',key)
+                mudlet.updateRoom(value)
+                super(Mapper.Rooms,self).__setitem__(key,value)
+                value.setContainer(self)
+            elif type(value) == dict:
+                value['id']=int(key)
+                mudlet.updateRoom(value)
+                super(Mapper.Rooms,self).__setitem__(key,Mapper.Room(value,self))
+            else:
+                raise Exception('Value must be a Room or a dict')
+            
+        def __delitem__(self,key):
+            mudlet.deleteRoom(key)
+            super(Mapper.Rooms,self).__delitem__(key)            
+            for k,v in self.iteritems():
+                for rk,rv in v.iteritems():
+                    if type(rv) == type(1):
+                        if rv == key and rk in ('north','northeast','east','southeast','south','southwest','west','northwest','up','down','in','out'):
+                            v[rk]=-1
+                            super(Mapper.Rooms,self).__setitem__(k,v)
+                            
+    class Room(dict):
+        def __init__(self,data,c=None):
+            self.rooms = c
+            for k,v in data.iteritems():
+                super(Mapper.Room,self).__setitem__(k,v)
+                
+        def __setitem__(self,key,value):
+            super(Mapper.Room,self).__setitem__(key,value)
+            if key == 'userData':
+                for k,v in value.iteritems():
+                    mudlet.setRoomUserData(self['id'],k,v)
+            elif key == 'highlight':
+                mudlet.toggleHighlight(self['id'], value)
+            else:         
+                self.rooms[self['id']]=self
+            
+        def setContainer(self,c):
+            self.rooms = c
                 
     class AreaNamesMap(dict):
         def __init__(self):
             super(Mapper.AreaNamesMap,self).__init__()
             for key,value in HOST_AREA_NAMES_MAP.iteritems():
-                self[ord(key)]=value
+                super(Mapper.AreaNamesMap,self).__setitem__(ord(key),value)
+                
+        def __setitem__(self,key,value):
+            mudlet.setAreaName( key, value )
+            super(Mapper.AreaNamesMap,self).__setitem__(key,value)  
+            
+        def __delitem__(self, key):
+            mudlet.deleteArea(key)
+            for k,v in Mapper.rooms.items():
+                if v['area'] == key:
+                    del Mapper.rooms[k]
+            super(Mapper.AreaNamesMap,self).__delitem__(key)            
                 
     class CustomEnvColors(dict):
         def __init__(self):
             super(Mapper.CustomEnvColors,self).__init__()
             for key,value in HOST_CUSTOM_ENV_COLORS.iteritems():
-                self[ord(key)]=value
+                super(Mapper.CustomEnvColors,self).__setitem__(ord(key),value)                
+            
+        def __setitem__(self,key,value):
+            mudlet.setCustomEnvColor(key,value)
+            super(Mapper.CustomEnvColors,self).__setitem__(key,value)
+            
+        def __delitem__(self, key):
+            mudlet.removeCustomEnvColor(key)
+            super(Mapper.CustomEnvColors,self).__delitem__(key)
                 
-    class HashTable(dict):
-        def __init__(self):
-            super(Mapper.HashTable,self).__init__()
-            for key,value in HOST_MAP_HASH_TABLE.iteritems():
-                self[str(key)]=value
+#    class HashTable(dict):
+#        def __init__(self):
+#            super(Mapper.HashTable,self).__init__()
+#            for key,value in HOST_MAP_HASH_TABLE.iteritems():
+#                super(Mapper.HashTable,self).__setitem__(str(key),value)                
                 
     class MapLabels(dict):
         def __init__(self):
@@ -85,11 +155,69 @@ class Mapper:
             for key,value in HOST_MAP_LABELS.iteritems():
                 labelmap = {}
                 for map_key,map_value in value.iteritems():
-                    label = {}
+                    l = {}
                     for label_key,label_value in map_value.iteritems():
-                        label[str(label_key)] = label_value
-                    labelmap[ord(map_key)]=label
-                self[ord(key)]=labelmap
+                        l[str(label_key)] = label_value
+                    labelmap[ord(map_key)]=Mapper.MapLabel(l.get('pos'),l.get('size'),l.get('text'),l.get('fgColor'),l.get('bgColor'),l.get('pix'),l.get('pointer'))
+                super(Mapper.MapLabels,self).__setitem__(ord(key),Mapper.Labels(labelmap))
+                self[ord(key)].setContainer(self,ord(key))
+                
+        def __setitem__(self,key,value):
+            if type(value) == dict:
+                value = Mapper.Labels(value)
+            if type(value) == Mapper.Labels:
+                value.setContainer(self,key)
+                for k,v in value.iteritems():
+                     mudlet.updateMapLabel( key, v.text, v.pos.x(), v.pos.y(), v.fgColor, v.bgColor, k )
+                super(Mapper.MapLabels,self).__setitem__(key,value)          
+            else:
+                raise Exception('Value must be a Room or a dict')
+                
+        def __delitem__(self,key):
+            for k,v in self[key].items():
+                del self[key][k]
+            super(Mapper.MapLabels,self).__delitem__(key)
+                
+    class Labels(dict):
+        def __init__(self,data):
+            for k,v in data.iteritems():
+                v.setContainer(self,k)
+                super(Mapper.Labels,self).__setitem__(k,v)                
+                
+        def __setitem__(self,key,value):            
+            if type(value) == Mapper.MapLabel:
+                mudlet.updateMapLabel( self.areaid, value.text, value.pos.x(), value.pos.y(), value.fgColor, value.bgColor, key )            
+            else:
+                raise Exception('Value must either be a MapLabel or a dict')
+            value.setContainer(self,key)
+            super(Mapper.Labels,self).__setitem__(key,value)
+            
+        def __delitem__(self,key):
+            mudlet.deleteMapLabel(self.areaid, key)
+            super(Mapper.Labels,self).__delitem__(key)
+            
+        def setContainer(self,c,areaid):
+            self.maplabels = c
+            self.areaid = areaid
+            
+    class MapLabel(object):
+        def __init__(self,pos,size,text,fgColor,bgColor,pix=None,pointer=None):            
+            super(Mapper.MapLabel,self).__setattr__('pos', pos)
+            super(Mapper.MapLabel,self).__setattr__('pointer', pointer)
+            super(Mapper.MapLabel,self).__setattr__('size', size)
+            super(Mapper.MapLabel,self).__setattr__('text', text)
+            super(Mapper.MapLabel,self).__setattr__('fgColor', fgColor)
+            super(Mapper.MapLabel,self).__setattr__('bgColor', bgColor)
+            super(Mapper.MapLabel,self).__setattr__('pix', pix)
+            
+        def __setattr__(self, name, value):
+            super(Mapper.MapLabel,self).__setattr__(name, value)
+            self.labels[self.labelid]=self
+            
+        def setContainer(self,c,labelid):
+            super(Mapper.MapLabel,self).__setattr__('labels', c)
+            super(Mapper.MapLabel,self).__setattr__('labelid', labelid)
+            
 
 line = ''
 command = ''
