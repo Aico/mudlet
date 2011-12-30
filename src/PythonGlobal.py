@@ -218,6 +218,21 @@ class Mapper:
             super(Mapper.MapLabel,self).__setattr__('labels', c)
             super(Mapper.MapLabel,self).__setattr__('labelid', labelid)
             
+    def centerview(self,roomid):
+        mudlet.centerview(roomid)
+        
+    def getPath(self,from_room,to_room):
+        return mudlet.getPath(from_room,to_room)
+        
+    def gotoRoom(self,room):
+        return mudlet.gotoRoom(room)
+        
+    def saveMap(self,location):
+        return mudlet.saveMap(location)
+        
+    def setGridMode(self,area,on):
+        return mudlet.setGridMode(area,on)
+            
 
 line = ''
 command = ''

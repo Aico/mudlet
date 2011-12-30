@@ -355,6 +355,8 @@ void Host::assemblePath()
     mLuaInterpreter.set_lua_table( t1, list );
     QString t2 = "speedWalkDir";
     mLuaInterpreter.set_lua_table( t2, list2 );
+    getPythonInterpreter()->add_python_variable(t1, QVariant(list) );
+    getPythonInterpreter()->add_python_variable(t2, QVariant(list2) );
 }
 
 int Host::check_for_mappingscript()

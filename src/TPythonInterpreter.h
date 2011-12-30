@@ -194,6 +194,7 @@ public slots:
   int playSoundFile( MudletObject*o, QString& sound );
   int sendSocket( MudletObject*o, QString& txt );
   //Mapper Functions.
+  //Data structure internal functions, not called directly.
   int setCustomEnvColor( MudletObject* o, int id, QColor c);
   int removeCustomEnvColor( MudletObject* o, int id);
   int updateRoom( MudletObject* o, QMap<QString, QVariant> map);
@@ -205,6 +206,12 @@ public slots:
   int deleteArea( MudletObject* o, int id );
   int updateMapLabel( MudletObject* o, int area, QString text, float x, float y, QColor fg, QColor bg, int id );
   int deleteMapLabel( MudletObject* o, int area, int labelID  );
+  //Callable general mapper functions.
+  int centerview( MudletObject* o, int roomid );
+  bool getPath( MudletObject* o, int r1, int r2 );
+  bool gotoRoom( MudletObject* o, int r );
+  bool saveMap(MudletObject* o, QString location );
+  bool setGridMode( MudletObject* o, int area, bool gridMode );
 };
 
 #endif  

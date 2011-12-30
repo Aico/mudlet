@@ -1909,3 +1909,56 @@ int MudletObjectWrapper::deleteMapLabel( MudletObject* o, int area, int labelID 
     o->mpHost->mpMap->deleteMapLabel( area, labelID );
     return 0;
 }
+
+int MudletObjectWrapper::centerview( MudletObject* o, int roomid )
+{
+    if( o->mpHost->mpMap && o->mpHost->mpMap->rooms.contains( roomid ) )
+    {
+        o->mpHost->mpMap->mRoomId = roomid;
+        o->mpHost->mpMap->mNewMove = true;
+        if( o->mpHost->mpMap->mpM )
+        {
+            o->mpHost->mpMap->mpM->update();
+        }
+        if( o->mpHost->mpMap->mpMapper )
+        {
+            o->mpHost->mpMap->mpMapper->mp2dMap->update();
+        }
+
+    }
+
+    return 0;
+}
+
+bool MudletObjectWrapper::getPath( MudletObject* o, int r1, int r2 )
+{
+    bool ret = o->mpHost->mpMap->gotoRoom( r1, r2 );
+    o->mpHost->assemblePath();
+    return ret;
+}
+
+bool MudletObjectWrapper::gotoRoom( MudletObject* o, int r )
+{
+    bool ret = o->mpHost->mpMap->gotoRoom( r );
+    o->mpHost->startSpeedWalk();
+    return ret;
+}
+
+bool MudletObjectWrapper::saveMap(MudletObject* o, QString location )
+{
+    bool error = o->mpHost->mpConsole->saveMap(location);
+    return error;
+}
+
+bool MudletObjectWrapper::setGridMode( MudletObject* o, int area, bool gridMode )
+{
+    if( ! o->mpHost->mpMap->areas.contains( area ) )
+    {
+        return false;
+    }
+    else
+    {
+        o->mpHost->mpMap->areas[area]->gridMode = gridMode;
+    }
+    return true;
+}
