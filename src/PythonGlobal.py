@@ -1149,5 +1149,8 @@ def setGauge(name,value,maxValue,txt=""):
                 echo(name, txt)
                 gaugesTable[name].text = txt
     
-
-execfile('PythonLocal.py')
+try:
+    #Put code in PythonLocal.py file for code you would like to run on startup of mudlet.
+    execfile('PythonLocal.py')
+catch IOError:
+    pass
