@@ -2057,9 +2057,9 @@ int MudletObjectWrapper::updateRoom( MudletObject* o, QMap<QString, QVariant> ma
     room->out=map["out"].toInt();
     room->environment=map["environment"].toInt();
     room->weight=map["weight"].toInt();
-    room->isLocked=map["isLocked"].toInt();
+    room->isLocked=map["isLocked"].toBool();
     room->c=(qint8)map["c"].toInt();
-    room->name=map["name"].toInt();
+    room->name=map["name"].toString();
     
     QMap<QString,QString> udata;
     QMapIterator<QString,QVariant> udatai(map["userData"].value<QMap<QString,QVariant> >());

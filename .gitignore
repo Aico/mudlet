@@ -32,3 +32,4 @@ CPackConfig.cmake
 CPackSourceConfig.cmake
 _CPack_Packages
 install_manifest.txt
+src/PythonLocal.py

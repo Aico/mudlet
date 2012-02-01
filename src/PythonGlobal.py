@@ -232,6 +232,9 @@ class Mapper:
         
     def setGridMode(self,area,on):
         return mudlet.setGridMode(area,on)
+        
+    def refresh(self):
+        mudlet.update2DMapperNow()
             
 
 line = ''
