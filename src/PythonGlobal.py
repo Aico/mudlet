@@ -97,20 +97,48 @@ class Mapper:
         def __init__(self,data,c=None):
             self.rooms = c
             for k,v in data.iteritems():
-                super(Mapper.Room,self).__setitem__(k,v)
+                if k == 'userData':
+                    super(Mapper.Room,self).__setitem__(k,Mapper.UserData(v))
+                else:
+                    super(Mapper.Room,self).__setitem__(k,v)
+            self['userData'].setRoom(self)
                 
         def __setitem__(self,key,value):
-            super(Mapper.Room,self).__setitem__(key,value)
             if key == 'userData':
+                if value.__class__ == Mapper.UserData:
+                    super(Mapper.Room,self).__setitem__(key,value)
+                elif type(value) == dict:
+                    super(Mapper.Room,self).__setitem__(key,Mapper.UserData(value))
+                else:
+                    raise Exception('Value must be a UserData object or a dict')
+                mudlet.clearRoomUserData(self['id'])
                 for k,v in value.iteritems():
                     mudlet.setRoomUserData(self['id'],k,v)
             elif key == 'highlight':
+                super(Mapper.Room,self).__setitem__(key,value)
                 mudlet.toggleHighlight(self['id'], value)
-            else:         
+            else:
+                super(Mapper.Room,self).__setitem__(key,value)         
                 self.rooms[self['id']]=self
             
         def setContainer(self,c):
             self.rooms = c
+            
+    class UserData(dict):
+        def __init__(self,value):
+            for k,v in value.iteritems():
+                super(Mapper.UserData,self).__setitem__(k,v)
+            
+        def __setitem__(self,key,value):
+            mudlet.setRoomUserData(self.room['id'],key,value)
+            super(Mapper.UserData,self).__setitem__(key,value)
+        
+        def __delitem__(self,key):
+            super(Mapper.UserData,self).__delitem__(key)
+            self.room['userData']=self
+            
+        def setRoom(self,room):
+            self.room = room
                 
     class AreaNamesMap(dict):
         def __init__(self):
@@ -1152,5 +1180,5 @@ def setGauge(name,value,maxValue,txt=""):
 try:
     #Put code in PythonLocal.py file for code you would like to run on startup of mudlet.
     execfile('PythonLocal.py')
-catch IOError:
+except IOError:
     pass

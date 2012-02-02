@@ -232,6 +232,7 @@ public slots:
   int updateRoom( MudletObject* o, QMap<QString, QVariant> map);
   int deleteRoom( MudletObject* o, int id);
   int setRoomUserData( MudletObject* o, int roomID, QString key, QString value );
+  int clearRoomUserData( MudletObject* o, int id_from );
   int update2DMapperNow( MudletObject* o);
   int toggleHighlight( MudletObject* o, int roomID, bool highlight);
   int setAreaName( MudletObject* o, int id, QString name );

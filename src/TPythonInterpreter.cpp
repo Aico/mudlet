@@ -2110,6 +2110,15 @@ int MudletObjectWrapper::setRoomUserData( MudletObject* o, int roomID, QString k
     }
 }
 
+int MudletObjectWrapper::clearRoomUserData( MudletObject* o, int id_from )
+{
+    if( o->mpHost->mpMap->rooms.contains( id_from ) )
+    {
+        o->mpHost->mpMap->rooms[id_from]->userData.clear();
+    }
+    return 0;
+}
+
 int MudletObjectWrapper::update2DMapperNow( MudletObject* o)
 {
     if( o->mpHost->mpMap->mpMapper )
