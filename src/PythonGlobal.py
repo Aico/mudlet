@@ -196,10 +196,11 @@ class Mapper:
             if type(value) == Mapper.Labels:
                 value.setContainer(self,key)
                 for k,v in value.iteritems():
-                     mudlet.updateMapLabel( key, v.text, v.pos.x(), v.pos.y(), v.fgColor, v.bgColor, k )
+                    # area, text, x, y, fg, bg, id
+                    mudlet.updateMapLabel( key, v.text, v.pos.x(), v.pos.y(), v.fgColor, v.bgColor, k )
                 super(Mapper.MapLabels,self).__setitem__(key,value)          
             else:
-                raise Exception('Value must be a Room or a dict')
+                raise Exception('Value must be a Label or a dict')
                 
         def __delitem__(self,key):
             for k,v in self[key].items():
@@ -216,7 +217,7 @@ class Mapper:
             if type(value) == Mapper.MapLabel:
                 mudlet.updateMapLabel( self.areaid, value.text, value.pos.x(), value.pos.y(), value.fgColor, value.bgColor, key )            
             else:
-                raise Exception('Value must either be a MapLabel or a dict')
+                raise Exception('Value must be a MapLabel(QPointF pos,QSizeF size,text,QColor fgColor,QColor bgColor,QPixmap pix=None,QPointF pointer=None)')
             value.setContainer(self,key)
             super(Mapper.Labels,self).__setitem__(key,value)
             
