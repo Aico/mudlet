@@ -398,7 +398,9 @@ void TPythonInterpreter::setGMCPTable(QString & key, QString & string_data)
 
 void TPythonInterpreter::slotEchoMessage(const QString & msg)
 {
-    mpHost->mpConsole->echo( const_cast<QString&>(msg) );
+    if (!mpHost->mpConsole->mUserAgreedToCloseConsole) {
+        mpHost->mpConsole->echo( const_cast<QString&>(msg) );
+    }
 }
 
 MudletObject::MudletObject(const QString& hash)

@@ -1,5 +1,5 @@
 
-CONFIG += release uitools
+CONFIG += debug uitools
 
 QMAKE_CXXFLAGS_RELEASE += -O3 -Wno-deprecated -Wno-unused-parameter
 QMAKE_CXXFLAGS_DEBUG += -O3 -Wno-deprecated -Wno-unused-parameter

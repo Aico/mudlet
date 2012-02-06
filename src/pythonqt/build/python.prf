@@ -2,7 +2,7 @@
 
 # Change this variable to your python version (2.5, 2.6, 2.7)
 win32:PYTHON_VERSION=26
-unix:PYTHON_VERSION=2.6
+unix:PYTHON_VERSION=$$system(python --version 2>&1| cut -c 8-10)
 
 macx {
   # for macx you need to have the Python development kit installed as framework

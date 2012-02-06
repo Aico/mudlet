@@ -27,7 +27,7 @@ def printFixedStackTrace(trace,funcName):
     replace[1] = ' line ' + str(int(lineno)-3)
     replace[2] = ' in ' + scripttype + ': ' + funcName
     lines[1] = ','.join(replace)
-    print '\n'.join(lines)
+    mudlet.echo('\n'.join(lines),'main')
 
 class NestedDict(dict):
     def __getitem__(self,item):
