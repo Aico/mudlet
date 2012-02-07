@@ -12,21 +12,15 @@ b) chmod u+x the file to make it executable and then run to install.
 
 3. compile mudlet
 
-a) If you are using a version of Python different than 2.6 you need to edit this file:
-src/pythonqt/build/python.prf
-and replace with your Python version number (ie 2.7 instead of 2.6)
-
-b) For Ubuntu 11.10 only create the following link:
-ln -s /usr/lib/x86_64-linux-gnu/liblua5.1.so /usr/local/lib/liblua.so
-replacing the 64bit part with 32 if your system is 32bit.
-
-c) go to the mudlet base directory where mudlet.pro is:
+a) go to the mudlet base directory where mudlet.pro is:
 cd /path to git clone/mudlet
 
-d) qmake
+b) qmake
 
-e) make
+c) make
 
 4. Run mudlet:
 cd src
 ./mudlet
+
+you need to turn on python manually in Settings.
