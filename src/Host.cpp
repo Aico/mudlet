@@ -43,6 +43,7 @@ Host::Host( int port, QString hostname, QString login, QString pass, int id )
 : mTelnet( this )
 , mpConsole( 0 )
 , mLuaInterpreter    ( this, id )
+, mPythonInterpreter (this)
 , mTriggerUnit       ( this )
 , mTimerUnit         ( this )
 , mScriptUnit        ( this )
@@ -170,6 +171,7 @@ Host::Host()
 : mTelnet( this )
 , mpConsole( 0 )
 , mLuaInterpreter    ( this, 0 )
+, mPythonInterpreter (this)
 , mTriggerUnit       ( this )
 , mTimerUnit         ( this )
 , mScriptUnit        ( this )
@@ -412,6 +414,7 @@ void Host::resetProfile()
     mEventMap.clear();
     mLuaInterpreter.initLuaGlobals();
     mLuaInterpreter.loadGlobal();
+    mPythonInterpreter.init();
     mBlockScriptCompile = false;
 
 
@@ -450,6 +453,8 @@ void Host::assemblePath()
     mLuaInterpreter.set_lua_table( t1, list );
     QString t2 = "speedWalkDir";
     mLuaInterpreter.set_lua_table( t2, list2 );
+    getPythonInterpreter()->add_python_variable(t1, QVariant(list) );
+    getPythonInterpreter()->add_python_variable(t2, QVariant(list2) );
 }
 
 int Host::check_for_mappingscript()
@@ -1095,6 +1100,11 @@ bool Host::uninstallPackage( QString packageName, int module)
         file_xml.close();
     }
     return true;
+}
+
+bool Host::pythonEnabled() 
+{
+    return mPython;
 }
 
 #endif

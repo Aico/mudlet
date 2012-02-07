@@ -8,6 +8,9 @@ src/Makefile*
 src/object_script*
 src/src.pro.orig
 src/src.pro.user*
+src/qrc_mudlet_alpha.cpp
+src/pythonqt/lib/*.a
+*.pyc
 *.o
 moc_*.cpp
 *.cxx
@@ -29,3 +32,4 @@ CPackConfig.cmake
 CPackSourceConfig.cmake
 _CPack_Packages
 install_manifest.txt
+src/PythonLocal.py

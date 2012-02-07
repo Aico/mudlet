@@ -40,6 +40,9 @@
 
 using namespace std;
 
+#define LUA     0
+#define PYTHON  1
+
 TAction::TAction( TAction * parent, Host * pHost )
 : Tree<TAction>( parent )
 , mpToolBar( 0 )
@@ -142,20 +145,30 @@ bool TAction::setScript( QString & script )
 bool TAction::compileScript()
 {
     mFuncName = QString("Action")+QString::number( mID );
-    QString code = QString("function ")+ mFuncName + QString("()\n") + mScript + QString("\nend\n");
-    QString error;
-    if( mpHost->mLuaInterpreter.compile( code, error ) )
+    if (mScriptLanguage == PYTHON)
     {
-        mNeedsToBeCompiled = false;
-        mOK_code = true;
-        return true;
+        QString indent = mScript;
+        (mpHost->getPythonInterpreter())->executeScript((mpHost->getPythonInterpreter())->wrapCode(mFuncName,indent,mName));
     }
     else
-    {
-        mOK_code = false;
-        setError( error );
-        return false;
+    {       
+        QString code = QString("function ")+ mFuncName + QString("()\n") + mScript + QString("\nend\n");
+        QString error;
+        if( mpHost->mLuaInterpreter.compile( code, error ) )
+        {
+            mNeedsToBeCompiled = false;
+            mOK_code = true;
+            return true;
+        }
+        else
+        {
+            mOK_code = false;
+            setError( error );
+            return false;
+        }
     }
+    
+    return true;
 }
 
 void TAction::execute(QStringList & list )
@@ -183,7 +196,14 @@ void TAction::_execute(QStringList & list)
         }
     }
     mpHost->mpConsole->mButtonState = mButtonState;
-    mpHost->mLuaInterpreter.call( mFuncName, mName );
+    if (mScriptLanguage == PYTHON)
+    {
+        (mpHost->getPythonInterpreter())->call( mFuncName);
+    }
+    else
+    {
+        mpHost->mLuaInterpreter.call( mFuncName, mName );
+    }
     // move focus back to the active console / command line
     mpHost->mpConsole->activateWindow();
     mpHost->mpConsole->setFocus();
@@ -364,3 +384,26 @@ bool TAction::isClone( TAction & b ) const
              && mIcon == b.mIcon );
 }
 
+void TAction::setScriptLanguage( QString & script_language)
+{
+    if (script_language == "PYTHON")
+    {
+        mScriptLanguage = PYTHON;
+    }
+    else
+    {
+        mScriptLanguage = LUA;
+    }
+}
+
+QString TAction::getScriptLanguage()
+{
+    if (mScriptLanguage == PYTHON)
+    {
+        return QString("PYTHON");
+    }
+    else
+    {
+        return QString("LUA");
+    }
+}

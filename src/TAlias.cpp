@@ -36,6 +36,9 @@
 
 using namespace std;
 
+#define LUA     0
+#define PYTHON  1
+
 TAlias::TAlias( TAlias * parent, Host * pHost )
 : Tree<TAlias>( parent )
 , mpHost( pHost )
@@ -375,20 +378,30 @@ bool TAlias::setScript( QString & script )
 bool TAlias::compileScript()
 {
     mFuncName = QString("Alias")+QString::number( mID );
-    QString code = QString("function ")+ mFuncName + QString("()\n") + mScript + QString("\nend\n");
-    QString error;
-    if( mpHost->mLuaInterpreter.compile( code, error ) )
+    if (mScriptLanguage == PYTHON)
     {
-        mNeedsToBeCompiled = false;
-        mOK_code = true;
-        return true;
+        QString indent = mScript;
+        (mpHost->getPythonInterpreter())->executeScript((mpHost->getPythonInterpreter())->wrapCode(mFuncName,indent,mName));
     }
     else
-    {
-        mOK_code = false;
-        setError( error );
-        return false;
+    { 
+        QString code = QString("function ")+ mFuncName + QString("()\n") + mScript + QString("\nend\n");
+        QString error;
+        if( mpHost->mLuaInterpreter.compile( code, error ) )
+        {
+            mNeedsToBeCompiled = false;
+            mOK_code = true;
+            return true;
+        }
+        else
+        {
+            mOK_code = false;
+            setError( error );
+            return false;
+        }
     }
+    
+    return true;
 }
 
 void TAlias::execute()
@@ -404,7 +417,36 @@ void TAlias::execute()
             return;
         }
     }
-    mpHost->mLuaInterpreter.call( mFuncName, mName );
+    if (mScriptLanguage == PYTHON)
+    {
+        (mpHost->getPythonInterpreter())->call( mFuncName);
+    }
+    else
+    {
+        mpHost->mLuaInterpreter.call( mFuncName, mName );
+    }
 }
 
+void TAlias::setScriptLanguage( QString & script_language)
+{
+    if (script_language == "PYTHON")
+    {
+        mScriptLanguage = PYTHON;
+    }
+    else
+    {
+        mScriptLanguage = LUA;
+    }
+}
 
+QString TAlias::getScriptLanguage()
+{
+    if (mScriptLanguage == PYTHON)
+    {
+        return QString("PYTHON");
+    }
+    else
+    {
+        return QString("LUA");
+    }
+}

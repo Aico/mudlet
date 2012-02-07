@@ -80,6 +80,8 @@ public:
     void             setIcon( QString & icon )                 { mIcon = icon; }
     QString          getScript()                               { return mScript; }
     bool             setScript( QString & script );
+    QString          getScriptLanguage();
+    void             setScriptLanguage( QString & script_language);
     QString          getCommandButtonUp()                      { return mCommandButtonUp; }
     void             setCommandButtonUp( QString cmd )         { mCommandButtonUp = cmd; }
     void             setCommandButtonDown( QString command )   { mCommandButtonDown = command; }
@@ -114,6 +116,7 @@ public:
     QString          mCommandButtonDown;
     QRegExp          mRegex;
     QString          mScript;
+    int              mScriptLanguage;
     bool             mIsPushDownButton;
     bool             mIsFolder;
 

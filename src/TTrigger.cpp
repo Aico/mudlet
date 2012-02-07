@@ -41,6 +41,9 @@
 
 using namespace std;
 
+#define LUA     0
+#define PYTHON  1
+
 const QString nothing = "";
 
 TTrigger::TTrigger( TTrigger * parent, Host * pHost )
@@ -1430,20 +1433,30 @@ bool TTrigger::setScript( QString & script )
 bool TTrigger::compileScript()
 {
     mFuncName = QString("Trigger")+QString::number( mID );
-    QString code = QString("function ")+ mFuncName + QString("()\n") + mScript + QString("\nend\n");
-    QString error;
-    if( mpLua->compile( code, error ) )
+    if (mScriptLanguage == PYTHON)
     {
-        mNeedsToBeCompiled = false;
-        mOK_code = true;
-        return true;
+        QString indent = mScript;
+        (mpHost->getPythonInterpreter())->executeScript((mpHost->getPythonInterpreter())->wrapCode(mFuncName,indent,mName));
     }
     else
     {
-        mOK_code = false;
-        setError( error );
-        return false;
+        QString code = QString("function ")+ mFuncName + QString("()\n") + mScript + QString("\nend\n");
+        QString error;
+        if( mpLua->compile( code, error ) )
+        {
+            mNeedsToBeCompiled = false;
+            mOK_code = true;
+            return true;
+        }
+        else
+        {
+            mOK_code = false;
+            setError( error );
+            return false;
+        }
     }
+    
+    return true;
 }
 
 void TTrigger::execute()
@@ -1465,11 +1478,25 @@ void TTrigger::execute()
     }
     if( mIsMultiline )
     {
-        mpLua->callMulti( mFuncName, mName );
+        if (mScriptLanguage == PYTHON)
+        {
+            (mpHost->getPythonInterpreter())->callMulti( mFuncName);
+        }
+        else
+        {
+            mpLua->callMulti( mFuncName, mName );
+        }
     }
     else
     {
-        mpLua->call( mFuncName, mName );
+        if (mScriptLanguage == PYTHON)
+        {
+            (mpHost->getPythonInterpreter())->call( mFuncName);
+        }
+        else
+        {
+            mpLua->call( mFuncName, mName );
+        }   
     }
 }
 
@@ -1582,3 +1609,26 @@ bool TTrigger::restore( QDataStream & ifs, bool initMode )
     return ret;
 }
 
+void TTrigger::setScriptLanguage( QString & script_language)
+{
+    if (script_language == "PYTHON")
+    {
+        mScriptLanguage = PYTHON;
+    }
+    else
+    {
+        mScriptLanguage = LUA;
+    }
+}
+
+QString TTrigger::getScriptLanguage()
+{
+    if (mScriptLanguage == PYTHON)
+    {
+        return QString("PYTHON");
+    }
+    else
+    {
+        return QString("LUA");
+    }
+}

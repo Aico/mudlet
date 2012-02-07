@@ -26,6 +26,7 @@ win32:LIBS += -L"c:\mudlet2_package" \
     -lhunspell \
     -lyajl
 
+LIBS += -Lpythonqt/lib -lPythonQt
 unix:INCLUDEPATH += /usr/include/lua5.1
 
 win32:INCLUDEPATH += "c:\mudlet_package_MINGW\Lua_src\include" \
@@ -42,6 +43,8 @@ unix: {
     BIN_DIR = $$INSTALL_PREFIX/bin
 }
 INCLUDEPATH += irc/include
+INCLUDEPATH += pythonqt
+include ( pythonqt/build/python.prf )
 SOURCES += TConsole.cpp \
     ctelnet.cpp \
     main.cpp \
@@ -53,6 +56,7 @@ SOURCES += TConsole.cpp \
     TTrigger.cpp \
     TriggerUnit.cpp \
     TLuaInterpreter.cpp \
+    TPythonInterpreter.cpp \
     dlgTriggersMainArea.cpp \
     dlgOptionsAreaTriggers.cpp \
     dlgOptionsAreaTimers.cpp \
@@ -131,6 +135,7 @@ HEADERS += mudlet.h \
     dlgTriggerEditor.h \
     TTrigger.h \
     TLuaInterpreter.h \
+    TPythonInterpreter.h \
     dlgTriggers_main_area.h \
     dlgOptionsAreaTriggers.h \
     dlgTriggerPatternEdit.h \
@@ -252,3 +257,4 @@ INSTALLS += fonts \
 
 OTHER_FILES += \
     mudlet_documentation.txt
+

@@ -162,7 +162,7 @@
           <item>
            <widget class="QCheckBox" name="acceptServerGUI">
             <property name="text">
-             <string>Allow server to install scrpt packages</string>
+             <string>Allow server to install script packages</string>
             </property>
            </widget>
           </item>
@@ -1594,6 +1594,74 @@ or some other computer model that has a small screen.</string>
           </item>
          </layout>
         </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="tab_2">
+      <attribute name="title">
+       <string>Script Editor Options</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_4">
+       <item>
+        <widget class="QGroupBox" name="groupBox_12">
+         <property name="title">
+          <string>Visual</string>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_11">
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_33">
+            <property name="text">
+             <string>folder/group in tree icons size:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QSpinBox" name="TEFolderIconSize">
+            <property name="minimum">
+             <number>1</number>
+            </property>
+            <property name="maximum">
+             <number>4</number>
+            </property>
+            <property name="value">
+             <number>3</number>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="groupBox_python">
+         <property name="title">
+          <string>Python</string>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_python">
+          <item row="0" column="0">
+           <widget class="QCheckBox" name="mEnablePython">
+            <property name="toolTip">
+             <string>Check to be able to script in python.</string>
+            </property>
+            <property name="text">
+             <string>Enable Python</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <spacer name="verticalSpacer_4">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>423</height>
+          </size>
+         </property>
+        </spacer>
        </item>
       </layout>
      </widget>

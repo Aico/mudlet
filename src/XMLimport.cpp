@@ -679,6 +679,7 @@ void XMLimport::readHostPackage( Host * pT )
     pT->mAcceptServerGUI = ( attributes().value("mAcceptServerGUI") == "yes" );
     pT->mMapperUseAntiAlias = ( attributes().value("mMapperUseAntiAlias") == "yes" );
     pT->mFORCE_MXP_NEGOTIATION_OFF = ( attributes().value("mFORCE_MXP_NEGOTIATION_OFF") == "yes" );
+	pT->mPython = ( attributes().value("mPython") == "yes" );
 
     while( ! atEnd() )
     {
@@ -1059,6 +1060,12 @@ void XMLimport::readTriggerGroup( TTrigger * pParent )
                 pT->mScript = readElementText();
                 continue;
             }
+            else if ( name() == "scriptlanguage")
+            {
+                QString scriptlang = readElementText();
+                pT->setScriptLanguage(scriptlang);
+                continue;
+            }
             else if( name() == "packageName")
             {
                 pT->mPackageName = readElementText();
@@ -1200,6 +1207,8 @@ void XMLimport::readTimerGroup( TTimer * pParent )
     pT->mIsTempTimer = ( attributes().value("isTempTimer") == "yes" );
     if (module)
         pT->mModuleMember = true;
+    
+    QString script = "";
 
     while( ! atEnd() )
     {
@@ -1220,8 +1229,13 @@ void XMLimport::readTimerGroup( TTimer * pParent )
             }
             else if( name() == "script")
             {
-                QString script = readElementText();
-                pT->setScript( script );
+                script = readElementText();
+                continue;
+            }
+            else if ( name() == "scriptlanguage")
+            {
+                QString scriptlang = readElementText();
+                pT->setScriptLanguage(scriptlang);
                 continue;
             }
             else if( name() == "command")
@@ -1249,6 +1263,11 @@ void XMLimport::readTimerGroup( TTimer * pParent )
                 readUnknownTimerElement();
             }
         }
+    }
+    
+    if (script != "")
+    {
+        pT->setScript( script );
     }
 
     if( ( ! pT->isOffsetTimer() ) && ( pT->shouldBeActive() ) )
@@ -1312,6 +1331,8 @@ void XMLimport::readAliasGroup( TAlias * pParent )
     pT->mIsFolder = ( attributes().value("isFolder") == "yes" );
     if (module)
         pT->mModuleMember = true;
+    
+    QString script = "";
 
     while( ! atEnd() )
     {
@@ -1332,8 +1353,13 @@ void XMLimport::readAliasGroup( TAlias * pParent )
             }
             else if( name() == "script")
             {
-                QString script = readElementText();
-                pT->setScript( script );
+                script = readElementText();
+                continue;
+            }
+            else if ( name() == "scriptlanguage")
+            {
+                QString scriptlang = readElementText();
+                pT->setScriptLanguage(scriptlang);
                 continue;
             }
             else if( name() == "command")
@@ -1361,6 +1387,10 @@ void XMLimport::readAliasGroup( TAlias * pParent )
         }
     }
 
+    if (script != "")
+    {
+        pT->setScript( script );
+    }
 
 }
 
@@ -1419,6 +1449,9 @@ void XMLimport::readActionGroup( TAction * pParent )
     if (module)
         pT->mModuleMember = true;
 
+    
+    QString script = "";
+    
     while( ! atEnd() )
     {
         readNext();
@@ -1439,7 +1472,12 @@ void XMLimport::readActionGroup( TAction * pParent )
             else if( name() == "script")
             {
                 QString script = readElementText();
-                pT->setScript( script );
+                continue;
+            }
+            else if ( name() == "scriptlanguage")
+            {
+                QString scriptlang = readElementText();
+                pT->setScriptLanguage(scriptlang);
                 continue;
             }
             else if( name() == "css")
@@ -1529,7 +1567,11 @@ void XMLimport::readActionGroup( TAction * pParent )
             }
         }
     }
-
+    
+    if (script != "")
+    {
+        pT->setScript( script );
+    }
 
 }
 
@@ -1585,6 +1627,8 @@ void XMLimport::readScriptGroup( TScript * pParent )
     pT->mIsFolder = ( attributes().value("isFolder") == "yes" );
     if (module)
         pT->mModuleMember = true;
+    
+    QString script = "";
 
     while( ! atEnd() )
     {
@@ -1605,8 +1649,13 @@ void XMLimport::readScriptGroup( TScript * pParent )
             }
             else if( name() == "script")
             {
-                QString script = readElementText();
-                pT->setScript( script );
+                script = readElementText();
+                continue;
+            }
+            else if ( name() == "scriptlanguage")
+            {
+                QString scriptlang = readElementText();
+                pT->setScriptLanguage(scriptlang);
                 continue;
             }
             else if( name() == "eventHandlerList")
@@ -1628,6 +1677,11 @@ void XMLimport::readScriptGroup( TScript * pParent )
                 readUnknownScriptElement();
             }
         }
+    }
+    
+    if (script != "")
+    {
+        pT->setScript( script );
     }
 }
 
@@ -1684,6 +1738,8 @@ void XMLimport::readKeyGroup( TKey * pParent )
     pT->mIsFolder = ( attributes().value("isFolder") == "yes" );
     if (module)
         pT->mModuleMember = true;
+    
+    QString script = "";
 
     while( ! atEnd() )
     {
@@ -1704,8 +1760,13 @@ void XMLimport::readKeyGroup( TKey * pParent )
             }
             else if( name() == "script")
             {
-                QString script = readElementText();
-                pT->setScript( script );
+                script = readElementText();
+                continue;
+            }
+            else if ( name() == "scriptlanguage")
+            {
+                QString scriptlang = readElementText();
+                pT->setScriptLanguage(scriptlang);
                 continue;
             }
             else if( name() == "command")
@@ -1737,6 +1798,11 @@ void XMLimport::readKeyGroup( TKey * pParent )
                 readUnknownKeyElement();
             }
         }
+    }
+    
+    if (script != "")
+    {
+        pT->setScript( script );
     }
 }
 

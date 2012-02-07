@@ -65,6 +65,9 @@ public:
     void             setCommand( QString & cmd )     { mCommand = cmd; }
     QString          getScript()                     { return mScript; }
     bool             setScript( QString & script );
+    QString          getScriptLanguage();
+    int              getScriptLanguageCode()         { return mScriptLanguage;}
+    void             setScriptLanguage( QString & script_language);
     bool             canBeUnlocked( TTimer * );
     bool             isFolder()                      { return mIsFolder; }
     void             setIsTempTimer( bool b )        { mIsTempTimer = b; }
@@ -91,6 +94,7 @@ private:
                        TTimer(){};
     QString            mName;
     QString            mScript;
+    int                mScriptLanguage;
     QTime              mTime;
     QString            mCommand;
     QString            mFuncName;

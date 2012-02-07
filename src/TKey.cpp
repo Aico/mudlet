@@ -37,6 +37,9 @@
 
 using namespace std;
 
+#define LUA     0
+#define PYTHON  1
+
 TKey::TKey( TKey * parent, Host * pHost )
 : Tree<TKey>( parent )
 , mpHost( pHost )
@@ -174,20 +177,30 @@ bool TKey::setScript( QString & script )
 bool TKey::compileScript()
 {
     mFuncName = QString("Key")+QString::number( mID );
-    QString code = QString("function ")+ mFuncName + QString("()\n") + mScript + QString("\nend\n");
-    QString error;
-    if( mpHost->mLuaInterpreter.compile( code, error ) )
+    if (mScriptLanguage == PYTHON)
     {
-        mNeedsToBeCompiled = false;
-        mOK_code = true;
-        return true;
+        QString indent = mScript;
+        (mpHost->getPythonInterpreter())->executeScript((mpHost->getPythonInterpreter())->wrapCode(mFuncName,indent,mName));
     }
     else
-    {
-        mOK_code = false;
-        setError( error );
-        return false;
+    { 
+        QString code = QString("function ")+ mFuncName + QString("()\n") + mScript + QString("\nend\n");
+        QString error;
+        if( mpHost->mLuaInterpreter.compile( code, error ) )
+        {
+            mNeedsToBeCompiled = false;
+            mOK_code = true;
+            return true;
+        }
+        else
+        {
+            mOK_code = false;
+            setError( error );
+            return false;
+        }
     }
+    
+    return true;
 }
 
 void TKey::execute()
@@ -203,7 +216,14 @@ void TKey::execute()
             return;
         }
     }
-    mpHost->mLuaInterpreter.call( mFuncName, mName );
+    if (mScriptLanguage == PYTHON)
+    {
+        (mpHost->getPythonInterpreter())->call( mFuncName);
+    }
+    else
+    {
+        mpHost->mLuaInterpreter.call( mFuncName, mName );
+    }
 }
 
 TKey& TKey::clone(const TKey& b)
@@ -233,4 +253,28 @@ bool TKey::isClone(TKey &b) const
             && mIsFolder == b.mIsFolder
             && mpHost == b.mpHost
             && mNeedsToBeCompiled == b.mNeedsToBeCompiled );
+}
+
+void TKey::setScriptLanguage( QString & script_language)
+{
+    if (script_language == "PYTHON")
+    {
+        mScriptLanguage = PYTHON;
+    }
+    else
+    {
+        mScriptLanguage = LUA;
+    }
+}
+
+QString TKey::getScriptLanguage()
+{
+    if (mScriptLanguage == PYTHON)
+    {
+        return QString("PYTHON");
+    }
+    else
+    {
+        return QString("LUA");
+    }
 }

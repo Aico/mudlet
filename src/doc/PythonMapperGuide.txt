@@ -1,0 +1,95 @@
+This guide will explain how to control the mudlet map with python.
+
+The map implementation for Python is designed differently than to the Lua counterpart. The main aim of the current design is twofolds:
+1. To reduce the number of functions to make using the mapper easier to use.
+2. To make its operation more pythonic.
+
+The map functions and data structures are contained in the Mapper class which is instantiated to the variable 'mapper':
+
+    > py print mapper
+    <PythonQt_module1.Mapper instance at 0x2a60290>
+    > py print dir(mapper)
+    ['AreaNamesMap', 'CustomEnvColors', 'EnvColors', 'Labels', 'MapLabel', 'MapLabels', 
+    'Room', 'Rooms', 'UserData', '__doc__', '__init__', '__module__', 'areaNamesMap', 
+    'centerview', 'customEnvColors', 'envColors', 'getPath', 'gotoRoom', 'mapLabels', 
+    'refresh', 'rooms', 'saveMap', 'setGridMode']
+    
+where '>' is the prompt and 'py' is just an input alias I use to run python code, with the following script:
+
+    exec matches[1]
+    
+Classes start with a capital letter and methods and dictionaries with lowercase.
+
+The methods are:
+centerview(roomid)
+getPath(roomid1,roomid2)
+gotoRoom(roomid)
+refresh()
+saveMap(location)
+setGridMode(areaid,gridmode?)
+
+What the methods do should hopefully be apparent. The python version only has 7 methods as opposed to the 52 in the Lua version.
+What happened to the other 45 methods you might wonder? They are replaced by the five dictionaries listed below:
+areaNamesMap
+customEnvColors
+envColors
+mapLabels
+rooms
+
+The above five dictionaries contain the data of a map. They are almost identical to the underlying C++ data structures used to store the map data. When a mud session is started, the C++ map data is used to populate the above python dictionaries. When the data in the dictionaries are created,updated or deleted, the changes are automatically updated to the C++ data structures. This process is transparent to the user who only has to treat the above as normal python dictionaries.
+
+Below I will do a quick rundown of the data expected in these dictionaries:
+
+    >py print  mapper.areaNamesMap
+    {0: u'The city of Gahlen'}
+    
+Above stores {areaid: areaName}
+
+    >py print mapper.customEnvColors
+    {257: QColor (#800000, at: 0x3ceefc0), 258: QColor (#00b300, at: 0x3d46600), 259: 
+    QColor (#808000, at: 0x3d04110), 260: QColor (#000080, at: 0x3d07370), 261: QColor 
+    (#800080, at: 0x2dee640), 262: QColor (#008080, at: 0x3ceace0), 263: QColor (#c0c0c0,
+     at: 0x3d0b180), 264: QColor (#242424, at: 0x3d0ab40), 265: QColor (#ff0000, at: 
+    0x3d0a640), 266: QColor (#00ff00, at: 0x3d09f10), 267: QColor (#ffff00, at: 
+    0x3d09410), 268: QColor (#0000ff, at: 0x3cde9b0), 269: QColor (#ff00ff, at: 
+    0x3cdcca0), 270: QColor (#00ffff, at: 0x3cddd10), 271: QColor (#ffffff, at: 
+    0x3cdf470), 272: QColor (#808080, at: 0x3d0cbb0)}
+
+Above stores {customEnvColorsid: QColor}. id is referenced by the environment field of a room to set the room's color.
+
+    >py print mapper.mapLabels
+    {0: {0: <PythonQt_module1.MapLabel object at 0x3f43690>}}
+
+Above stores {areaid: {maplabelid: MapLabel}}. 
+
+    >py print mapper.mapLabels[0][0].__dict__
+    {'labelid': 0, 'text': u'Library', 'labels': {0: <PythonQt_module1.MapLabel object 
+    at 0x3f43690>}, 'pos': QPointF (-1, 2, at: 0x3ce0c60), 'pix': None, 'bgColor': 
+    QColor (#000000, at: 0x3d03ab0), 'pointer': None, 'fgColor': QColor (#ff0000, at: 
+    0x3d039d0), 'size': QSizeF (100, 100, at: 0x3d0ebb0)}
+
+MapLabel class has the following constructor: MapLabel(pos,size,text,fgColor,bgColor,pix=None,pointer=None). the paramaters types can be seen in the above MapLabel example.
+
+    >py print mapper.rooms[0]
+    {'rendered': False, 'weight': 1, 'highlightRadius': 1.8521704558075383e+28, 'up': -1,
+     'down': -1, 'highlightColor': QColor (#ff9600, at: 0x3ce0320), 'in': -1, 'id': 0, 
+    'out': -1, 'northeast': -1, 'area': 0, 'west': -1, 'highlightColor2': QColor 
+    (#000000, at: 0x3d0f100), 'environment': 259, 'isLocked': False, 'northwest': -1, 
+    'east': 1, 'southwest': -1, 'userData': {u'desc': u'The painting room here has 
+    several paintings of nobility in the Kingdom. On both sides of the walls paintings 
+    are mounted in wood frames and covered by tempered glass. Small lanterns set in the 
+    wall itself provide a soft light for the art work. An archaic wall closing off the 
+    western hall is built from light wood and metal lacing. To the north is the Library 
+    of Fame.'}, 'north': 2, 'southeast': -1, 'x': 0, 'c': 0, 'name': u'The Hall of Fame',
+     'exitLocks': (), 'y': 0, 'highlight': False, 'z': 0, 'south': -1}
+ 
+rooms dictionary stores {roomid: Room}. example of a room is shown above. Room and be a Room object or a dictionary with the above set of keys.
+ 
+    >py print mapper.envColors
+    {}
+
+envColors table is like the customEnvColors table but used in IRE MUDs This table reads its data from mmp and cannot be changed.
+
+Lastly, when you change the tables, for the changes to instantly get updated on the map you need to call the mapper.refresh() method.
+
+If you have any problems or find any bugs or unexpected behaviour, please send me an email at this address: kenneth.chik@gmail.com

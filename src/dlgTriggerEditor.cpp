@@ -28,6 +28,7 @@
 #include <QHeaderView>
 //#include <Qsci/qsciscintilla.h>
 //#include <Qsci/qscilexerlua.h>
+#include <QString>
 #include <QtGui>
 #include <QMainWindow>
 #include <QListWidgetItem>
@@ -58,7 +59,7 @@ const int dlgTriggerEditor::cmTimerView = 2;
 const int dlgTriggerEditor::cmAliasView = 3;
 const int dlgTriggerEditor::cmScriptView = 4;
 const int dlgTriggerEditor::cmActionView = 5;
-const int dlgTriggerEditor::cmKeysView = 6;
+const int dlgTriggerEditor::cmKeysView = 6; 
 
 const QString msgInfoAddAlias = "Alias are input triggers. To make a new alias: <b>1.</b> Define an input trigger pattern with a Perl regular expression. " \
                                 "<b>2.</b> Define a command to send to the MUD in clear text <b><u>instead of the alias pattern</b></u>or write a script for more complicated needs. " \
@@ -98,6 +99,7 @@ dlgTriggerEditor::dlgTriggerEditor( Host * pH )
 , mpCurrentTriggerItem( 0 )
 , mpCurrentAliasItem( 0 )
 , mpHost( pH )
+, mpDefaultLanguage("Lua")
 {
     // init generated dialog
     setupUi(this);
@@ -134,12 +136,12 @@ dlgTriggerEditor::dlgTriggerEditor( Host * pH )
     connect(mpTriggersMainArea->pushButtonFgColor, SIGNAL(clicked()), this, SLOT(slot_colorizeTriggerSetFgColor()));
     connect(mpTriggersMainArea->pushButtonBgColor, SIGNAL(clicked()), this, SLOT(slot_colorizeTriggerSetBgColor()));
     connect(mpTriggersMainArea->pushButtonSound, SIGNAL(clicked()), this, SLOT(slot_soundTrigger()));
-
+    
     mpTimersMainArea = new dlgTimersMainArea( mainArea );
     QSizePolicy sizePolicy7(QSizePolicy::Expanding, QSizePolicy::Fixed);
     mpTimersMainArea->setSizePolicy( sizePolicy7 );
     pVB1->addWidget( mpTimersMainArea );
-
+    
     mpAliasMainArea = new dlgAliasMainArea( mainArea );
     QSizePolicy sizePolicy8(QSizePolicy::Expanding, QSizePolicy::Fixed);
     mpAliasMainArea->setSizePolicy( sizePolicy8 );
@@ -158,7 +160,6 @@ dlgTriggerEditor::dlgTriggerEditor( Host * pH )
     pVB1->addWidget( mpKeysMainArea );
     connect(mpKeysMainArea->pushButton_grabKey, SIGNAL(pressed()), this, SLOT(slot_grab_key()));
 
-
     mpScriptsMainArea = new dlgScriptsMainArea( mainArea );
     QSizePolicy sizePolicy9(QSizePolicy::Expanding, QSizePolicy::Fixed);
     mpScriptsMainArea->setSizePolicy( sizePolicy9 );
@@ -175,11 +176,17 @@ dlgTriggerEditor::dlgTriggerEditor( Host * pH )
     QSizePolicy sizePolicy5(QSizePolicy::Expanding, QSizePolicy::Expanding);
     mpSourceEditorArea->setSizePolicy( sizePolicy5 );
     pVB1->addWidget( mpSourceEditorArea );
-    QPlainTextEdit * editp = mpSourceEditorArea->editor;
+    PlainTextEdit * editp = mpSourceEditorArea->editor;
     editp->setWordWrapMode( QTextOption::NoWrap );
     //QLineEdit * mpCursorPositionIndicator = new QLineEdit;
     //(QMainWindow::statusBar())->addWidget( mpCursorPositionIndicator  );
     connect(editp,SIGNAL(cursorPositionChanged()), this, SLOT(slot_cursorPositionChanged()));
+    connect(mpTriggersMainArea->comboBox_lang, SIGNAL(activated(int)), editp, SLOT(setScriptLanguage(int)));
+    connect(mpTimersMainArea->comboBox_lang, SIGNAL(activated(int)), editp, SLOT(setScriptLanguage(int)));
+    connect(mpAliasMainArea->comboBox_lang, SIGNAL(activated(int)), editp, SLOT(setScriptLanguage(int)));
+    connect(mpKeysMainArea->comboBox_lang, SIGNAL(activated(int)), editp, SLOT(setScriptLanguage(int)));
+    connect(mpScriptsMainArea->comboBox_lang, SIGNAL(activated(int)), editp, SLOT(setScriptLanguage(int)));
+
     // option areas
 
     QHBoxLayout * pHB2 = new QHBoxLayout(popupArea);
@@ -2205,6 +2212,7 @@ void dlgTriggerEditor::addTrigger( bool isFolder )
     pT->setName( name );
     pT->setRegexCodeList( regexList, regexPropertyList );
     pT->setScript( script );
+    pT->setScriptLanguage(mpDefaultLanguage);
     pT->setIsFolder( isFolder );
     pT->setIsActive( false );
     pT->setIsMultiline( false );
@@ -2315,6 +2323,7 @@ void dlgTriggerEditor::addTimer( bool isFolder )
     pT->setName( name );
     pT->setCommand( command );
     pT->setScript( script );
+    pT->setScriptLanguage(mpDefaultLanguage);
     pT->setIsFolder( isFolder );
     pT->setIsActive( false );
     pT->registerTimer();
@@ -2406,6 +2415,7 @@ void dlgTriggerEditor::addKey( bool isFolder )
     pT->setKeyCode( -1 );
     pT->setKeyModifiers( -1 );
     pT->setScript( script );
+    pT->setScriptLanguage(mpDefaultLanguage);
     pT->setIsFolder( isFolder );
     pT->setIsActive( false );
     pT->registerKey();
@@ -2500,6 +2510,7 @@ ROOT_ALIAS:
     pT->setCommand( command );
     pT->setRegexCode( regex );
     pT->setScript( script );
+    pT->setScriptLanguage(mpDefaultLanguage);
     pT->setIsFolder( isFolder );
     pT->setIsActive( false );
     pT->registerAlias();
@@ -2707,6 +2718,7 @@ void dlgTriggerEditor::addScript( bool isFolder )
 
     pT->setName( name );
     pT->setScript( script );
+    pT->setScriptLanguage(mpDefaultLanguage);
     pT->setIsFolder( isFolder );
     pT->setIsActive( false );
     pT->registerScript();
@@ -2725,6 +2737,7 @@ void dlgTriggerEditor::addScript( bool isFolder )
     if( pParent ) pParent->setExpanded( true );
     mpScriptsMainArea->lineEdit_scripts_name->clear();
     //FIXME mpScriptsMainArea->pattern_textedit->clear();
+    mpSourceEditorArea->editor->setScriptLanguage(pT->getScriptLanguageCode());
     mpSourceEditorArea->editor->setPlainText( script );
     mCurrentScript = pNewItem;
     treeWidget_scripts->setCurrentItem( pNewItem );
@@ -2901,6 +2914,8 @@ void dlgTriggerEditor::saveTrigger()
             pT->setRegexCodeList( regexList, regexPropertyList );
 
             pT->setScript( script );
+            QString lang = (mpTriggersMainArea->comboBox_lang->currentText()).toUpper();
+            pT->setScriptLanguage(lang);
             pT->setIsMultiline( isMultiline );
             pT->mPerlSlashGOption = mpTriggersMainArea->perlSlashGOption->isChecked();
             pT->mFilterTrigger = mpTriggersMainArea->filterTrigger->isChecked();
@@ -3114,6 +3129,8 @@ void dlgTriggerEditor::saveTimer()
             pT->setCommand( command );
             pT->setName( name );
             pT->setScript( script );
+            QString lang = (mpTimersMainArea->comboBox_lang->currentText()).toUpper();
+            pT->setScriptLanguage(lang);
            /* if( pT->isOffsetTimer() )
             {
                 pT->setShouldBeActive( false );
@@ -3273,6 +3290,7 @@ void dlgTriggerEditor::saveAlias()
     }
     QString substitution = mpAliasMainArea->substitution->text();
     QString script = mpSourceEditorArea->editor->toPlainText();
+    QString lang = (mpAliasMainArea->comboBox_lang->currentText()).toUpper();
     if( pItem )
     {
         int triggerID = pItem->data(0, Qt::UserRole).toInt();
@@ -3284,7 +3302,7 @@ void dlgTriggerEditor::saveAlias()
             pT->setCommand( substitution );
             pT->setRegexCode( regex );
             pT->setScript( script );
-
+            pT->setScriptLanguage(lang);
             QIcon icon;
             if( pT->isFolder() )
             {
@@ -3480,6 +3498,7 @@ void dlgTriggerEditor::saveAction()
             pT->setCommandButtonUp( cmdUp );
             pT->setIcon( icon );
             pT->setScript( script );
+            //pT->setScriptLanguage(getScriptLanguage());
             pT->setIsPushDownButton( isChecked );
             pT->mLocation = location;
             pT->mOrientation = orientation;
@@ -3669,7 +3688,8 @@ void dlgTriggerEditor::saveScript()
             pT->setName( name );
             pT->setEventHandlerList( handlerList );
             pT->setScript( script );
-
+            QString lang = (mpScriptsMainArea->comboBox_lang->currentText()).toUpper();
+            pT->setScriptLanguage(lang);
             pT->compile();
             QIcon icon;
             if( pT->isFolder() )
@@ -3820,6 +3840,7 @@ void dlgTriggerEditor::saveKey()
     }
     QString command = mpKeysMainArea->lineEdit_command->text();
     QString script = mpSourceEditorArea->editor->toPlainText();
+    QString lang = (mpKeysMainArea->comboBox_lang->currentText()).toUpper();
     if( pItem )
     {
         int triggerID = pItem->data(0, Qt::UserRole).toInt();
@@ -3830,7 +3851,7 @@ void dlgTriggerEditor::saveKey()
             pT->setName( name );
             pT->setCommand( command );
             pT->setScript( script );
-
+            pT->setScriptLanguage(lang);
             QIcon icon;
             if( pT->isFolder() )
             {
@@ -4090,7 +4111,11 @@ void dlgTriggerEditor::slot_trigger_clicked( QTreeWidgetItem *pItem, int column 
         mpTriggersMainArea->pushButtonBgColor->setPalette( BgColorPalette );
         mpTriggersMainArea->colorizerTrigger->setChecked( pT->isColorizerTrigger() );
         QString script = pT->getScript();
+        mpSourceEditorArea->editor->setScriptLanguage(pT->getScriptLanguageCode());
         mpSourceEditorArea->editor->setPlainText( script );
+        QString lang = pT->getScriptLanguage().toLower();
+        lang[0] = lang[0].toUpper();
+        mpTriggersMainArea->comboBox_lang->setCurrentIndex(mpTriggersMainArea->comboBox_lang->findText(lang));
 
         /*mpTriggersMainArea->colorTrigger->setChecked( pT->mColorTrigger );
         if( pT->mColorTriggerBg )
@@ -4138,6 +4163,8 @@ void dlgTriggerEditor::slot_alias_clicked( QTreeWidgetItem *pItem, int column )
         QString pattern = pT->getRegexCode();
         QString command = pT->getCommand();
         QString name = pT->getName();
+        QString lang = pT->getScriptLanguage().toLower();
+        lang[0] = lang[0].toUpper();
 
         mpAliasMainArea->pattern_textedit->clear();
         mpAliasMainArea->substitution->clear();
@@ -4146,8 +4173,10 @@ void dlgTriggerEditor::slot_alias_clicked( QTreeWidgetItem *pItem, int column )
         mpAliasMainArea->pattern_textedit->setText( pattern );
         mpAliasMainArea->substitution->setText( command );
         mpAliasMainArea->lineEdit_alias_name->setText( name );
+        mpAliasMainArea->comboBox_lang->setCurrentIndex(mpAliasMainArea->comboBox_lang->findText(lang));
 
         QString script = pT->getScript();
+        mpSourceEditorArea->editor->setScriptLanguage(pT->getScriptLanguageCode());
         mpSourceEditorArea->editor->setPlainText( script );
         if( ! pT->state() ) showError( pT->getError() );
     }
@@ -4181,6 +4210,10 @@ void dlgTriggerEditor::slot_key_clicked( QTreeWidgetItem *pItem, int column )
         QString keyName = mpHost->getKeyUnit()->getKeyName( pT->getKeyCode(), pT->getKeyModifiers() );
         mpKeysMainArea->lineEdit_key->setText( keyName );
         QString script = pT->getScript();
+        QString lang = pT->getScriptLanguage().toLower();
+        lang[0] = lang[0].toUpper();
+        mpKeysMainArea->comboBox_lang->setCurrentIndex(mpKeysMainArea->comboBox_lang->findText(lang));
+        mpSourceEditorArea->editor->setScriptLanguage(pT->getScriptLanguageCode());
         mpSourceEditorArea->editor->setPlainText( script );
         if( ! pT->state() ) showError( pT->getError() );
     }
@@ -4294,7 +4327,11 @@ void dlgTriggerEditor::slot_scripts_clicked( QTreeWidgetItem *pItem, int column 
         }
         mpScriptsMainArea->lineEdit_scripts_name->clear();
         QString script = pT->getScript();
+        mpSourceEditorArea->editor->setScriptLanguage(pT->getScriptLanguageCode());
         mpSourceEditorArea->editor->setPlainText( script );
+        QString lang = pT->getScriptLanguage().toLower();
+        lang[0] = lang[0].toUpper();
+        mpScriptsMainArea->comboBox_lang->setCurrentIndex(mpScriptsMainArea->comboBox_lang->findText(lang));
         mpScriptsMainArea->lineEdit_scripts_name->setText( name );
         if( ! pT->state() ) showError( pT->getError() );
     }
@@ -4350,7 +4387,11 @@ void dlgTriggerEditor::slot_timer_clicked( QTreeWidgetItem *pItem, int column )
         mpTimersMainArea->timeEdit_msecs->setTime(t5);
 
         QString script = pT->getScript();
+        mpSourceEditorArea->editor->setScriptLanguage(pT->getScriptLanguageCode());
         mpSourceEditorArea->editor->setPlainText( script );
+        QString lang = pT->getScriptLanguage().toLower();
+        lang[0] = lang[0].toUpper();
+        mpTimersMainArea->comboBox_lang->setCurrentIndex(mpTimersMainArea->comboBox_lang->findText(lang));
         if( ! pT->state() ) showError( pT->getError() );
     }
 }
@@ -6670,8 +6711,6 @@ void dlgTriggerEditor::slot_cursorPositionChanged()
     }
     QMainWindow::statusBar()->showMessage( line );
 }
-
-
 
 
 

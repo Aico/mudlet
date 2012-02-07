@@ -22,6 +22,7 @@
 #define DLGTRIGGEREDITOR_H
 
 #include <QFile>
+#include <QString>
 
 #include "ui_trigger_editor.h"
 #include <QDialog>
@@ -263,6 +264,7 @@ private:
     //QsciDocument                mDocument;
     Host *                      mpHost;
     QList<dlgTriggerPatternEdit *> mTriggerPatternEdit;
+    QString                     mpDefaultLanguage;
 };
 
 #endif

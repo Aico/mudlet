@@ -81,6 +81,7 @@ class TMap
 public:
     TMap( Host *);
     int createMapLabel(int area, QString text, float x, float y, float z, QColor fg, QColor bg );
+    int updateMapLabel(int area, QString text, float x, float y, QColor fg, QColor bg, int id );
     void deleteMapLabel( int area, int labelID );
     bool addRoom( int id=0 );
     void auditRooms();

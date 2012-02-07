@@ -42,6 +42,11 @@ dlgProfilePreferences::dlgProfilePreferences( QWidget * pF, Host * pH )
 
     mFORCE_MXP_NEGOTIATION_OFF->setChecked(mpHost->mFORCE_MXP_NEGOTIATION_OFF);
     mMapperUseAntiAlias->setChecked(mpHost->mMapperUseAntiAlias);
+    mEnablePython->setChecked(mpHost->mPython);
+    if (!mpHost->mPythonWorking)
+    {
+        mEnablePython->setEnabled(false);
+    }
     acceptServerGUI->setChecked(mpHost->mAcceptServerGUI);
     QString nick = tr("Mudlet%1").arg(QString::number(rand()%10000));
     QFile file( QDir::homePath()+"/.config/mudlet/irc_nick" );
@@ -1342,6 +1347,11 @@ void dlgProfilePreferences::slot_save_and_exit()
     pHost->mFORCE_MXP_NEGOTIATION_OFF = mFORCE_MXP_NEGOTIATION_OFF->isChecked();
     mudlet::self()->mMainIconSize = MainIconSize->value();
     mudlet::self()->mTEFolderIconSize = TEFolderIconSize->value();
+    pHost->mPython = mEnablePython->isChecked();
+    if (mEnablePython->isChecked() && !(pHost->getPythonInterpreter()->isInitialized()))
+    {
+        pHost->getPythonInterpreter()->init();
+    }
     mudlet::self()->setIcoSize(MainIconSize->value());
     pHost->mpEditorDialog->setTBIconSize( 0 );
     mudlet::self()->mShowMenuBar = showMenuBar->isChecked();

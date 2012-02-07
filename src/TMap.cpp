@@ -1386,6 +1386,33 @@ int TMap::createMapLabel(int area, QString text, float x, float y, float z, QCol
     return labelID;
 }
 
+int TMap::updateMapLabel(int area, QString text, float x, float y, QColor fg, QColor bg, int id )
+{
+    if( ! areas.contains( area ) ) return -1;
+    TMapLabel label;
+    label.text = text;
+    label.bgColor = bg;
+    label.bgColor.setAlpha(50);
+    label.fgColor = fg;
+    label.size = QSizeF(100,100);
+    label.pos = QPointF( x, y );
+
+    int labelID = id;
+    if( ! mapLabels.contains( area ) )
+    {
+        QMap<int, TMapLabel> m;
+        m[labelID] = label;
+        mapLabels[area] = m;
+    }
+    else
+    {
+        mapLabels[area].insert(labelID, label);
+    }
+
+    if( mpMapper ) mpMapper->mp2dMap->update();
+    return 0;
+}
+
 void TMap::deleteMapLabel(int area, int labelID )
 {
     if( ! areas.contains( area ) ) return;

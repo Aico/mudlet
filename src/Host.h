@@ -25,6 +25,7 @@
 
 class mudlet;
 class TLuaInterpreter;
+class TPythonInterpreter;
 
 
 #include <list>
@@ -39,6 +40,7 @@ class TLuaInterpreter;
 #include "AliasUnit.h"
 #include "ActionUnit.h"
 #include "TLuaInterpreter.h"
+#include "TPythonInterpreter.h"
 #include <QTextBlock>
 #include <QTextStream>
 #include <QFile>
@@ -50,7 +52,7 @@ class TLuaInterpreter;
 #include "TArea.h"
 #include "TRoom.h"
 #include "TMap.h"
-#include <QListWidget>;
+#include <QListWidget>
 
 class dlgTriggerEditor;
 class TConsole;
@@ -103,6 +105,7 @@ public:
     int                getHostID() { QMutexLocker locker(& mLock); return mHostID; }
     void               setHostID( int id ) { QMutexLocker locker(& mLock); mHostID = id; }
     TLuaInterpreter *  getLuaInterpreter() { return & mLuaInterpreter; }
+    TPythonInterpreter * getPythonInterpreter() { return & mPythonInterpreter; }
     void               incomingStreamProcessor( QString & paragraph, int line );
     void               postIrcMessage( QString, QString, QString );
     void               enableTimer( QString & );
@@ -128,6 +131,7 @@ public:
 
     void               setIsAutologin( bool b ){ mIsAutologin = b; }
     bool               isAutologin(){ return mIsAutologin; }
+    bool               pythonEnabled(); 
     void               setReplacementCommand( QString );
     void               registerEventHandler( QString, TScript * );
     void               registerAnonymousEventHandler( QString name, QString fun );
@@ -150,6 +154,7 @@ public:
     cTelnet            mTelnet;
     TConsole *         mpConsole;
     TLuaInterpreter    mLuaInterpreter;
+    TPythonInterpreter mPythonInterpreter;
     TriggerUnit        mTriggerUnit;
     TimerUnit          mTimerUnit;
     ScriptUnit         mScriptUnit;
@@ -188,6 +193,8 @@ public:
     bool               mIsAutologin;
     bool               mIsGoingDown;
     bool               mIsProfileLoadingSequence;
+    bool               mPython;
+    bool               mPythonWorking;
 
     bool               mIsClosingDown;
     bool               mLF_ON_GA;

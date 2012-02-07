@@ -25,9 +25,13 @@ macx:LIBS += \
 -lz \
 -lyajl
 
+LIBS += -Lpythonqt/lib -lPythonQt
+
 unix:INCLUDEPATH += /usr/include/lua5.1
 
 INCLUDEPATH += irc/include
+INCLUDEPATH += pythonqt
+include ( pythonqt/build/python.prf )
 
 SOURCES += TConsole.cpp \
     ctelnet.cpp \
@@ -239,3 +243,4 @@ INSTALLS += fonts \
 
 OTHER_FILES += \
     mudlet_documentation.txt
+

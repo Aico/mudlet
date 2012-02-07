@@ -101,6 +101,7 @@ public:
     bool              mIsCommandPopup;
     bool              mIsTailMode;
     QMap<QString, QString> mPopupCommands;
+    QString           mPopupLanguage;
     int               mScrollVector;
     QRegion           mSelectedRegion;
     bool              mShowTimeStamps;

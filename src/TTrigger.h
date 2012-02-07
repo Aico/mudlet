@@ -97,6 +97,9 @@ public:
     bool             setRegexCodeList( QStringList regex, QList<int> regexPorpertyList );
     QString          getScript()                     { return mScript; }
     bool             setScript( QString & script );
+    QString          getScriptLanguage();
+    int              getScriptLanguageCode()         { return mScriptLanguage;}
+    void             setScriptLanguage( QString & script_language);
     bool             compileScript();
     bool             match( char *, QString &, int line, int posOffset = 0 );
 
@@ -166,6 +169,7 @@ private:
     QMap<int, pcre *>                      mRegexMap;
 
     QString                                mScript;
+    int                                    mScriptLanguage;
 
     bool                                   mIsFolder;
     bool                                   mNeedsToBeCompiled;

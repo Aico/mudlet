@@ -64,6 +64,9 @@ public:
     void             execute();
     QString          getScript()                        { return mScript; }
     bool             setScript( QString & script );
+    QString          getScriptLanguage();
+    int              getScriptLanguageCode()            { return mScriptLanguage;}
+    void           setScriptLanguage( QString & script_language);
     void             setCommand( QString command )      { mCommand = command; }
     QString          getCommand()                       { return mCommand; }
     bool             isFolder()                         { return mIsFolder; }
@@ -93,6 +96,7 @@ private:
     QString          mRegexCode;
     QRegExp          mRegex;
     QString          mScript;
+    int              mScriptLanguage;
     QString          mFuncName;
     bool             mIsFolder;
     Host *           mpHost;

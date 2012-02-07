@@ -5,6 +5,7 @@
 
 #include <QHash>
 #include <QTextCharFormat>
+#include "dlgSourceEditorArea.h"
 
 class QTextDocument;
 
@@ -13,7 +14,7 @@ class THighlighter : public QSyntaxHighlighter
      Q_OBJECT
 
  public:
-                               THighlighter(QTextDocument *parent = 0);
+                               THighlighter(QTextEdit *parent = 0);
      void                      setSearchPattern( QString p );
 
 
@@ -27,7 +28,8 @@ class THighlighter : public QSyntaxHighlighter
          QTextCharFormat format;
      };
      QString                   mSearchPattern;
-     QVector<HighlightingRule> highlightingRules;
+     QVector<HighlightingRule> highlightingRulesLua;
+     QVector<HighlightingRule> highlightingRulesPython;
      QRegExp                   commentStartExpression;
      QRegExp                   commentEndExpression;
      QRegExp                   stringStart;
@@ -39,6 +41,7 @@ class THighlighter : public QSyntaxHighlighter
      QTextCharFormat           multiLineCommentFormat;
      QTextCharFormat           quotationFormat;
      QTextCharFormat           functionFormat;
+     PlainTextEdit *           editor;
      //bool isString;
  };
 

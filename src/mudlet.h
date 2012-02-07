@@ -82,8 +82,8 @@ public:
    bool                          createMiniConsole( Host *, QString &, int, int, int, int );
    bool                          createLabel( Host *, QString &, int, int, int, int, bool );
    bool                          echoWindow( Host *, QString &, QString & );
-   bool                          echoLink( Host * pHost, QString & name, QString & text, QStringList &, QStringList &, bool customFormat=false );
-   void                          insertLink( Host *, QString &, QString, QStringList &, QStringList &, bool customFormat=false );
+   bool                          echoLink( Host * pHost, QString & name, QString & text, QStringList &, QStringList &, QString & lang, bool customFormat=false );
+   void                          insertLink( Host *, QString &, QString, QStringList &, QStringList &, QString &, bool customFormat=false );
    bool                          appendBuffer( Host *, QString & );
    bool                          createBuffer( Host *, QString & );
    bool                          showWindow( Host *, QString & );
@@ -96,7 +96,7 @@ public:
    bool                          setBackgroundColor( Host *, QString & name, int r, int g, int b, int alpha );
    bool                          setBackgroundImage( Host *, QString & name, QString & path );
    bool                          setTextFormat( Host *, QString & name, int, int, int, int, int, int, bool, bool, bool );
-   bool                          setLabelClickCallback( Host *, QString &, QString &, TEvent * );
+   bool                          setLabelClickCallback( Host *, QString &, QString &, QString &, TEvent * );
    bool                          setLabelOnEnter( Host *, QString &, QString &, TEvent * );
    bool                          setLabelOnLeave( Host *, QString &, QString &, TEvent * );
    bool                          moveWindow( Host *, QString & name, int, int );
@@ -106,7 +106,7 @@ public:
    int                           selectString( Host *, QString & name, QString what, int );
    int                           selectSection( Host *, QString & name, int, int );
    void                          setBold( Host *, QString & name, bool );
-   void                          setLink( Host * pHost, QString & name, QString & linkText, QStringList & linkFunction, QStringList & );
+   void                          setLink( Host * pHost, QString & name, QString & linkText, QStringList & linkFunction, QStringList & , QString & lang);
    void                          setItalics( Host *, QString & name, bool );
    void                          setUnderline( Host *, QString & name, bool );
    void                          setFgColor( Host *, QString & name, int, int, int );

@@ -214,6 +214,7 @@ void cTelnet::handle_socket_signal_connected()
     QString func = "onConnect";
     QString nothing = "";
     mpHost->mLuaInterpreter.call(func, nothing );
+    (mpHost->getPythonInterpreter())->call(func);
     mConnectionTime.start();
     if( (mpHost->getLogin().size()>0) && (mpHost->getPass().size()>0))
         mTimerLogin->start(2000);
@@ -240,6 +241,7 @@ void cTelnet::handle_socket_signal_disconnected()
         postMessage( err );
         postMessage( msg );
         postMessage( spacer );
+        (mpHost->getPythonInterpreter())->call("onDisconnect");
     }
 }
 
@@ -962,6 +964,7 @@ void cTelnet::setATCPVariables( QString & msg )
         arg = arg.prepend( var.section( " ", 1 ) );
         var = var.section( " ", 0, 0 );
     }
+    mpHost->getPythonInterpreter()->setAtcpTable( var, arg );
     mpHost->mLuaInterpreter.setAtcpTable( var, arg );
     if( var.startsWith("RoomNum") )
     {
@@ -1046,6 +1049,7 @@ void cTelnet::setGMCPVariables( QString & msg )
         return;
     }
     arg.remove( '\n' );
+	mpHost->getPythonInterpreter()->setGMCPTable( var, arg );
     mpHost->mLuaInterpreter.setGMCPTable( var, arg );
 }
 
@@ -1061,7 +1065,8 @@ void cTelnet::setChannel102Variables( QString & msg )
     {
         int _m = msg.at(0).toAscii();
         int _a = msg.at(1).toAscii();
-        mpHost->mLuaInterpreter.setChannel102Table( _m, _a );
+        mpHost->getPythonInterpreter()->setChannel102Table( _m, _a );
+        mpHost->mLuaInterpreter.setChannel102Table( _m, _a );        
     }
 }
 
