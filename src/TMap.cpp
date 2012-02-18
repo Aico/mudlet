@@ -1386,7 +1386,7 @@ int TMap::createMapLabel(int area, QString text, float x, float y, float z, QCol
     return labelID;
 }
 
-int TMap::updateMapLabel(int area, QString text, float x, float y, QColor fg, QColor bg, int id )
+int TMap::updateMapLabel(int area, QString text, float x, float y, float z, QColor fg, QColor bg, int id )
 {
     if( ! areas.contains( area ) ) return -1;
     TMapLabel label;
@@ -1395,7 +1395,7 @@ int TMap::updateMapLabel(int area, QString text, float x, float y, QColor fg, QC
     label.bgColor.setAlpha(50);
     label.fgColor = fg;
     label.size = QSizeF(100,100);
-    label.pos = QPointF( x, y );
+    label.pos = QVector3D( x, y, z );
 
     int labelID = id;
     if( ! mapLabels.contains( area ) )

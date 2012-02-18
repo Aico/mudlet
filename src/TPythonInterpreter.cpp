@@ -153,12 +153,8 @@ QMap<QString,QVariant> TPythonInterpreter::convertQMap(const QMap<int,TRoom *> m
     while (i.hasNext()) {
         i.next();
         count += 1;
-        if (i.key() == 99999) {
-            std::cout << " found key 99999 with values: " <<  std::endl;
-        }
         result[QString(i.key())]=roomToQVariant(*(i.value()));
     }
-    std::cout << count << " :count" << std::endl;
 
     return result;
 }
@@ -203,7 +199,9 @@ QMap<QString,QVariant> TPythonInterpreter::mapLabelsToQVariant(const QMap<qint32
 QMap<QString,QVariant> TPythonInterpreter::mapLabelToQVariant(const TMapLabel label) {
     QMap<QString,QVariant> result;
     if (!label.pos.isNull()) {
-        result["pos"]=QVariant(label.pos);
+        result["x"]=QVariant(label.pos.x());
+        result["y"]=QVariant(label.pos.y());
+        result["z"]=QVariant(label.pos.z());
     }
     if (!label.pointer.isNull()) {
         result["pointer"]=QVariant(label.pointer);
@@ -252,6 +250,7 @@ QMap<QString,QVariant> TPythonInterpreter::roomToQVariant(const TRoom room) {
     if (!room.name.isNull()) {
         result["name"]=QVariant(room.name);
     }
+    result["exitStubs"]=QVariant(convertQList(room.exitStubs));
     result["userData"]=QVariant(convertQMap(room.userData));
     result["exitLocks"]=QVariant(convertQList(room.exitLocks));
     result["highlight"]=QVariant(room.highlight);
@@ -2062,6 +2061,12 @@ int MudletObjectWrapper::updateRoom( MudletObject* o, QMap<QString, QVariant> ma
     room->isLocked=map["isLocked"].toBool();
     room->c=(qint8)map["c"].toInt();
     room->name=map["name"].toString();
+    QList<int> exitStubs;
+    QListIterator<QVariant> exitStubssi(map["exitStubs"].value<QList<QVariant> >());
+    while (exitStubssi.hasNext()) {
+        exitStubs.append(exitStubssi.next().toInt());
+    }
+    room->exitStubs = exitStubs;
     
     QMap<QString,QString> udata;
     QMapIterator<QString,QVariant> udatai(map["userData"].value<QMap<QString,QVariant> >());
@@ -2123,6 +2128,8 @@ int MudletObjectWrapper::clearRoomUserData( MudletObject* o, int id_from )
 
 int MudletObjectWrapper::update2DMapperNow( MudletObject* o)
 {
+    if (o->mpHost->mpMap->mpM)
+            o->mpHost->mpMap->mpM->update();
     if( o->mpHost->mpMap->mpMapper )
             if( o->mpHost->mpMap->mpMapper->mp2dMap )
                 o->mpHost->mpMap->mpMapper->mp2dMap->update();
@@ -2152,9 +2159,9 @@ int MudletObjectWrapper::deleteArea( MudletObject* o, int id )
     return 0;
 }
 
-int MudletObjectWrapper::updateMapLabel( MudletObject* o, int area, QString text, float x, float y, QColor fg, QColor bg, int id )
+int MudletObjectWrapper::updateMapLabel( MudletObject* o, int area, QString text, float x, float y, float z, QColor fg, QColor bg, int id )
 {
-    o->mpHost->mpMap->updateMapLabel(area, text, x, y, fg, bg, id );
+    o->mpHost->mpMap->updateMapLabel(area, text, x, y, z, fg, bg, id );
     return 0;
 }
 

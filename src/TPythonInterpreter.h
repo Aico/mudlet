@@ -237,7 +237,7 @@ public slots:
   int toggleHighlight( MudletObject* o, int roomID, bool highlight);
   int setAreaName( MudletObject* o, int id, QString name );
   int deleteArea( MudletObject* o, int id );
-  int updateMapLabel( MudletObject* o, int area, QString text, float x, float y, QColor fg, QColor bg, int id );
+  int updateMapLabel( MudletObject* o, int area, QString text, float x, float y, float z, QColor fg, QColor bg, int id );
   int deleteMapLabel( MudletObject* o, int area, int labelID  );
   //Callable general mapper functions.
   int centerview( MudletObject* o, int roomid );

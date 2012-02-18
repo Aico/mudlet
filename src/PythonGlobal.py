@@ -186,7 +186,7 @@ class Mapper:
                     l = {}
                     for label_key,label_value in map_value.iteritems():
                         l[str(label_key)] = label_value
-                    labelmap[ord(map_key)]=Mapper.MapLabel(l.get('pos'),l.get('size'),l.get('text'),l.get('fgColor'),l.get('bgColor'),l.get('pix'),l.get('pointer'))
+                    labelmap[ord(map_key)]=Mapper.MapLabel(l.get('x'),l.get('y'),l.get('z'),l.get('size'),l.get('text'),l.get('fgColor'),l.get('bgColor'),l.get('pix'),l.get('pointer'))
                 super(Mapper.MapLabels,self).__setitem__(ord(key),Mapper.Labels(labelmap))
                 self[ord(key)].setContainer(self,ord(key))
                 
@@ -196,8 +196,8 @@ class Mapper:
             if type(value) == Mapper.Labels:
                 value.setContainer(self,key)
                 for k,v in value.iteritems():
-                    # area, text, x, y, fg, bg, id
-                    mudlet.updateMapLabel( key, v.text, v.pos.x(), v.pos.y(), v.fgColor, v.bgColor, k )
+                    # area, text, x, y, z, fg, bg, id
+                    mudlet.updateMapLabel( key, v.text, v.x, v.y, v.z, v.fgColor, v.bgColor, k )
                 super(Mapper.MapLabels,self).__setitem__(key,value)          
             else:
                 raise Exception('Value must be a Label or a dict')
@@ -215,9 +215,9 @@ class Mapper:
                 
         def __setitem__(self,key,value):            
             if type(value) == Mapper.MapLabel:
-                mudlet.updateMapLabel( self.areaid, value.text, value.pos.x(), value.pos.y(), value.fgColor, value.bgColor, key )            
+                mudlet.updateMapLabel( self.areaid, value.text, value.x, value.y, value.z, value.fgColor, value.bgColor, key )            
             else:
-                raise Exception('Value must be a MapLabel(QPointF pos,QSizeF size,text,QColor fgColor,QColor bgColor,QPixmap pix=None,QPointF pointer=None)')
+                raise Exception('Value must be a MapLabel(int x,int y,int z,QSizeF size,text,QColor fgColor,QColor bgColor,QPixmap pix=None,QPointF pointer=None)')
             value.setContainer(self,key)
             super(Mapper.Labels,self).__setitem__(key,value)
             
@@ -230,8 +230,10 @@ class Mapper:
             self.areaid = areaid
             
     class MapLabel(object):
-        def __init__(self,pos,size,text,fgColor,bgColor,pix=None,pointer=None):            
-            super(Mapper.MapLabel,self).__setattr__('pos', pos)
+        def __init__(self,x,y,z,size,text,fgColor,bgColor,pix=None,pointer=None):            
+            super(Mapper.MapLabel,self).__setattr__('x', x)
+            super(Mapper.MapLabel,self).__setattr__('y', y)
+            super(Mapper.MapLabel,self).__setattr__('z', z)
             super(Mapper.MapLabel,self).__setattr__('pointer', pointer)
             super(Mapper.MapLabel,self).__setattr__('size', size)
             super(Mapper.MapLabel,self).__setattr__('text', text)
