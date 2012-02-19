@@ -2041,24 +2041,22 @@ int MudletObjectWrapper::removeCustomEnvColor( MudletObject* o, int id)
 
 int MudletObjectWrapper::updateRoom( MudletObject* o, QMap<QString, QVariant> map)
 {
-    TRoom * room = new TRoom();
-    room->id=map["id"].toInt();
-    room->area=map["area"].toInt();
-    room->x=map["x"].toInt();
-    room->y=map["y"].toInt();
-    room->z=map["z"].toInt();
-    room->north=map["north"].toInt();
-    room->northeast=map["northeast"].toInt();
-    room->east=map["east"].toInt();
-    room->southeast=map["southeast"].toInt();
-    room->south=map["south"].toInt();
-    room->southwest=map["southwest"].toInt();
-    room->west=map["west"].toInt();
-    room->northwest=map["northwest"].toInt();
-    room->up=map["up"].toInt();
-    room->down=map["down"].toInt();
-    room->in=map["in"].toInt();
-    room->out=map["out"].toInt();
+    o->mpHost->mpMap->addRoom(map["id"].toInt());
+    TRoom *room = o->mpHost->mpMap->rooms[map["id"].toInt()];
+    o->mpHost->mpMap->setRoomArea(room->id,map["area"].toInt());
+    o->mpHost->mpMap->setRoomCoordinates(room->id,map["x"].toInt(),map["y"].toInt(),map["z"].toInt());
+    o->mpHost->mpMap->setExit(room->id,map["north"].toInt(),DIR_NORTH);
+    o->mpHost->mpMap->setExit(room->id,map["northeast"].toInt(),DIR_NORTHEAST);
+    o->mpHost->mpMap->setExit(room->id,map["east"].toInt(),DIR_EAST);
+    o->mpHost->mpMap->setExit(room->id,map["southeast"].toInt(),DIR_SOUTHEAST);
+    o->mpHost->mpMap->setExit(room->id,map["south"].toInt(),DIR_SOUTH);
+    o->mpHost->mpMap->setExit(room->id,map["southwest"].toInt(),DIR_SOUTHWEST);
+    o->mpHost->mpMap->setExit(room->id,map["west"].toInt(),DIR_WEST);
+    o->mpHost->mpMap->setExit(room->id,map["northwest"].toInt(),DIR_NORTHWEST);
+    o->mpHost->mpMap->setExit(room->id,map["up"].toInt(),DIR_UP);
+    o->mpHost->mpMap->setExit(room->id,map["down"].toInt(),DIR_DOWN);
+    o->mpHost->mpMap->setExit(room->id,map["in"].toInt(),DIR_IN);
+    o->mpHost->mpMap->setExit(room->id,map["out"].toInt(),DIR_OUT);
     room->environment=map["environment"].toInt();
     room->weight=map["weight"].toInt();
     room->isLocked=map["isLocked"].toBool();
