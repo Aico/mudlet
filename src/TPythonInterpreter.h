@@ -44,6 +44,7 @@ public:
     QNetworkAccessManager * mpFileDownloader;
     QMap<QNetworkReply *, QString> downloadMap;
     void init();
+    void loadMapperVariables();
     void add_python_variable( const QString & varName, const QVariant & var);
     void callEventHandler( const QString & function, const TEvent * pE );
     void executeScript( const QString & code );
@@ -63,7 +64,7 @@ private:
     PythonQtObjectPtr mainModule;
     Host * mpHost;
     bool mpInitialized;
-    void runMethod(const QString& msg);
+    void runMethod(const QString& msg); 
     QMap<QString,QVariant> convertQMap(const QMap<int,int> map);
     QMap<QString,QVariant> convertQMap(const QMap<int,QString> map);
     QMap<QString,QVariant> convertQMap(const QMap<int,QColor> map);
@@ -245,6 +246,7 @@ public slots:
   bool gotoRoom( MudletObject* o, int r );
   bool saveMap(MudletObject* o, QString location );
   bool setGridMode( MudletObject* o, int area, bool gridMode );
+  void loadMap( MudletObject* o);
 };
 
 #endif  

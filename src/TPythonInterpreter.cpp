@@ -74,32 +74,35 @@ void TPythonInterpreter::init()
         const QString& varHostLogin = "HOST_LOGIN";
         const QVariant& varHostLoginValue = mpHost->getLogin();
         add_python_variable(varHostLogin,varHostLoginValue);
-        const QString& varEnvColors = "HOST_ENV_COLORS";
-        const QVariant& varEnvColorsValue = convertQMap(mpHost->mpMap->envColors);
-        add_python_variable(varEnvColors,varEnvColorsValue);
-        const QString& varAreaNamesMap = "HOST_AREA_NAMES_MAP";
-        const QVariant& varAreaNamesMapValue = convertQMap(mpHost->mpMap->areaNamesMap);
-        add_python_variable(varAreaNamesMap,varAreaNamesMapValue);
-        const QString& varCustomEnvColors = "HOST_CUSTOM_ENV_COLORS";
-        const QVariant& varCustomEnvColorsValue = convertQMap(mpHost->mpMap->customEnvColors);
-        add_python_variable(varCustomEnvColors,varCustomEnvColorsValue);
-        //const QString& varMapHash = "HOST_MAP_HASH_TABLE";
-        //const QVariant& varMapHashValue = convertQMap(mpHost->mpMap->hashTable);
-        //add_python_variable(varMapHash,varMapHashValue);
-        const QString& varMapLabels = "HOST_MAP_LABELS";
-        const QVariant& varMapLabelsValue = mapLabelsToQVariant(mpHost->mpMap->mapLabels);
-        add_python_variable(varMapLabels,varMapLabelsValue);
-        const QString& varRooms = "HOST_ROOMS";
-        const QVariant& varRoomsValue = convertQMap(mpHost->mpMap->rooms);
-        add_python_variable(varRooms,varRoomsValue);
+        loadMapperVariables();
         
-
         PythonQt::self()->registerCPPClass("MudletObject", "","mudlet", PythonQtCreateObject<MudletObjectWrapper>);
         
         QString dirPath = QCoreApplication::applicationDirPath();
         mainModule.evalFile(dirPath + "/PythonGlobal.py");
         mpInitialized = true;
     }
+}
+
+void TPythonInterpreter::loadMapperVariables() {
+    const QString& varEnvColors = "HOST_ENV_COLORS";
+    const QVariant& varEnvColorsValue = convertQMap(mpHost->mpMap->envColors);
+    add_python_variable(varEnvColors,varEnvColorsValue);
+    const QString& varAreaNamesMap = "HOST_AREA_NAMES_MAP";
+    const QVariant& varAreaNamesMapValue = convertQMap(mpHost->mpMap->areaNamesMap);
+    add_python_variable(varAreaNamesMap,varAreaNamesMapValue);
+    const QString& varCustomEnvColors = "HOST_CUSTOM_ENV_COLORS";
+    const QVariant& varCustomEnvColorsValue = convertQMap(mpHost->mpMap->customEnvColors);
+    add_python_variable(varCustomEnvColors,varCustomEnvColorsValue);
+    //const QString& varMapHash = "HOST_MAP_HASH_TABLE";
+    //const QVariant& varMapHashValue = convertQMap(mpHost->mpMap->hashTable);
+    //add_python_variable(varMapHash,varMapHashValue);
+    const QString& varMapLabels = "HOST_MAP_LABELS";
+    const QVariant& varMapLabelsValue = mapLabelsToQVariant(mpHost->mpMap->mapLabels);
+    add_python_variable(varMapLabels,varMapLabelsValue);
+    const QString& varRooms = "HOST_ROOMS";
+    const QVariant& varRoomsValue = convertQMap(mpHost->mpMap->rooms);
+    add_python_variable(varRooms,varRoomsValue);
 }
 
 QMap<QString,QVariant> TPythonInterpreter::convertQMap(const QMap<int,int> map) {
@@ -2222,4 +2225,9 @@ bool MudletObjectWrapper::setGridMode( MudletObject* o, int area, bool gridMode 
         o->mpHost->mpMap->areas[area]->gridMode = gridMode;
     }
     return true;
+}
+
+void MudletObjectWrapper::loadMap( MudletObject* o)
+{
+    o->mpHost->getPythonInterpreter()->loadMapperVariables();
 }

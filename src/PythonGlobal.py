@@ -39,12 +39,18 @@ class NestedDict(dict):
             
 class Mapper:
     def __init__(self):
+        global HOST_ENV_COLORS,HOST_ROOMS,HOST_AREA_NAMES_MAP,HOST_CUSTOM_ENV_COLORS,HOST_MAP_LABELS
         self.envColors = Mapper.EnvColors()
+        del HOST_ENV_COLORS
         self.rooms = Mapper.Rooms()
+        del HOST_ROOMS
         self.areaNamesMap = Mapper.AreaNamesMap()
+        del HOST_AREA_NAMES_MAP
         self.customEnvColors = Mapper.CustomEnvColors()
+        del HOST_CUSTOM_ENV_COLORS
         #self.hashTable = Mapper.HashTable()
         self.mapLabels = Mapper.MapLabels()
+        del HOST_MAP_LABELS
         
     class EnvColors(dict):
         def __init__(self):
@@ -266,6 +272,10 @@ class Mapper:
         
     def refresh(self):
         mudlet.update2DMapperNow()
+        
+    def sync(self):
+        mudlet.loadMap()
+        self.__init__()
             
 
 line = ''
