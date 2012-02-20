@@ -1458,7 +1458,7 @@ void TConsole::reset()
     mFormatCurrent.underline = false;
 }
 
-void TConsole::insertLink( QString text, QStringList & func, QStringList & hint, QPoint P, QString & lang,bool customFormat )
+void TConsole::insertLink( QString text, QStringList & func, QStringList & hint, QPoint P, int lang,bool customFormat )
 {
     int x = P.x();
     int y = P.y();
@@ -1757,7 +1757,7 @@ void TConsole::insertText( QString msg )
     insertText( msg, mUserCursor );
 }
 
-void TConsole::insertLink( QString text, QStringList & func, QStringList & hint, QString & lang,bool customFormat)
+void TConsole::insertLink( QString text, QStringList & func, QStringList & hint, int lang,bool customFormat)
 {
     insertLink( text, func, hint, mUserCursor, lang, customFormat );
 }
@@ -2075,7 +2075,7 @@ bool TConsole::selectSection( int from, int to )
     return true;
 }
 
-void TConsole::setLink( QString & linkText, QStringList & linkFunction, QStringList & linkHint, QString & lang )
+void TConsole::setLink( QString & linkText, QStringList & linkFunction, QStringList & linkHint, int lang )
 {
     buffer.applyLink( P_begin, P_end, linkText, linkFunction, linkHint, lang );
 }
@@ -2177,7 +2177,7 @@ void TConsole::printCommand( QString & msg )
     }
 }
 
-void TConsole::echoLink( QString & text, QStringList & func, QStringList & hint, QString & lang, bool customFormat )
+void TConsole::echoLink( QString & text, QStringList & func, QStringList & hint, int lang, bool customFormat )
 {
     if( customFormat )
         buffer.addLink( mTriggerEngineMode, text, func, hint, mFormatCurrent, lang );

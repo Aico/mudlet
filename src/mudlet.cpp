@@ -1132,7 +1132,7 @@ bool mudlet::closeWindow( Host * pHost, QString & name )
         return false;
 }
 
-bool mudlet::setLabelClickCallback( Host * pHost, QString & name, QString & func, QString & lang, TEvent * pA )
+bool mudlet::setLabelClickCallback( Host * pHost, QString & name, QString & func, int lang, TEvent * pA )
 {
     QMap<QString, TLabel *> & labelMap = mHostLabelMap[pHost];
     if( labelMap.contains( name ) )
@@ -1223,7 +1223,7 @@ void mudlet::insertText( Host * pHost, QString & name, QString text )
     }
 }
 
-void mudlet::insertLink( Host * pHost, QString & name, QString text, QStringList & func, QStringList & hint, QString & lang,bool customFormat )
+void mudlet::insertLink( Host * pHost, QString & name, QString text, QStringList & func, QStringList & hint, int lang,bool customFormat )
 {
     QMap<QString, TConsole *> & dockWindowConsoleMap = mHostConsoleMap[pHost];
     if( dockWindowConsoleMap.contains( name ) )
@@ -1241,7 +1241,7 @@ void mudlet::replace( Host * pHost, QString & name, QString text )
     }
 }
 
-void mudlet::setLink( Host * pHost, QString & name, QString & linkText, QStringList & linkFunction, QStringList & linkHint, QString & lang )
+void mudlet::setLink( Host * pHost, QString & name, QString & linkText, QStringList & linkFunction, QStringList & linkHint, int lang )
 {
     QMap<QString, TConsole *> & dockWindowConsoleMap = mHostConsoleMap[pHost];
     if( dockWindowConsoleMap.contains( name ) )
@@ -1380,7 +1380,7 @@ bool mudlet::echoWindow( Host * pHost, QString & name, QString & text )
         return false;
 }
 
-bool mudlet::echoLink( Host * pHost, QString & name, QString & text, QStringList & func, QStringList & hint, QString & lang, bool customFormat )
+bool mudlet::echoLink( Host * pHost, QString & name, QString & text, QStringList & func, QStringList & hint, int lang, bool customFormat )
 {
     QMap<QString, TConsole *> & dockWindowConsoleMap = mHostConsoleMap[pHost];
     QString t = text;

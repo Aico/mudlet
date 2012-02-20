@@ -36,7 +36,8 @@
 #include "TEvent.h"
 #include "dlgMapper.h"
 
-
+#define LUA 0
+#define PYTHON 1
 
 //#ifdef Q_OS_WIN32
 //    #include "lua_yajl.c"
@@ -2584,8 +2585,8 @@ int TLuaInterpreter::setLabelClickCallback( lua_State *L )
     Host * pHost = TLuaInterpreter::luaInterpreterMap[L];
     QString text(luaSendText.c_str());
     QString name(luaName.c_str());
-    QString lang = "LUA";
-    mudlet::self()->setLabelClickCallback( pHost, text, name, lang, pE );
+    
+    mudlet::self()->setLabelClickCallback( pHost, text, name, LUA, pE );
 
     return 0;
 }
@@ -4063,13 +4064,13 @@ int TLuaInterpreter::setLink( lua_State * L )
     QString _linkText = "";//QString(linkText.c_str());
     QStringList _linkFunction;
     _linkFunction <<  QString(linkFunction.c_str());
-    QString lang = "LUA";
+    
     QStringList _linkHint;
     _linkHint << QString(linkHint.c_str());
     if( windowName.size() > 0 )
-        mudlet::self()->setLink( pHost, windowName, _linkText, _linkFunction, _linkHint, lang );
+        mudlet::self()->setLink( pHost, windowName, _linkText, _linkFunction, _linkHint, LUA );
     else
-        pHost->mpConsole->setLink( _linkText, _linkFunction, _linkHint, lang );
+        pHost->mpConsole->setLink( _linkText, _linkFunction, _linkHint, LUA );
     return 0;
 }
 
@@ -4168,14 +4169,14 @@ int TLuaInterpreter::setPopup( lua_State *L )
         return 1;
     }
 
-    QString lang = "LUA";
+    
     if( a1 == "" )
     {
-        pHost->mpConsole->setLink( txt, _commandList, _hintList, lang );
+        pHost->mpConsole->setLink( txt, _commandList, _hintList, LUA );
     }
     else
     {
-        mudlet::self()->setLink( pHost, name, txt, _commandList, _hintList, lang );
+        mudlet::self()->setLink( pHost, name, txt, _commandList, _hintList, LUA );
     }
 
     return 0;
@@ -7493,19 +7494,19 @@ int TLuaInterpreter::insertLink( lua_State *L )
     }
     QStringList command;
     QStringList hint;
-    QString lang = "LUA";
+    
     Host * pHost = TLuaInterpreter::luaInterpreterMap[L];
     if( n == 3 )
     {
         command << a2.c_str();
         hint << a3.c_str();
-        pHost->mpConsole->insertLink( QString(a1.c_str()), command, hint, lang );
+        pHost->mpConsole->insertLink( QString(a1.c_str()), command, hint, LUA );
     }
     else
     {
         command << a3.c_str();
         hint << a4.c_str();
-        mudlet::self()->insertLink( pHost, _name, QString( a2.c_str() ), command, hint, lang );
+        mudlet::self()->insertLink( pHost, _name, QString( a2.c_str() ), command, hint, LUA );
     }
 
     return 0;
@@ -7606,14 +7607,14 @@ int TLuaInterpreter::insertPopup( lua_State *L )
         return 1;
     }
 
-    QString lang = "LUA";
+    
     if( a1 == "" )
     {
-        pHost->mpConsole->insertLink( txt, _commandList, _hintList, lang, customFormat );
+        pHost->mpConsole->insertLink( txt, _commandList, _hintList, LUA, customFormat );
     }
     else
     {
-        mudlet::self()->insertLink( pHost, name, txt, _commandList, _hintList, lang, customFormat );
+        mudlet::self()->insertLink( pHost, name, txt, _commandList, _hintList, LUA, customFormat );
     }
 
     return 0;
@@ -7821,14 +7822,14 @@ int TLuaInterpreter::echoPopup( lua_State *L )
         return 1;
     }
 
-    QString lang = "LUA";
+    
     if( a1 == "" )
     {
-        pHost->mpConsole->echoLink( txt, _commandList, _hintList, lang, customFormat );
+        pHost->mpConsole->echoLink( txt, _commandList, _hintList, LUA, customFormat );
     }
     else
     {
-        mudlet::self()->echoLink( pHost, name, txt, _commandList, _hintList, lang, customFormat );
+        mudlet::self()->echoLink( pHost, name, txt, _commandList, _hintList, LUA, customFormat );
     }
 
     return 0;
@@ -7920,13 +7921,13 @@ int TLuaInterpreter::echoLink( lua_State *L )
     QString name;
     QStringList func;
     QStringList hint;
-    QString lang = "LUA";
+    
     if( n == 3 || ( n == 4 && gotBool ) )
     {
         txt = a1.c_str();
         func << a2.c_str();
         hint << a3.c_str();
-        pHost->mpConsole->echoLink( txt, func, hint, lang, a5 );
+        pHost->mpConsole->echoLink( txt, func, hint, LUA, a5 );
     }
     else
     {
@@ -7934,7 +7935,7 @@ int TLuaInterpreter::echoLink( lua_State *L )
         func << a3.c_str();
         hint << a4.c_str();
         name = a1.c_str();
-        mudlet::self()->echoLink( pHost, name, txt, func, hint, lang, a5 );
+        mudlet::self()->echoLink( pHost, name, txt, func, hint, LUA, a5 );
     }
 
     return 0;

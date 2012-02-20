@@ -31,6 +31,9 @@
 #include "TTextEdit.h"
 #include <math.h>
 
+#define LUA 0
+#define PYTHON 1
+
 TTextEdit::TTextEdit( TConsole * pC, QWidget * pW, TBuffer * pB, Host * pH, bool isDebugConsole, bool isSplitScreen )
 : QWidget( pW )
 , mCursorY( 0 )
@@ -1210,7 +1213,7 @@ void TTextEdit::slot_popupMenu()
     {
         cmd = mPopupCommands[pA->text()];
     }
-    if( mPopupLanguage == "PYTHON")
+    if( mPopupLanguage == PYTHON)
     {
         mpHost->mPythonInterpreter.executeScript(cmd);
     }
@@ -1263,13 +1266,13 @@ void TTextEdit::mousePressEvent( QMouseEvent * event )
                {
                     QStringList command = mpBuffer->mLinkStore[mpBuffer->buffer[y][x].link];
                     QString func;
-					QString lang;
+					int lang;
                     if( command.size() > 0 )
                     {
                         func = command.at(0);
                     	lang = mpBuffer->mLanguageStore[mpBuffer->buffer[y][x].link];
 
-                    	if( lang == "PYTHON" )
+                    	if( lang == PYTHON )
                     	{
                     	    mpHost->mPythonInterpreter.executeScript(func);
                     	    return;

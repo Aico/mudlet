@@ -103,9 +103,9 @@ public:
       void              insertHTML( QString );
       void              insertText( QString );
       void              insertText( QString, QPoint );
-      void              insertLink( QString, QStringList &, QStringList &, QPoint, QString &, bool customFormat=false);
-      void              insertLink( QString, QStringList &, QStringList &, QString &, bool customFormat=false);
-      void              echoLink( QString & text, QStringList & func, QStringList & hint, QString &, bool customFormat=false);
+      void              insertLink( QString, QStringList &, QStringList &, QPoint, int, bool customFormat=false);
+      void              insertLink( QString, QStringList &, QStringList &, int, bool customFormat=false);
+      void              echoLink( QString & text, QStringList & func, QStringList & hint, int, bool customFormat=false);
       void              setLabelStyleSheet( std::string & buf, std::string & sh );
       void              copy();
       void              cut();
@@ -165,7 +165,7 @@ public:
       void              selectCurrentLine( std::string & );
       bool              setMiniConsoleFontSize( std::string &, int );
       void              setBold( bool );
-      void              setLink( QString & linkText, QStringList & linkFunction, QStringList & linkHint, QString & lang );
+      void              setLink( QString & linkText, QStringList & linkFunction, QStringList & linkHint, int lang );
       void              setItalics( bool );
       void              setUnderline( bool );
       void              finalize();

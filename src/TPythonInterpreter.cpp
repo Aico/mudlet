@@ -35,6 +35,8 @@
 #include <QMapIterator>
 #include <QMap>
 
+#define LUA 0
+#define PYTHON 1
 
 QHash<QString, Host *> TPythonInterpreter::pythonHostMap;
 
@@ -693,34 +695,32 @@ int MudletObjectWrapper::echoLink( MudletObject* o, QString& themsg, QString& th
     QStringList tip;
     func <<  thefunc;
     tip << tooltip;
-    QString lang = "PYTHON";
 
     if (console == "main")
     {
-        o->mpHost->mpConsole->echoLink( themsg, func, tip, lang, customFormat );
+        o->mpHost->mpConsole->echoLink( themsg, func, tip, PYTHON, customFormat );
     }
     else
     {
-        mudlet::self()->echoLink( o->mpHost, console, themsg, func, tip, lang, customFormat  );
+        mudlet::self()->echoLink( o->mpHost, console, themsg, func, tip, PYTHON, customFormat  );
     }
     return 0;
 }
 
-int MudletObjectWrapper::insertLink(MudletObject* o, QString& themsg, QString& thefunc, QString& tooltip, QString& console)
+int MudletObjectWrapper::insertLink(MudletObject* o, QString& themsg, QString& thefunc, QString& tooltip, QString& console, bool customFormat)
 {
     QStringList func;
     QStringList tip;
     func <<  thefunc;
     tip << tooltip;
-    QString lang = "PYTHON";
 
     if (console == "main")
     {
-        o->mpHost->mpConsole->insertLink( themsg, func, tip, lang);
+        o->mpHost->mpConsole->insertLink( themsg, func, tip, PYTHON, customFormat);
     }
     else
     {
-        mudlet::self()->insertLink( o->mpHost, console, themsg, func, tip, lang  );
+        mudlet::self()->insertLink( o->mpHost, console, themsg, func, tip, PYTHON, customFormat);
     }
     return 0;
 }
@@ -731,16 +731,15 @@ int MudletObjectWrapper::setLink( MudletObject* o,QString& thefunc, QString& too
     QStringList tip;
     func <<  thefunc;
     tip << tooltip;
-    QString lang = "PYTHON";
     QString linkTxt="";
 
     if (console == "main")
     {
-        o->mpHost->mpConsole->setLink( linkTxt, func, tip, lang );
+        o->mpHost->mpConsole->setLink( linkTxt, func, tip, PYTHON);
     }
     else
     {
-        mudlet::self()->setLink( o->mpHost, console, linkTxt, func, tip, lang  );
+        mudlet::self()->setLink( o->mpHost, console, linkTxt, func, tip, PYTHON);
     }
     return 0;
 }
@@ -861,43 +860,40 @@ int MudletObjectWrapper::setUnderline(MudletObject* o, QString& console, bool ac
 
 int MudletObjectWrapper::echoPopup(MudletObject* o, QString& themsg, QStringList& func, QStringList& tooltip, QString& console, bool customFormat)
 {
-    QString lang = "PYTHON";
     if (console == "main")
     {
-        o->mpHost->mpConsole->echoLink( themsg, func, tooltip, lang, customFormat );
+        o->mpHost->mpConsole->echoLink( themsg, func, tooltip, PYTHON, customFormat );
     }
     else
     {
-        mudlet::self()->echoLink( o->mpHost, console, themsg, func, tooltip, lang, customFormat  );
+        mudlet::self()->echoLink( o->mpHost, console, themsg, func, tooltip, PYTHON, customFormat  );
     }
     return 0;
 }
 
 int MudletObjectWrapper::setPopup(MudletObject* o, QStringList& func, QStringList& tip, QString& console)
 {
-    QString lang = "PYTHON";
     QString linkTxt="";
     if (console == "main")
     {
-        o->mpHost->mpConsole->setLink( linkTxt, func, tip, lang );
+        o->mpHost->mpConsole->setLink( linkTxt, func, tip, PYTHON);
     }
     else
     {
-        mudlet::self()->setLink( o->mpHost, console, linkTxt, func, tip, lang  );
+        mudlet::self()->setLink( o->mpHost, console, linkTxt, func, tip, PYTHON);
     }
     return 0;
 }
 
 int MudletObjectWrapper::insertPopup(MudletObject* o, QString& themsg, QStringList& func, QStringList& tooltip, QString& console)
 {
-    QString lang = "PYTHON";
     if (console == "main")
     {
-        o->mpHost->mpConsole->insertLink( themsg, func, tooltip, lang);
+        o->mpHost->mpConsole->insertLink( themsg, func, tooltip, PYTHON);
     }
     else
     {
-        mudlet::self()->insertLink( o->mpHost, console, themsg, func, tooltip, lang  );
+        mudlet::self()->insertLink( o->mpHost, console, themsg, func, tooltip, PYTHON);
     }
     return 0;
 }
@@ -2014,8 +2010,7 @@ void MudletObjectWrapper::setLabelClickCallback( MudletObject*o, QString & label
             pE->mArgumentTypeList.append( ARGUMENT_TYPE_STRING );
         }
     }
-    QString lang = "PYTHON";
-    mudlet::self()->setLabelClickCallback( o->mpHost, label, func, lang, pE );
+    mudlet::self()->setLabelClickCallback( o->mpHost, label, func, PYTHON, pE );
 }
 
 void MudletObjectWrapper::setLabelStyleSheet( MudletObject*o, QString & label, QString & sheet )

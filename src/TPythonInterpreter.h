@@ -124,7 +124,7 @@ public slots:
   int sendIrc( MudletObject* o, QString& channel, QString& message);
   int echo( MudletObject* o, QString& themsg, QString& console);
   int echoLink( MudletObject* o, QString& themsg, QString& thefunc, QString& tooltip, QString& console, bool customFormat);
-  int insertLink( MudletObject* o, QString& themsg, QString& thefunc, QString& tooltip, QString& console);
+  int insertLink( MudletObject* o, QString& themsg, QString& thefunc, QString& tooltip, QString& console, bool customFormat);
   int setLink( MudletObject* o, QString& thefunc, QString& tooltip, QString& console);
   int createBuffer(MudletObject* o, QString& name);
   int appendBuffer(MudletObject* o, QString& console);

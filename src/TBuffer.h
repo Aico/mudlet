@@ -82,7 +82,7 @@ public:
     void expandLine( int y, int count, TChar & );
     int wrap( int startLine, int screenWidth, int indentSize, TChar & format );
     int wrapLine( int startLine, int screenWidth, int indentSize, TChar & format );
-    void addLink( bool, QString & text, QStringList & command, QStringList & hint, TChar format, QString & lang );
+    void addLink( bool, QString & text, QStringList & command, QStringList & hint, TChar format, int lang );
 //    void appendLink( QString & text,
 //                     int sub_start,
 //                     int sub_end,
@@ -109,7 +109,7 @@ public:
     bool applyFormat( QPoint &, QPoint &, TChar & format );
     bool applyUnderline( QPoint & P_begin, QPoint & P_end, bool bold );
     bool applyBold( QPoint & P_begin, QPoint & P_end, bool bold );
-    bool applyLink( QPoint & P_begin, QPoint & P_end, QString linkText, QStringList &, QStringList & , QString & lang);
+    bool applyLink( QPoint & P_begin, QPoint & P_end, QString linkText, QStringList &, QStringList & , int lang);
     bool applyItalics( QPoint & P_begin, QPoint & P_end, bool bold );
     bool applyFgColor( QPoint &, QPoint &, int, int, int );
     bool applyBgColor( QPoint &, QPoint &, int, int, int );
@@ -140,7 +140,7 @@ public:
     QList<bool>            dirty;
     QMap<int, QStringList> mLinkStore;
     QMap<int, QStringList> mHintStore;
-    QMap<int, QString>     mLanguageStore;
+    QMap<int, int>     mLanguageStore;
     int                    mLinkID;
     int                    mLinesLimit;
     int                    mBatchDeleteSize;

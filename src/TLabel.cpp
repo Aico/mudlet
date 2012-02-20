@@ -23,6 +23,9 @@
 #include "TLabel.h"
 #include <QDebug>
 
+#define LUA 0
+#define PYTHON 1
+
 TLabel::TLabel( QWidget * pW )
 : QLabel( pW )
 , mpHost( 0 )
@@ -38,11 +41,11 @@ void TLabel::mousePressEvent( QMouseEvent * event )
     {
         if( mpHost )
         {
-            if(mScriptLanguage == "LUA")
+            if(mScriptLanguage == LUA)
             {
                 mpHost->getLuaInterpreter()->callEventHandler( mScript, mpParameters );
             }
-            if(mScriptLanguage == "PYTHON")
+            if(mScriptLanguage == PYTHON)
             {
                 mpHost->getPythonInterpreter()->callEventHandler( mScript, mpParameters );
             }
