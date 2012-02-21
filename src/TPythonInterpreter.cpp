@@ -154,11 +154,11 @@ QMap<QString,QVariant> TPythonInterpreter::convertQMap(const QMap<QString,int> m
 QMap<QString,QVariant> TPythonInterpreter::convertQMap(const QMap<int,TRoom *> map) {
     QMap<QString,QVariant> result;
     QMapIterator<int,TRoom *> i(map);
-    int count = 0;
     while (i.hasNext()) {
         i.next();
-        count += 1;
-        result[QString(i.key())]=roomToQVariant(*(i.value()));
+        if (i.value()->id > 0) {
+            result[QString(i.key())]=roomToQVariant(i.value());
+        }
     }
 
     return result;
@@ -229,40 +229,39 @@ QMap<QString,QVariant> TPythonInterpreter::mapLabelToQVariant(const TMapLabel la
     return result;
 }
 
-QMap<QString,QVariant> TPythonInterpreter::roomToQVariant(const TRoom room) {
+QMap<QString,QVariant> TPythonInterpreter::roomToQVariant(TRoom* room) {
     QMap<QString,QVariant> result;
-    result["id"]=QVariant(room.id);
-    result["area"]=QVariant(room.area);
-    result["x"]=QVariant(room.x);
-    result["y"]=QVariant(room.y);
-    result["z"]=QVariant(room.z);
-    result["north"]=QVariant(room.north);
-    result["northeast"]=QVariant(room.northeast);
-    result["east"]=QVariant(room.east);
-    result["southeast"]=QVariant(room.southeast);
-    result["south"]=QVariant(room.south);
-    result["southwest"]=QVariant(room.southwest);
-    result["west"]=QVariant(room.west);
-    result["northwest"]=QVariant(room.northwest);
-    result["up"]=QVariant(room.up);
-    result["down"]=QVariant(room.down);
-    result["in"]=QVariant(room.in);
-    result["out"]=QVariant(room.out);
-    result["environment"]=QVariant(room.environment);
-    result["weight"]=QVariant(room.weight);
-    result["isLocked"]=QVariant(room.isLocked);
-    result["c"]=QVariant((int)room.c);
-    if (!room.name.isNull()) {
-        result["name"]=QVariant(room.name);
+    result["id"]=QVariant(room->id);
+    result["area"]=QVariant(room->area);
+    result["x"]=QVariant(room->x);
+    result["y"]=QVariant(room->y);
+    result["z"]=QVariant(room->z);
+    result["north"]=room->hasExitStub(DIR_NORTH) ? 0 : QVariant(room->north);
+    result["northeast"]=room->hasExitStub(DIR_NORTHEAST) ? 0 : QVariant(room->northeast);
+    result["east"]=room->hasExitStub(DIR_EAST) ? 0 : QVariant(room->east);
+    result["southeast"]=room->hasExitStub(DIR_SOUTHEAST) ? 0 : QVariant(room->southeast);
+    result["south"]=room->hasExitStub(DIR_SOUTH) ? 0 : QVariant(room->south);
+    result["southwest"]=room->hasExitStub(DIR_SOUTHWEST) ? 0 : QVariant(room->southwest);
+    result["west"]=room->hasExitStub(DIR_WEST) ? 0 : QVariant(room->west);
+    result["northwest"]=room->hasExitStub(DIR_NORTHWEST) ? 0 : QVariant(room->northwest);
+    result["up"]=room->hasExitStub(DIR_UP) ? 0 : QVariant(room->up);
+    result["down"]=room->hasExitStub(DIR_DOWN) ? 0 : QVariant(room->down);
+    result["in"]=room->hasExitStub(DIR_IN) ? 0 : QVariant(room->in);
+    result["out"]=room->hasExitStub(DIR_OUT) ? 0 : QVariant(room->out);
+    result["environment"]=QVariant(room->environment);
+    result["weight"]=QVariant(room->weight);
+    result["isLocked"]=QVariant(room->isLocked);
+    result["c"]=QVariant((int)room->c);
+    if (!room->name.isNull()) {
+        result["name"]=QVariant(room->name);
     }
-    result["exitStubs"]=QVariant(convertQList(room.exitStubs));
-    result["userData"]=QVariant(convertQMap(room.userData));
-    result["exitLocks"]=QVariant(convertQList(room.exitLocks));
-    result["highlight"]=QVariant(room.highlight);
-    result["highlightColor"]=(QVariant)room.highlightColor;
-    result["highlightColor2"]=(QVariant)room.highlightColor2;
-    result["highlightRadius"]=QVariant(room.highlightRadius);
-    result["rendered"]=QVariant(room.rendered);
+    result["userData"]=QVariant(convertQMap(room->userData));
+    result["exitLocks"]=QVariant(convertQList(room->exitLocks));
+    result["highlight"]=QVariant(room->highlight);
+    result["highlightColor"]=(QVariant)room->highlightColor;
+    result["highlightColor2"]=(QVariant)room->highlightColor2;
+    result["highlightRadius"]=QVariant(room->highlightRadius);
+    result["rendered"]=QVariant(room->rendered);
     
     return result;
 }
@@ -2057,12 +2056,18 @@ int MudletObjectWrapper::updateRoom( MudletObject* o, QMap<QString, QVariant> ma
     room->isLocked=map["isLocked"].toBool();
     room->c=(qint8)map["c"].toInt();
     room->name=map["name"].toString();
-    QList<int> exitStubs;
-    QListIterator<QVariant> exitStubssi(map["exitStubs"].value<QList<QVariant> >());
-    while (exitStubssi.hasNext()) {
-        exitStubs.append(exitStubssi.next().toInt());
-    }
-    room->exitStubs = exitStubs;
+    room->setExitStub(DIR_NORTH,map["north"].toInt()==0);
+    room->setExitStub(DIR_NORTHEAST,map["northeast"].toInt()==0);
+    room->setExitStub(DIR_EAST,map["east"].toInt()==0);
+    room->setExitStub(DIR_SOUTHEAST,map["southeast"].toInt()==0);
+    room->setExitStub(DIR_SOUTH,map["south"].toInt()==0);
+    room->setExitStub(DIR_SOUTHWEST,map["southwest"].toInt()==0);
+    room->setExitStub(DIR_WEST,map["west"].toInt()==0);
+    room->setExitStub(DIR_NORTHWEST,map["northwest"].toInt()==0);
+    room->setExitStub(DIR_UP,map["up"].toInt()==0);
+    room->setExitStub(DIR_DOWN,map["down"].toInt()==0);
+    room->setExitStub(DIR_IN,map["in"].toInt()==0);
+    room->setExitStub(DIR_OUT,map["out"].toInt()==0);
     
     QMap<QString,QString> udata;
     QMapIterator<QString,QVariant> udatai(map["userData"].value<QMap<QString,QVariant> >());

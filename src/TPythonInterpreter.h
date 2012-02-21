@@ -74,7 +74,7 @@ private:
     QMap<QString,QVariant> convertQMap(const QMap<int,TRoom *> map);
     QMap<QString,QVariant> convertQMap(const QMap<QString,QString> map);
     QList<QVariant> convertQList(const QList<int> list);
-    QMap<QString,QVariant> roomToQVariant(const TRoom room);
+    QMap<QString,QVariant> roomToQVariant(TRoom* room);
 };
 
 class MudletObject {

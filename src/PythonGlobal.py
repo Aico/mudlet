@@ -77,6 +77,8 @@ class Mapper:
             if key > 65000:
                 #TODO create support for keys > 65000.
                 raise Exception('key cannot be higher than 65000')
+            if key == 0:
+                raise Exception('key 0 is reserved for exit stubs')
             if type(value) == Mapper.Room:
                 super(Mapper.Room,value).__setitem__('id',key)
                 mudlet.updateRoom(value)
@@ -123,6 +125,8 @@ class Mapper:
             elif key == 'highlight':
                 super(Mapper.Room,self).__setitem__(key,value)
                 mudlet.toggleHighlight(self['id'], value)
+            elif key == 'id' and value < 1:
+                raise Exception('id cannot be less than 1')
             else:
                 super(Mapper.Room,self).__setitem__(key,value)         
                 self.rooms[self['id']]=self
