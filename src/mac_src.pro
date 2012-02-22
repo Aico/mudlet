@@ -44,6 +44,7 @@ SOURCES += TConsole.cpp \
     TTrigger.cpp \
     TriggerUnit.cpp \
     TLuaInterpreter.cpp \
+    TPythonInterpreter.cpp \
     dlgTriggersMainArea.cpp \
     dlgOptionsAreaTriggers.cpp \
     dlgOptionsAreaTimers.cpp \
@@ -123,6 +124,7 @@ HEADERS += mudlet.h \
     dlgTriggerEditor.h \
     TTrigger.h \
     TLuaInterpreter.h \
+    TPythonInterpreter.h \
     dlgTriggers_main_area.h \
     dlgOptionsAreaTriggers.h \
     dlgTriggerPatternEdit.h \
