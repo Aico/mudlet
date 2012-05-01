@@ -260,24 +260,31 @@ class Mapper:
             super(Mapper.MapLabel,self).__setattr__('labelid', labelid)
             
     def centerview(self,roomid):
+        """Centers the map to room, also highlights the room."""
         mudlet.centerview(roomid)
         
     def getPath(self,from_room,to_room):
+        """Returns the path from from_room to to_room in the rooms passed (first item)
+        and the direction travelled (second item)."""
         if mudlet.getPath(from_room,to_room):
             return speedWalkPath,speedWalkDir
         else:
             return (),()
         
     def saveMap(self,location):
+        """Saves a copy of the map to file at location."""
         return mudlet.saveMap(location)
         
     def setGridMode(self,area,on):
+        """Sets Gridmode for area."""
         return mudlet.setGridMode(area,on)
         
     def refresh(self):
+        """Causes the mapper display to refresh."""
         mudlet.update2DMapperNow()
         
     def sync(self):
+        """This reloads the python mapper data structures with the C++ mapper data structures."""
         mudlet.loadMap()
         self.__init__()
             
