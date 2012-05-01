@@ -243,7 +243,6 @@ public slots:
   //Callable general mapper functions.
   int centerview( MudletObject* o, int roomid );
   bool getPath( MudletObject* o, int r1, int r2 );
-  bool gotoRoom( MudletObject* o, int r );
   bool saveMap(MudletObject* o, QString location );
   bool setGridMode( MudletObject* o, int area, bool gridMode );
   void loadMap( MudletObject* o);

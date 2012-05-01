@@ -2199,13 +2199,6 @@ bool MudletObjectWrapper::getPath( MudletObject* o, int r1, int r2 )
     return ret;
 }
 
-bool MudletObjectWrapper::gotoRoom( MudletObject* o, int r )
-{
-    bool ret = o->mpHost->mpMap->gotoRoom( r );
-    o->mpHost->startSpeedWalk();
-    return ret;
-}
-
 bool MudletObjectWrapper::saveMap(MudletObject* o, QString location )
 {
     bool error = o->mpHost->mpConsole->saveMap(location);

@@ -263,10 +263,10 @@ class Mapper:
         mudlet.centerview(roomid)
         
     def getPath(self,from_room,to_room):
-        return mudlet.getPath(from_room,to_room)
-        
-    def gotoRoom(self,room):
-        return mudlet.gotoRoom(room)
+        if mudlet.getPath(from_room,to_room):
+            return speedWalkPath,speedWalkDir
+        else:
+            return (),()
         
     def saveMap(self,location):
         return mudlet.saveMap(location)
