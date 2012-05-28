@@ -1320,6 +1320,14 @@ int MudletObjectWrapper::exists(MudletObject*o, QString& obj, QString& type)
     return cnt;
 }
 
+QString& MudletObjectWrapper::processTempTimerScript(QString& script,int& id)
+{
+    script.replace(QString("enableTimer()"),QString("enableTimer(%1)").arg(QString::number(id)));
+    script.replace(QString("disableTimer()"),QString("disableTimer(%1)").arg(QString::number(id)));
+    script.replace(QString("killTimer()"),QString("killTimer(%1)").arg(QString::number(id)));
+    return script;
+}
+
 int MudletObjectWrapper::startTempTimer(MudletObject*o, double timeout, QString & function )
 {
     QString lang = "PYTHON";
@@ -1332,9 +1340,9 @@ int MudletObjectWrapper::startTempTimer(MudletObject*o, double timeout, QString 
     pT->setIsFolder( false );
     pT->setIsTempTimer( true );
     pT->registerTimer();
-    pT->setScript( function );
-    pT->setScriptLanguage(lang);
     int id = pT->getID();
+    pT->setScript( processTempTimerScript(function,id) );
+    pT->setScriptLanguage(lang);
     pT->setName( QString::number( id ) );//darf erst nach isTempTimer gesetzt werde, damit setName() schneller ist
     pT->setIsActive( true );
     pT->enableTimer( id );
@@ -1406,6 +1414,14 @@ int MudletObjectWrapper::startPermAlias(MudletObject*o, QString & name, QString 
     return id;
 }
 
+QString& MudletObjectWrapper::processTempAliasScript(QString& script,int& id)
+{
+    script.replace(QString("enableAlias()"),QString("enableAlias(%1)").arg(QString::number(id)));
+    script.replace(QString("disableAlias()"),QString("disableAlias(%1)").arg(QString::number(id)));
+    script.replace(QString("killAlias()"),QString("killAlias(%1)").arg(QString::number(id)));
+    return script;
+}
+
 int MudletObjectWrapper::startTempAlias( MudletObject*o, QString & regex, QString & function )
 {
     QString lang = "PYTHON";
@@ -1417,10 +1433,18 @@ int MudletObjectWrapper::startTempAlias( MudletObject*o, QString & regex, QStrin
     pT->setIsActive( true );
     pT->setIsTempAlias( true );
     pT->registerAlias();
-    pT->setScript( function );
     int id = pT->getID();
+    pT->setScript( processTempAliasScript(function,id) );
     pT->setName( QString::number( id ) );
     return id;
+}
+
+QString& MudletObjectWrapper::processTempTriggerScript(QString& script,int& id)
+{
+    script.replace(QString("enableTrigger()"),QString("enableTrigger(%1)").arg(QString::number(id)));
+    script.replace(QString("disableTrigger()"),QString("disableTrigger(%1)").arg(QString::number(id)));
+    script.replace(QString("killTrigger()"),QString("killTrigger(%1)").arg(QString::number(id)));
+    return script;
 }
 
 int MudletObjectWrapper::startTempExactMatchTrigger( MudletObject*o, QString & regex, QString & function )
@@ -1437,8 +1461,8 @@ int MudletObjectWrapper::startTempExactMatchTrigger( MudletObject*o, QString & r
     pT->setIsActive( true );
     pT->setIsTempTrigger( true );
     pT->registerTrigger();
-    pT->setScript( function );
     int id = pT->getID();
+    pT->setScript( processTempTriggerScript(function,id) );
     pT->setName( QString::number( id ) );
     return id;
 }
@@ -1457,8 +1481,8 @@ int MudletObjectWrapper::startTempBeginOfLineTrigger( MudletObject*o, QString & 
     pT->setIsActive( true );
     pT->setIsTempTrigger( true );
     pT->registerTrigger();
-    pT->setScript( function );
     int id = pT->getID();
+    pT->setScript( processTempTriggerScript(function,id) );
     pT->setName( QString::number( id ) );
     return id;
 }
@@ -1477,8 +1501,8 @@ int MudletObjectWrapper::startTempTrigger( MudletObject*o, QString & regex, QStr
     pT->setIsActive( true );
     pT->setIsTempTrigger( true );
     pT->registerTrigger();
-    pT->setScript( function );
     int id = pT->getID();
+    pT->setScript( processTempTriggerScript(function,id) );
     pT->setName( QString::number( id ) );
     return id;
 }
@@ -1500,8 +1524,8 @@ int MudletObjectWrapper::startTempLineTrigger( MudletObject*o,  int from, int ho
     pT->setStartOfLineDelta( from );
     pT->setLineDelta( howmany );
     pT->registerTrigger();
-    pT->setScript( function );
     int id = pT->getID();
+    pT->setScript( processTempTriggerScript(function,id) );
     pT->setName( QString::number( id ) );
     return id;
 }
@@ -1521,8 +1545,8 @@ int MudletObjectWrapper::startTempColorTrigger( MudletObject*o, int fg, int bg, 
     pT->setIsTempTrigger( true );
     pT->setupTmpColorTrigger( fg, bg );
     pT->registerTrigger();
-    pT->setScript( function );
     int id = pT->getID();
+    pT->setScript( processTempTriggerScript(function,id) );
     pT->setName( QString::number( id ) );
     return id;
 }
@@ -1542,8 +1566,8 @@ int MudletObjectWrapper::startTempRegexTrigger( MudletObject*o, QString & regex,
     pT->setIsActive( true );
     pT->setIsTempTrigger( true );
     pT->registerTrigger();
-    pT->setScript( function );
     int id = pT->getID();
+    pT->setScript( processTempTriggerScript(function,id) );
     pT->setName( QString::number( id ) );
     return id;
 }

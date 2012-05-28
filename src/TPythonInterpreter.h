@@ -246,6 +246,11 @@ public slots:
   bool saveMap(MudletObject* o, QString location );
   bool setGridMode( MudletObject* o, int area, bool gridMode );
   void loadMap( MudletObject* o);
+  
+private:
+  QString& processTempTriggerScript(QString& script,int& id);
+  QString& processTempAliasScript(QString& script,int& id);
+  QString& processTempTimerScript(QString& script,int& id);
 };
 
 #endif  

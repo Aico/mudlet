@@ -51,6 +51,7 @@ class Mapper:
         #self.hashTable = Mapper.HashTable()
         self.mapLabels = Mapper.MapLabels()
         del HOST_MAP_LABELS
+        self._name_hash = self._construct_name_hash()
         
     class EnvColors(dict):
         def __init__(self):
@@ -270,6 +271,25 @@ class Mapper:
             return speedWalkPath,speedWalkDir
         else:
             return (),()
+            
+    def searchRoom(self,room_name,dirs=None):
+        """Search for room by name. Optionally a list of directions can be supplied
+        ie ['east','northeast','up'] etc. to match rooms with these directions."""
+        matched_rooms = self._name_hash[room_name]
+        if (len(dirs)):
+            result = []
+            for room in matched_rooms:
+                not_found = False
+                for d in dirs:
+                    if self.rooms[room].has_key(d):
+                        if self.rooms[room][d] == -1:
+                            not_found = True
+                            break
+                if not not_found:
+                    result.append(room)
+            return result
+        else:
+            return matched_rooms
         
     def saveMap(self,location):
         """Saves a copy of the map to file at location."""
@@ -287,7 +307,15 @@ class Mapper:
         """This reloads the python mapper data structures with the C++ mapper data structures."""
         mudlet.loadMap()
         self.__init__()
-            
+        
+    def _construct_name_hash(self):
+        result = {}
+        for key,value in self.rooms.iteritems():
+            if result.has_key(value['name']):
+                result[value['name']].append(key)
+            else:
+                result[value['name']] = [key]
+        return result
 
 line = ''
 command = ''
