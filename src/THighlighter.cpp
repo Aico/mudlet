@@ -1,6 +1,7 @@
 #include "THighlighter.h"
 
 #include <QtGui>
+#include <iostream>
 
 #define LUA     0
 #define PYTHON  1
@@ -162,12 +163,16 @@ THighlighter::THighlighter( QTextEdit *parent )
 
     multiLineCommentFormat.setForeground( Qt::darkGreen );
 
-    stringStart = QRegExp( "\\[\\[" );
-    stringEnd = QRegExp( "\\]\\]" );
-
     commentStartExpression = QRegExp( "\\[\\[" );
     commentEndExpression = QRegExp( "\\]\\]" );
-    //highlightingRules.append( rule );
+    
+    multiLineCommentFormatPython.setForeground( Qt::magenta );
+
+    commentStartExpressionPython1 = QRegExp( "\"\"\""  );
+    commentEndExpressionPython1 = QRegExp( "\"\"\"" );
+    
+    commentStartExpressionPython2 = QRegExp( "\'\'\'"  );
+    commentEndExpressionPython2 = QRegExp( "\'\'\'" );
 
     mSearchPattern = "MudletTheMUDClient";
 
@@ -212,28 +217,72 @@ void THighlighter::highlightBlock( const QString & text )
             index = text.indexOf( expression, index + length );
         }
     }
-    
-    if ( editor->getScriptLanguageCode() == LUA)
+
+    setCurrentBlockState( 0 );
+    int startIndex = 0;
+    if( previousBlockState() != 1 )
     {
-        setCurrentBlockState( 0 );
-        int startIndex = 0;
-        if( previousBlockState() != 1 )
+        if ( editor->getScriptLanguageCode() == PYTHON)
         {
-            startIndex = text.indexOf( commentStartExpression );
-        }
-        while( startIndex >= 0 )
-        {
-            int endIndex = text.indexOf( commentEndExpression, startIndex );
-            int commentLength;
-            if( endIndex == -1 )
+            startIndex = text.indexOf( commentStartExpressionPython1 );
+            if (startIndex == -1)
             {
-                setCurrentBlockState( 1 );
-                commentLength = text.length() - startIndex;
+                startIndex = text.indexOf( commentStartExpressionPython2 );
+                commentTypeSingleQuotePython=true;
             }
             else
             {
-                commentLength = endIndex - startIndex + 2;
+                commentTypeSingleQuotePython=false;
             }
+        }
+        else
+        {
+            startIndex = text.indexOf( commentStartExpression );
+        }
+    }
+    while( startIndex >= 0 )
+    {
+        int endIndex,commentSyntaxLength;
+        if ( editor->getScriptLanguageCode() == PYTHON)
+        {
+            commentSyntaxLength=3;
+            if (commentTypeSingleQuotePython)
+            {
+                endIndex = text.indexOf( commentEndExpressionPython2, startIndex+1 );
+            }
+            else
+            {
+                endIndex = text.indexOf( commentEndExpressionPython1, startIndex+1 );
+            }
+        }
+        else
+        {
+            commentSyntaxLength=2;
+            endIndex = text.indexOf( commentEndExpression, startIndex );
+        }
+        int commentLength;
+        if( endIndex == -1 )
+        {
+            setCurrentBlockState( 1 );
+            commentLength = text.length() - startIndex;
+        }
+        else
+        {
+            commentLength = endIndex - startIndex + commentSyntaxLength;
+        }
+        if ( editor->getScriptLanguageCode() == PYTHON)
+        {
+            int startIndexTmp;
+            setFormat( startIndex, commentLength, multiLineCommentFormatPython );
+            startIndexTmp = text.indexOf( commentStartExpressionPython1, startIndex + commentLength );
+            startIndex = text.indexOf( commentStartExpressionPython2, startIndex + commentLength );
+            if (startIndexTmp != -1 && startIndexTmp<startIndex)
+            {
+                startIndex=startIndexTmp;
+            }            
+        }
+        else
+        {
             setFormat( startIndex, commentLength, multiLineCommentFormat );
             startIndex = text.indexOf( commentStartExpression, startIndex + commentLength );
         }

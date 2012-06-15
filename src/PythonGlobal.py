@@ -261,8 +261,11 @@ class Mapper:
             super(Mapper.MapLabel,self).__setattr__('labelid', labelid)
             
     def centerview(self,roomid):
-        """Centers the map to room, also highlights the room."""
+        """Centers the map to room, also highlights the room.
+        Also sets the current room to the roomid."""
+        global current_room
         mudlet.centerview(roomid)
+        current_room = roomid
         
     def getPath(self,from_room,to_room):
         """Returns the path from from_room to to_room in the rooms passed (first item)
