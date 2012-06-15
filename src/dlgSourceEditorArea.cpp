@@ -22,6 +22,7 @@
 //#include <Qsci/qscilexerlua.h>
 
 #include <QWidget>
+#include <iostream>
 
 #include "dlgSourceEditorArea.h"
 #include "THighlighter.h"
@@ -54,7 +55,28 @@ void PlainTextEdit::keyPressEvent(QKeyEvent * event)
     }
     else if (event->key() == Qt::Key_Tab)
     {
-        textCursor().insertText("    ");
+        int nl = textCursor().selectedText().count(QString::fromUtf8("\u2029"));
+        if (nl>0)
+        {
+            QString sText = textCursor().selectedText();
+            textCursor().removeSelectedText();
+            if (event->modifiers() == Qt::ControlModifier) {
+                if (sText.startsWith(QString("    "))) {
+                    sText.remove(0,4);
+                }
+                sText.replace(QString::fromUtf8("\u2029")+QString("    "),QString::fromUtf8("\u2029"));
+            }
+            else
+            {
+                sText.insert(0,QString("    "));
+                sText.replace(QString::fromUtf8("\u2029"),QString::fromUtf8("\u2029")+QString("    "));
+            }
+            textCursor().insertText(sText);
+        }
+        else
+        {
+            textCursor().insertText("    ");
+        }
     }
     else if (event->key() == Qt::Key_Return)
     {
