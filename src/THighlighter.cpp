@@ -1,7 +1,6 @@
 #include "THighlighter.h"
 
 #include <QtGui>
-#include <iostream>
 
 #define LUA     0
 #define PYTHON  1

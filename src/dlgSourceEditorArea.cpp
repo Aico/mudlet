@@ -22,7 +22,6 @@
 //#include <Qsci/qscilexerlua.h>
 
 #include <QWidget>
-#include <iostream>
 
 #include "dlgSourceEditorArea.h"
 #include "THighlighter.h"
@@ -59,7 +58,7 @@ void PlainTextEdit::keyPressEvent(QKeyEvent * event)
         if (nl>0)
         {
             QString sText = textCursor().selectedText();
-            textCursor().removeSelectedText();
+            //textCursor().removeSelectedText();
             if (event->modifiers() == Qt::ControlModifier) {
                 if (sText.startsWith(QString("    "))) {
                     sText.remove(0,4);
