@@ -295,16 +295,15 @@ class Mapper:
             matched_rooms = filter(lambda x:'desc' in self.rooms[x]['userData'] and self.rooms[x]['userData']['desc']==desc,matched_rooms)
             if len(matched_rooms) == 0:
                 print 'Description not found'
-        if (len(dirs)):
+        if dirs:
             result = []
             for room in matched_rooms:
                 not_found = False
-                for d in dirs:
-                    if self.rooms[room].has_key(d):
-                        if self.rooms[room][d] == -1:
-                            not_found = True
-                            print 'Direction %s not found' % (d,)
-                            break
+                for d in ('north','northeast','east','southeast','south','southwest','west','northwest','up','down','in','out'):
+                    if (self.rooms[room][d] == -1 and d in dirs) or (self.rooms[room][d] != -1 and d not in dirs):
+                        not_found = True
+                        print 'Direction %s not found' % (d,)
+                        break
                 if not not_found:
                     result.append(room)
             return result
