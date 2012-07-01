@@ -283,12 +283,18 @@ class Mapper:
         else:
             return (),()
             
-    def searchRoom(self,room_name,dirs=None,color=None):
+    def searchRoom(self,room_name,dirs=None,color=None,desc=None):
         """Search for room by name. Optionally a list of directions can be supplied
         ie ['east','northeast','up'] etc. to match rooms with these directions."""
         matched_rooms = self._name_hash[room_name]
         if color:
             matched_rooms = filter(lambda x:self.rooms[x]['environment']==color,matched_rooms)
+            if len(matched_rooms) == 0:
+                print 'Color not found'
+        if desc:
+            matched_rooms = filter(lambda x:'desc' in self.rooms[x]['userData'] and self.rooms[x]['userData']['desc']==desc,matched_rooms)
+            if len(matched_rooms) == 0:
+                print 'Description not found'
         if (len(dirs)):
             result = []
             for room in matched_rooms:
@@ -297,6 +303,7 @@ class Mapper:
                     if self.rooms[room].has_key(d):
                         if self.rooms[room][d] == -1:
                             not_found = True
+                            print 'Direction %s not found' % (d,)
                             break
                 if not not_found:
                     result.append(room)
