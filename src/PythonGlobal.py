@@ -52,6 +52,7 @@ class Mapper:
         self.mapLabels = Mapper.MapLabels()
         del HOST_MAP_LABELS
         self._name_hash = self._construct_name_hash()
+        self.rooms._name_hash = self._name_hash
         
     class EnvColors(dict):
         def __init__(self):
@@ -80,21 +81,28 @@ class Mapper:
                 raise Exception('key cannot be higher than 65000')
             if key == 0:
                 raise Exception('key 0 is reserved for exit stubs')
+            if key in self and self[key]['name'] in self._name_hash:
+                    if self[key]['id'] in self._name_hash[self[key]['name']]:
+                        self._name_hash[self[key]['name']].remove(self[key]['id'])
             if type(value) == Mapper.Room:
                 super(Mapper.Room,value).__setitem__('id',key)
                 mudlet.updateRoom(value)
                 super(Mapper.Rooms,self).__setitem__(key,value)
-                value.setContainer(self)
+                value.setContainer(self)                
             elif type(value) == dict:
                 value['id']=int(key)
                 mudlet.updateRoom(value)
                 super(Mapper.Rooms,self).__setitem__(key,Mapper.Room(value,self))
             else:
                 raise Exception('Value must be a Room or a dict')
+            if value['name'] not in self._name_hash:
+                self._name_hash[value['name']]=[]
+            self._name_hash[value['name']].append(key)
             
         def __delitem__(self,key):
+            self._name_hash[self[key]['name']].remove(key)
             mudlet.deleteRoom(key)
-            super(Mapper.Rooms,self).__delitem__(key)            
+            super(Mapper.Rooms,self).__delitem__(key)       
             for k,v in self.iteritems():
                 for rk,rv in v.iteritems():
                     if type(rv) == type(1):
@@ -275,10 +283,12 @@ class Mapper:
         else:
             return (),()
             
-    def searchRoom(self,room_name,dirs=None):
+    def searchRoom(self,room_name,dirs=None,color=None):
         """Search for room by name. Optionally a list of directions can be supplied
         ie ['east','northeast','up'] etc. to match rooms with these directions."""
         matched_rooms = self._name_hash[room_name]
+        if color:
+            matched_rooms = filter(lambda x:self.rooms[x]['environment']==color,matched_rooms)
         if (len(dirs)):
             result = []
             for room in matched_rooms:
