@@ -229,6 +229,29 @@ QMap<QString,QVariant> TPythonInterpreter::mapLabelToQVariant(const TMapLabel la
     return result;
 }
 
+QVariant TPythonInterpreter::multiMapToQVariant(QMultiMap<int, QString> other) {
+    QMap<QString,QVariant> result;
+    QMap<int,QList<QString> > tmp;
+    QMapIterator<int, QString> i(other);
+    while (i.hasNext()) {
+        i.next();
+        if (!tmp.contains(i.key())) {
+            tmp[i.key()] = QList<QString>();
+        }
+        if (!tmp[i.key()].contains(i.value())) {
+            tmp[i.key()].insert(0,i.value());
+        }
+    }
+    
+    QMapIterator<int, QList<QString> > j(tmp);
+    while (j.hasNext()) {
+        j.next();
+        result[QString(j.key())]=QVariant(j.value());
+    }
+        
+    return result;
+}
+
 QMap<QString,QVariant> TPythonInterpreter::roomToQVariant(TRoom* room) {
     QMap<QString,QVariant> result;
     result["id"]=QVariant(room->id);
@@ -248,6 +271,7 @@ QMap<QString,QVariant> TPythonInterpreter::roomToQVariant(TRoom* room) {
     result["down"]=room->hasExitStub(DIR_DOWN) ? 0 : QVariant(room->down);
     result["in"]=room->hasExitStub(DIR_IN) ? 0 : QVariant(room->in);
     result["out"]=room->hasExitStub(DIR_OUT) ? 0 : QVariant(room->out);
+    result["special_exits"]=multiMapToQVariant(room->other);
     result["environment"]=QVariant(room->environment);
     result["weight"]=QVariant(room->weight);
     result["isLocked"]=QVariant(room->isLocked);
@@ -2075,6 +2099,7 @@ int MudletObjectWrapper::updateRoom( MudletObject* o, QMap<QString, QVariant> ma
     o->mpHost->mpMap->setExit(room->id,map["down"].toInt(),DIR_DOWN);
     o->mpHost->mpMap->setExit(room->id,map["in"].toInt(),DIR_IN);
     o->mpHost->mpMap->setExit(room->id,map["out"].toInt(),DIR_OUT);
+    
     room->environment=map["environment"].toInt();
     room->weight=map["weight"].toInt();
     room->isLocked=map["isLocked"].toBool();
@@ -2093,13 +2118,11 @@ int MudletObjectWrapper::updateRoom( MudletObject* o, QMap<QString, QVariant> ma
     room->setExitStub(DIR_IN,map["in"].toInt()==0);
     room->setExitStub(DIR_OUT,map["out"].toInt()==0);
     
-    QMap<QString,QString> udata;
     QMapIterator<QString,QVariant> udatai(map["userData"].value<QMap<QString,QVariant> >());
     while (udatai.hasNext()) {
         udatai.next();
-        udata[udatai.key()]=udatai.value().value<QString>();
+        o->mpHost->mpMap->rooms[map["id"].toInt()]->userData[udatai.key()] = udatai.value().value<QString>();
     }
-    room->userData = udata;
     
     QList<int> exlocks;
     QListIterator<QVariant> exlocksi(map["exitLocks"].value<QList<QVariant> >());
@@ -2246,3 +2269,44 @@ void MudletObjectWrapper::loadMap( MudletObject* o)
 {
     o->mpHost->getPythonInterpreter()->loadMapperVariables();
 }
+
+bool MudletObjectWrapper::addSpecialExit(MudletObject* o, int id_from, int id_to, QString cmd)
+{
+    if( o->mpHost->mpMap->rooms.contains( id_from ) )
+    {
+        if( o->mpHost->mpMap->rooms.contains( id_to ) )
+        {
+            o->mpHost->mpMap->rooms[id_from]->addSpecialExit( id_to, cmd );
+            o->mpHost->mpMap->rooms[id_from]->setSpecialExitLock( id_to, cmd, false );
+            o->mpHost->mpMap->mMapGraphNeedsUpdate = true;
+            return true;
+        }
+    }
+    return false;
+}
+
+bool MudletObjectWrapper::removeSpecialExit(MudletObject* o, int id_from, int id_to, QString cmd )
+{
+    if( o->mpHost->mpMap->rooms.contains( id_from ) )
+    {
+        if( o->mpHost->mpMap->rooms.contains( id_to ) )
+        {
+            o->mpHost->mpMap->rooms[id_from]->removeSpecialExit( id_to, cmd );
+            o->mpHost->mpMap->mMapGraphNeedsUpdate = true;
+            return true;        
+        }
+    }
+    return false;
+}
+
+bool MudletObjectWrapper::clearSpecialExits( MudletObject* o, int id_from )
+{
+    if( o->mpHost->mpMap->rooms.contains( id_from ) )
+    {
+        o->mpHost->mpMap->rooms[id_from]->other.clear();
+        o->mpHost->mpMap->mMapGraphNeedsUpdate = true;
+        return true;
+    }
+    return false;
+}
+        

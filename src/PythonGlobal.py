@@ -116,9 +116,12 @@ class Mapper:
             for k,v in data.iteritems():
                 if k == 'userData':
                     super(Mapper.Room,self).__setitem__(k,Mapper.UserData(v))
+                elif k == 'special_exits':
+                    super(Mapper.Room,self).__setitem__(k,Mapper.Other(v))
                 else:
                     super(Mapper.Room,self).__setitem__(k,v)
             self['userData'].setRoom(self)
+            self['special_exits'].set_from_id(self['id'])
                 
         def __setitem__(self,key,value):
             if key == 'userData':
@@ -131,6 +134,18 @@ class Mapper:
                 mudlet.clearRoomUserData(self['id'])
                 for k,v in value.iteritems():
                     mudlet.setRoomUserData(self['id'],k,v)
+            elif key == 'special_exits':
+                if value.__class__ == Mapper.Other or type(value) == dict:
+                    mudlet.clearSpecialExits(self['id'])
+                if value.__class__ == Mapper.Other:
+                    super(Mapper.Room,self).__setitem__(key,value)
+                elif type(value) == dict:
+                    super(Mapper.Room,self).__setitem__(key,Mapper.Other(value))
+                else:
+                    raise Exception('Value must be a Other object or a dict')
+                for k,v in value.iteritems():
+                    for i in v:
+                        mudlet.addSpecialExit(self['id'],k,i)
             elif key == 'highlight':
                 super(Mapper.Room,self).__setitem__(key,value)
                 mudlet.toggleHighlight(self['id'], value)
@@ -143,8 +158,113 @@ class Mapper:
         def setContainer(self,c):
             self.rooms = c
             
+    class Other(dict):
+        def __init__(self,it):
+            super(Mapper.Other,self).__init__()
+            for k,v in it.iteritems():
+                if type(k) == type(1):
+                    super(Mapper.Other,self).__setitem__(k,Mapper.CommandList(v))
+                    self[k].set_to_id(k)
+                else:
+                    super(Mapper.Other,self).__setitem__(ord(k),Mapper.CommandList(v))
+                    self[ord(k)].set_to_id(ord(k))
+                
+        def __setitem__(self,key,value):
+            if value.__class__ == Mapper.CommandList or type(value) == list:
+                if key in self:
+                    for i in self[key]:
+                        self[key].pop(0)
+            if value.__class__ == Mapper.CommandList:
+                super(Mapper.Other,self).__setitem__(key,value)
+            elif type(value) == list:
+                super(Mapper.Room,self).__setitem__(key,Mapper.CommandList(value))
+            else:
+                raise Exception('Value must be a CommandList object or a list')
+            self[key].set_from_id(self.from_id)
+            self[key].set_to_id(key)
+            for v in value:
+                self[key].append(v)
+                
+        def __delitem__(self,key):
+            for v in self[key]:
+                self[key].pop(0)
+            super(Mapper.Rooms,self).__delitem__(key)
+                
+        def set_from_id(self,fid):
+            self.from_id = fid
+            for v in self.itervalues():
+                v.set_from_id(fid)
+            
+            
+    class CommandList(list):
+        def __init__(self,it):
+            super(Mapper.CommandList,self).__init__()
+            for i in it:
+                super(Mapper.CommandList,self).append(i)
+        
+        def __setitem__(self,index,value):
+            oldv=self[index]
+            r= mudlet.removeSpecialExit(self.from_id, self.to_id, oldv)
+            if r:
+                super(Mapper.CommandList,self).__setitem__(index,value)
+            else:
+                print "Problem setting command list value."
+                
+        def __delitem__(self,index):
+            oldv=self[index]
+            r= mudlet.removeSpecialExit(self.from_id, self.to_id, oldv)
+            if r:
+                super(Mapper.CommandList,self).__delitem__(index)
+            else:
+                print "Problem deleting command list value."
+                
+        def append(self,o):
+            if type(o) is not type(''):
+                print 'Type of value to append to the command list must be a string'
+            r = mudlet.addSpecialExit(self.from_id, self.to_id, o)
+            if r:
+                super(Mapper.CommandList,self).append(o)
+            else:
+                print "Problem appending command list value."
+               
+        def extend(self,it):
+            for i in it:
+                if type(i) is type(''):
+                    r = mudlet.addSpecialExit(self.from_id, self.to_id, i)
+                    if r:
+                        super(Mapper.CommandList,self).append(i)
+                    else:
+                        print 'value %i cannot be added to command list.'%(i,)
+                        
+        def insert(self,index,value):
+            super(Mapper.CommandList,self).insert(index,value)
+            self.__setitem__(index,value)
+            
+        def pop(self,index):
+            if len(self) <= index:
+                raise IndexError('pop index out of range')
+            oldv=self[index]
+            super(Mapper.CommandList,self).__delitem__(index)
+            return oldv
+            
+        def remove(self,value):
+            count = 0
+            for i in self:
+                if i == value:
+                    self.__delitem__(count)
+                    return
+                count += 1
+            raise ValueError('x not in list')
+                
+        def set_from_id(self,fid):
+            self.from_id = fid
+        
+        def set_to_id(self,tid):
+            self.to_id = tid
+    
     class UserData(dict):
         def __init__(self,value):
+            super(Mapper.UserData,self).__init__()
             for k,v in value.iteritems():
                 super(Mapper.UserData,self).__setitem__(k,v)
             

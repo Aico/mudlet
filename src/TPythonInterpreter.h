@@ -74,6 +74,7 @@ private:
     QMap<QString,QVariant> convertQMap(const QMap<int,TRoom *> map);
     QMap<QString,QVariant> convertQMap(const QMap<QString,QString> map);
     QList<QVariant> convertQList(const QList<int> list);
+    QVariant multiMapToQVariant(QMultiMap<int, QString> other);
     QMap<QString,QVariant> roomToQVariant(TRoom* room);
 };
 
@@ -240,6 +241,9 @@ public slots:
   int deleteArea( MudletObject* o, int id );
   int updateMapLabel( MudletObject* o, int area, QString text, float x, float y, float z, QColor fg, QColor bg, int id );
   int deleteMapLabel( MudletObject* o, int area, int labelID  );
+  bool  addSpecialExit(MudletObject* o, int id_from, int id_to, QString cmd);
+  bool removeSpecialExit(MudletObject* o, int id_from, int id_to, QString cmd );
+  bool clearSpecialExits( MudletObject* o, int id_from );
   //Callable general mapper functions.
   int centerview( MudletObject* o, int roomid );
   bool getPath( MudletObject* o, int r1, int r2 );
