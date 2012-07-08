@@ -1625,7 +1625,8 @@ int MudletObjectWrapper::startPermRegexTrigger( MudletObject*o, QString & name, 
     pT->setIsTempTrigger( false );
     pT->registerTrigger();
     pT->setScript( function );
-    pT->setName( name );
+    int id = pT->getID();
+    pT->setName( QString::number( id ) );
     o->mpHost->mpEditorDialog->mNeedUpdateData = true;
     return 1;
 
@@ -1660,7 +1661,8 @@ int MudletObjectWrapper::startPermSubstringTrigger( MudletObject*o, QString & na
     pT->setIsTempTrigger( false );
     pT->registerTrigger();
     pT->setScript( function );
-    pT->setName( name );
+    int id = pT->getID();
+    pT->setName( QString::number( id ) );
     o->mpHost->mpEditorDialog->mNeedUpdateData = true;
     return 1;
 
@@ -1695,7 +1697,8 @@ int MudletObjectWrapper::startPermBeginOfLineStringTrigger(  MudletObject*o, QSt
     pT->setIsTempTrigger( false );
     pT->registerTrigger();
     pT->setScript( function );
-    pT->setName( name );
+    int id = pT->getID();
+    pT->setName( QString::number( id ) );
     o->mpHost->mpEditorDialog->mNeedUpdateData = true;
     return 1;
 
@@ -2176,12 +2179,18 @@ int MudletObjectWrapper::clearRoomUserData( MudletObject* o, int id_from )
 
 int MudletObjectWrapper::update2DMapperNow( MudletObject* o)
 {
-    if (o->mpHost->mpMap->mpM)
+    if( o->mpHost->mpMap)
+    {
+        if (o->mpHost->mpMap->mpM)
             o->mpHost->mpMap->mpM->update();
-    if( o->mpHost->mpMap->mpMapper )
-            if( o->mpHost->mpMap->mpMapper->mp2dMap )
+        if (o->mpHost->mpMap->mpMapper){
+            if (o->mpHost->mpMap->mpMapper->mp2dMap){
+                o->mpHost->mpMap->mpMapper->mp2dMap->mNewMoveAction=true;
                 o->mpHost->mpMap->mpMapper->mp2dMap->update();
-        return 0;
+            }
+        }
+    }
+    return 0;
 }
 
 int MudletObjectWrapper::toggleHighlight( MudletObject* o, int roomID, bool highlight)
