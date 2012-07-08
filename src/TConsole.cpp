@@ -1732,6 +1732,7 @@ bool TConsole::loadMap(QString location)
         return false;
     mpHost->mpMap->restore(location);
     mpHost->mpMap->init( mpHost );
+    qDebug()<<"TConsle::loadMap() -> call T2DMap::init()";
     mpHost->mpMap->mpMapper->mp2dMap->init();
     mpHost->mpMap->mpMapper->show();
     // previous selections stay, so we need to clear it
@@ -2366,6 +2367,7 @@ void TConsole::createMapper( int x, int y, int width, int height )
     }
     mpMapper->resize( width, height );
     mpMapper->move( x, y );
+    qDebug()<<"TConsole::createMapper() calling T2DMap::init()";
     mpMapper->mp2dMap->init();
     mpMapper->show();
 }
@@ -2741,6 +2743,17 @@ void TConsole::slot_searchBufferDown()
         }
     }
     print("No search results, sorry!\n");
+}
+
+QSize TConsole::getMainWindowSize() const
+{
+    qDebug()<<"CALLED!!!";
+    QSize consoleSize = size();
+    int toolbarWidth = mpLeftToolBar->width() + mpRightToolBar->width();
+    int toolbarHeight = mpTopToolBar->height();
+    int commandLineHeight = mpCommandLine->height();
+    QSize mainWindowSize( consoleSize.width()-toolbarWidth, consoleSize.height()-(commandLineHeight+toolbarHeight));
+    return mainWindowSize;
 }
 
 

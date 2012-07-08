@@ -1,5 +1,5 @@
 
-CONFIG += debug uitools
+CONFIG += uitools
 
 QMAKE_CXXFLAGS_RELEASE += -O3 -Wno-deprecated -Wno-unused-parameter
 QMAKE_CXXFLAGS_DEBUG += -O3 -Wno-deprecated -Wno-unused-parameter
@@ -18,6 +18,7 @@ unix:LIBS += -lpcre \
     $$LIBLUA \
     -lhunspell \
     -lyajl \
+    -lGLU \
     -lzzip
 
 win32:LIBS += -L"c:\mudlet2_package" \
@@ -118,7 +119,8 @@ SOURCES += TConsole.cpp \
     irc/src/ircutil.cpp \
     dlgIRC.cpp \
     T2DMap.cpp \
-    dlgRoomExits.cpp
+    dlgRoomExits.cpp \
+    exitstreewidget.cpp
 
 
 HEADERS += mudlet.h \
@@ -194,7 +196,8 @@ HEADERS += mudlet.h \
     irc/include/ircutil.h \
     dlgIRC.h \
     T2DMap.h \
-    dlgRoomExits.h
+    dlgRoomExits.h \
+    exitstreewidget.h
 
 FORMS += ui/connection_profiles.ui \
     ui/main_window.ui \

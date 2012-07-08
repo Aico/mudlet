@@ -59,7 +59,7 @@ const int dlgTriggerEditor::cmTimerView = 2;
 const int dlgTriggerEditor::cmAliasView = 3;
 const int dlgTriggerEditor::cmScriptView = 4;
 const int dlgTriggerEditor::cmActionView = 5;
-const int dlgTriggerEditor::cmKeysView = 6; 
+const int dlgTriggerEditor::cmKeysView = 6;
 
 const QString msgInfoAddAlias = "Alias are input triggers. To make a new alias: <b>1.</b> Define an input trigger pattern with a Perl regular expression. " \
                                 "<b>2.</b> Define a command to send to the MUD in clear text <b><u>instead of the alias pattern</b></u>or write a script for more complicated needs. " \
@@ -835,7 +835,7 @@ void dlgTriggerEditor::slot_search_triggers( const QString s )
             QTreeWidgetItem * parent = 0;
             TTrigger * pChild = *it;
             QString n = pChild->getName();
-            if( n.indexOf( s ) != -1 )
+            if( n.indexOf( s, 0, Qt::CaseInsensitive ) != -1 )
             {
                 QStringList sl;
                 sl << "Trigger" << pChild->getName() << "name";
@@ -856,7 +856,7 @@ void dlgTriggerEditor::slot_search_triggers( const QString s )
                 }
             }
             QStringList scriptList = pChild->getScript().split("\n");
-            QStringList resultList = scriptList.filter( s );
+            QStringList resultList = scriptList.filter( s, Qt::CaseInsensitive );
             for( int i=0; i<resultList.size(); i++ )
             {
                 QStringList sl;
@@ -878,7 +878,7 @@ void dlgTriggerEditor::slot_search_triggers( const QString s )
                 }
             }
             QStringList regexList = pChild->getRegexCodeList();
-            resultList = regexList.filter( s );
+            resultList = regexList.filter( s, Qt::CaseInsensitive );
             for( int i=0; i<resultList.size(); i++ )
             {
                 QStringList sl;
@@ -913,7 +913,7 @@ void dlgTriggerEditor::slot_search_triggers( const QString s )
             QTreeWidgetItem * parent = 0;
             TAlias * pChild = *it;
             QString n = pChild->getName();
-            if( n.indexOf( s ) != -1 )
+            if( n.indexOf( s, 0, Qt::CaseInsensitive ) != -1 )
             {
                 QStringList sl;
                 sl << "Alias" << pChild->getName() << "name";
@@ -934,7 +934,7 @@ void dlgTriggerEditor::slot_search_triggers( const QString s )
                 }
             }
             QStringList scriptList = pChild->getScript().split("\n");
-            QStringList resultList = scriptList.filter( s );
+            QStringList resultList = scriptList.filter( s, Qt::CaseInsensitive );
             for( int i=0; i<resultList.size(); i++ )
             {
                 QStringList sl;
@@ -956,7 +956,7 @@ void dlgTriggerEditor::slot_search_triggers( const QString s )
                 }
             }
 
-            if( pChild->getRegexCode().indexOf( s ) > -1 )
+            if( pChild->getRegexCode().indexOf( s, 0, Qt::CaseInsensitive ) > -1 )
             {
                 QStringList sl;
                 sl << "Alias" << pChild->getName() << "pattern" << pChild->getRegexCode();
@@ -990,7 +990,7 @@ void dlgTriggerEditor::slot_search_triggers( const QString s )
             QTreeWidgetItem * parent = 0;
             TScript * pChild = *it;
             QString n = pChild->getName();
-            if( n.indexOf( s ) != -1 )
+            if( n.indexOf( s, 0, Qt::CaseInsensitive ) != -1 )
             {
                 QStringList sl;
                 sl << "Script" << pChild->getName() << "name";
@@ -1011,7 +1011,7 @@ void dlgTriggerEditor::slot_search_triggers( const QString s )
                 }
             }
             QStringList scriptList = pChild->getScript().split("\n");
-            QStringList resultList = scriptList.filter( s );
+            QStringList resultList = scriptList.filter( s, Qt::CaseInsensitive );
             for( int i=0; i<resultList.size(); i++ )
             {
                 QStringList sl;
@@ -1047,7 +1047,7 @@ void dlgTriggerEditor::slot_search_triggers( const QString s )
             QTreeWidgetItem * parent = 0;
             TAction * pChild = *it;
             QString n = pChild->getName();
-            if( n.indexOf( s ) != -1 )
+            if( n.indexOf( s, 0, Qt::CaseInsensitive ) != -1 )
             {
                 QStringList sl;
                 sl << "Button" << pChild->getName() << "name";
@@ -1068,7 +1068,7 @@ void dlgTriggerEditor::slot_search_triggers( const QString s )
                 }
             }
             QStringList scriptList = pChild->getScript().split("\n");
-            QStringList resultList = scriptList.filter( s );
+            QStringList resultList = scriptList.filter( s, Qt::CaseInsensitive );
             for( int i=0; i<resultList.size(); i++ )
             {
                 QStringList sl;
@@ -1104,7 +1104,7 @@ void dlgTriggerEditor::slot_search_triggers( const QString s )
             QTreeWidgetItem * parent = 0;
             TTimer * pChild = *it;
             QString n = pChild->getName();
-            if( n.indexOf( s ) != -1 )
+            if( n.indexOf( s, 0, Qt::CaseInsensitive ) != -1 )
             {
                 QStringList sl;
                 sl << "Timer" << pChild->getName() << "name";
@@ -1125,7 +1125,7 @@ void dlgTriggerEditor::slot_search_triggers( const QString s )
                 }
             }
             QStringList scriptList = pChild->getScript().split("\n");
-            QStringList resultList = scriptList.filter( s );
+            QStringList resultList = scriptList.filter( s, Qt::CaseInsensitive );
             for( int i=0; i<resultList.size(); i++ )
             {
                 QStringList sl;
@@ -1161,7 +1161,7 @@ void dlgTriggerEditor::slot_search_triggers( const QString s )
             QTreeWidgetItem * parent = 0;
             TKey * pChild = *it;
             QString n = pChild->getName();
-            if( n.indexOf( s ) != -1 )
+            if( n.indexOf( s, 0, Qt::CaseInsensitive ) != -1 )
             {
                 QStringList sl;
                 sl << "Key" << pChild->getName() << "name";
@@ -1182,7 +1182,7 @@ void dlgTriggerEditor::slot_search_triggers( const QString s )
                 }
             }
             QStringList scriptList = pChild->getScript().split("\n");
-            QStringList resultList = scriptList.filter( s );
+            QStringList resultList = scriptList.filter( s, Qt::CaseInsensitive );
             for( int i=0; i<resultList.size(); i++ )
             {
                 QStringList sl;
@@ -1220,7 +1220,7 @@ void dlgTriggerEditor::recursiveSearchTriggers( TTrigger * pTriggerParent, const
         QTreeWidgetItem * parent = 0;
         TTrigger * pChild = *it;
         QString n = pChild->getName();
-        if( n.indexOf( s ) != -1 )
+        if( n.indexOf( s, 0, Qt::CaseInsensitive ) != -1 )
         {
             QStringList sl;
             sl << "Trigger" << pChild->getName() << "name";
@@ -1241,7 +1241,7 @@ void dlgTriggerEditor::recursiveSearchTriggers( TTrigger * pTriggerParent, const
             }
         }
         QStringList scriptList = pChild->getScript().split("\n");
-        QStringList resultList = scriptList.filter( s );
+        QStringList resultList = scriptList.filter( s, Qt::CaseInsensitive );
         for( int i=0; i<resultList.size(); i++ )
         {
             QStringList sl;
@@ -1263,7 +1263,7 @@ void dlgTriggerEditor::recursiveSearchTriggers( TTrigger * pTriggerParent, const
             }
         }
         QStringList regexList = pChild->getRegexCodeList();
-        resultList = regexList.filter( s );
+        resultList = regexList.filter( s, Qt::CaseInsensitive );
         for( int i=0; i<resultList.size(); i++ )
         {
             QStringList sl;
@@ -1301,7 +1301,7 @@ void dlgTriggerEditor::recursiveSearchAlias( TAlias * pTriggerParent, const QStr
         QTreeWidgetItem * parent = 0;
         TAlias * pChild = *it;
         QString n = pChild->getName();
-        if( n.indexOf( s ) != -1 )
+        if( n.indexOf( s, 0, Qt::CaseInsensitive ) != -1 )
         {
             QStringList sl;
             sl << "Alias" << pChild->getName() << "name";
@@ -1322,7 +1322,7 @@ void dlgTriggerEditor::recursiveSearchAlias( TAlias * pTriggerParent, const QStr
             }
         }
         QStringList scriptList = pChild->getScript().split("\n");
-        QStringList resultList = scriptList.filter( s );
+        QStringList resultList = scriptList.filter( s, Qt::CaseInsensitive );
         for( int i=0; i<resultList.size(); i++ )
         {
             QStringList sl;
@@ -1345,7 +1345,7 @@ void dlgTriggerEditor::recursiveSearchAlias( TAlias * pTriggerParent, const QStr
         }
 
 
-        if( pChild->getRegexCode().indexOf( s ) > -1 )
+        if( pChild->getRegexCode().indexOf( s, 0, Qt::CaseInsensitive ) > -1 )
         {
             QStringList sl;
             sl << "Alias" << pChild->getName() << "pattern" << pChild->getRegexCode();
@@ -1382,7 +1382,7 @@ void dlgTriggerEditor::recursiveSearchScripts( TScript * pTriggerParent, const Q
         QTreeWidgetItem * parent = 0;
         TScript * pChild = *it;
         QString n = pChild->getName();
-        if( n.indexOf( s ) != -1 )
+        if( n.indexOf( s, 0, Qt::CaseInsensitive ) != -1 )
         {
             QStringList sl;
             sl << "Script" << pChild->getName() << "name";
@@ -1403,7 +1403,7 @@ void dlgTriggerEditor::recursiveSearchScripts( TScript * pTriggerParent, const Q
             }
         }
         QStringList scriptList = pChild->getScript().split("\n");
-        QStringList resultList = scriptList.filter( s );
+        QStringList resultList = scriptList.filter( s, Qt::CaseInsensitive );
         for( int i=0; i<resultList.size(); i++ )
         {
             QStringList sl;
@@ -1442,7 +1442,7 @@ void dlgTriggerEditor::recursiveSearchActions( TAction * pTriggerParent, const Q
         QTreeWidgetItem * parent = 0;
         TAction * pChild = *it;
         QString n = pChild->getName();
-        if( n.indexOf( s ) != -1 )
+        if( n.indexOf( s, 0, Qt::CaseInsensitive ) != -1 )
         {
             QStringList sl;
             sl << "Button" << pChild->getName() << "name";
@@ -1463,7 +1463,7 @@ void dlgTriggerEditor::recursiveSearchActions( TAction * pTriggerParent, const Q
             }
         }
         QStringList scriptList = pChild->getScript().split("\n");
-        QStringList resultList = scriptList.filter( s );
+        QStringList resultList = scriptList.filter( s, Qt::CaseInsensitive );
         for( int i=0; i<resultList.size(); i++ )
         {
             QStringList sl;
@@ -1502,7 +1502,7 @@ void dlgTriggerEditor::recursiveSearchTimers( TTimer * pTriggerParent, const QSt
         QTreeWidgetItem * parent = 0;
         TTimer * pChild = *it;
         QString n = pChild->getName();
-        if( n.indexOf( s ) != -1 )
+        if( n.indexOf( s, 0, Qt::CaseInsensitive ) != -1 )
         {
             QStringList sl;
             sl << "Timer" << pChild->getName() << "name";
@@ -1523,7 +1523,7 @@ void dlgTriggerEditor::recursiveSearchTimers( TTimer * pTriggerParent, const QSt
             }
         }
         QStringList scriptList = pChild->getScript().split("\n");
-        QStringList resultList = scriptList.filter( s );
+        QStringList resultList = scriptList.filter( s, Qt::CaseInsensitive );
         for( int i=0; i<resultList.size(); i++ )
         {
             QStringList sl;
@@ -1562,7 +1562,7 @@ void dlgTriggerEditor::recursiveSearchKeys( TKey * pTriggerParent, const QString
         QTreeWidgetItem * parent = 0;
         TKey * pChild = *it;
         QString n = pChild->getName();
-        if( n.indexOf( s ) != -1 )
+        if( n.indexOf( s, 0, Qt::CaseInsensitive ) != -1 )
         {
             QStringList sl;
             sl << "Key" << pChild->getName() << "name";
@@ -1583,7 +1583,7 @@ void dlgTriggerEditor::recursiveSearchKeys( TKey * pTriggerParent, const QString
             }
         }
         QStringList scriptList = pChild->getScript().split("\n");
-        QStringList resultList = scriptList.filter( s );
+        QStringList resultList = scriptList.filter( s, Qt::CaseInsensitive );
         for( int i=0; i<resultList.size(); i++ )
         {
             QStringList sl;
@@ -1947,7 +1947,7 @@ void dlgTriggerEditor::slot_alias_toggle_active()
 
     TAlias * pT = mpHost->getAliasUnit()->getAlias(pItem->data(0, Qt::UserRole).toInt());
     if( ! pT ) return;
-
+    qDebug()<<"aliasToggleActive()";
     pT->setIsActive( ! pT->shouldBeActive() );
 
     if( pT->isFolder() )
@@ -1986,7 +1986,7 @@ void dlgTriggerEditor::slot_alias_toggle_active()
     }
     showInfo( QString( "Trying to %2 Alias %1 %3." )
               .arg(pT->getName())
-              .arg( pT->shouldBeActive() ? "activated" : "deactivated" )
+              .arg( pT->shouldBeActive() ? "activate" : "deactivate" )
               .arg( pT->state() ? "succeeded" : QString("failed reason:") + pT->getError() ) );
 }
 
@@ -3129,16 +3129,8 @@ void dlgTriggerEditor::saveTimer()
             pT->setCommand( command );
             pT->setName( name );
             pT->setScript( script );
-            QString lang = (mpTimersMainArea->comboBox_lang->currentText()).toUpper();
+			QString lang = (mpTimersMainArea->comboBox_lang->currentText()).toUpper();
             pT->setScriptLanguage(lang);
-           /* if( pT->isOffsetTimer() )
-            {
-                pT->setShouldBeActive( false );
-            }
-            else
-            {
-                pT->setIsActive( false );
-            }*/
 
             QIcon icon;
             if( pT->isFolder() )
@@ -3179,18 +3171,19 @@ void dlgTriggerEditor::saveTimer()
                 if( pT->shouldBeActive() )
                 {
                     icon.addPixmap(QPixmap(QString::fromUtf8(":/icons/tag_checkbox_checked.png")), QIcon::Normal, QIcon::Off);
+                    pT->setIsActive( true );
                 }
                 else
                 {
                     icon.addPixmap(QPixmap(QString::fromUtf8(":/icons/tag_checkbox.png")), QIcon::Normal, QIcon::Off);
                 }
+
             }
 
             if( pT->state() )
             {
                 pItem->setIcon( 0, icon);
                 pItem->setText( 0, name );
-
             }
             else
             {
@@ -3200,6 +3193,7 @@ void dlgTriggerEditor::saveTimer()
                 pItem->setText( 0, name );
 
             }
+
         }
     }
 }
@@ -3340,7 +3334,7 @@ void dlgTriggerEditor::saveAlias()
 
             if( pT->state() )
             {
-                if( old_name == "New Alias" || old_name == "New Alias Group" )
+                if( old_name == "New Alias" )//|| old_name == "New Alias Group" )
                 {
                     QIcon _icon;
                     if( pT->isFolder() )
@@ -3528,6 +3522,17 @@ void dlgTriggerEditor::saveAction()
                     }
                 }
                 else if( ! pT->getParent() )
+                {
+                    if( pT->isActive() )
+                    {
+                        icon.addPixmap(QPixmap(QString::fromUtf8(":/icons/folder-yellow.png")), QIcon::Normal, QIcon::Off);
+                    }
+                    else
+                    {
+                        icon.addPixmap(QPixmap(QString::fromUtf8(":/icons/folder-yellow-locked.png")), QIcon::Normal, QIcon::Off);
+                    }
+                }
+                else if( ! pT->getParent()->mPackageName.isEmpty() )
                 {
                     if( pT->isActive() )
                     {
@@ -4508,11 +4513,7 @@ void dlgTriggerEditor::fillout_form()
         TTimer * pT = *it;
         if( pT->isTempTimer() ) continue;
         QString s = pT->getName();
-
         qDebug()<<"init: name="<<pT->getName()<<" mUserActiveState="<<pT->shouldBeActive();
-
-
-        //        TTimer * pTimer = *it;
         QStringList sList;
         sList << s;
         QTreeWidgetItem * pItem = new QTreeWidgetItem( mpTimerBaseItem, sList);
@@ -4772,6 +4773,17 @@ void dlgTriggerEditor::fillout_form()
                     }
                 }
                 else if( ! pT->getParent() )
+                {
+                    if( pT->isActive() )
+                    {
+                        icon.addPixmap(QPixmap(QString::fromUtf8(":/icons/folder-yellow.png")), QIcon::Normal, QIcon::Off);
+                    }
+                    else
+                    {
+                        icon.addPixmap(QPixmap(QString::fromUtf8(":/icons/folder-yellow-locked.png")), QIcon::Normal, QIcon::Off);
+                    }
+                }
+                else if( ! pT->getParent()->mPackageName.isEmpty() )
                 {
                     if( pT->isActive() )
                     {
@@ -5145,7 +5157,18 @@ void dlgTriggerEditor::expand_child_action( TAction * pTriggerParent, QTreeWidge
         }
         if( pT->state() )
         {
-            if( pT->isFolder() )
+            if( ! pT->getParent()->mPackageName.isEmpty() )
+            {
+                if( pT->isActive() )
+                {
+                    icon.addPixmap(QPixmap(QString::fromUtf8(":/icons/folder-yellow.png")), QIcon::Normal, QIcon::Off);
+                }
+                else
+                {
+                    icon.addPixmap(QPixmap(QString::fromUtf8(":/icons/folder-yellow-locked.png")), QIcon::Normal, QIcon::Off);
+                }
+            }
+            else if( pT->isFolder() )
             {
                 if( pT->isActive() )
                 {
@@ -5246,14 +5269,15 @@ void dlgTriggerEditor::expand_child_timers( TTimer * pTimerParent, QTreeWidgetIt
             pItem->setIcon( 0, iconError );
             showError( pT->getError() );
         }
-        if( pT->isActive() )
-        {
-            pT->enableTimer( pT->getName() );
-        }
-        else
-        {
-            pT->disableTimer( pT->getName() );
-        }
+        qDebug()<<"WARNING: dlgTriggerEditor::expand_child_timers() called name:"<<pT->getName();
+//        if( pT->isActive() )
+//        {
+//            pT->enableTimer();// pT->getName() );
+//        }
+//        else
+//        {
+//            pT->disableTimer();// pT->getName() );
+//        }
     }
 }
 

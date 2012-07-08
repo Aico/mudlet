@@ -1755,7 +1755,7 @@ void TBuffer::translateToPlainText( std::string & s )
                         msPos += 5;
                         mIgnoreTag = false;
                         mSkip.clear();
-                        ch = '&';
+                        ch = '"';
                     }
                 }
                 // if the content is split across package borders
@@ -1771,17 +1771,17 @@ void TBuffer::translateToPlainText( std::string & s )
                     mSkip.clear();
                     ch = '<';
                 }
-                else if( mSkip == "&amp;" )
+                else if( mSkip == "&amp" && ch == ';' )
                 {
                     mIgnoreTag = false;
                     mSkip.clear();
                     ch = '&';
                 }
-                else if( mSkip == "&quot;" )
+                else if( mSkip == "&quot;" && ch == ';' )
                 {
                     mIgnoreTag = false;
                     mSkip.clear();
-                    ch = '&';
+                    ch = '"';
                 }
                 else
                 {

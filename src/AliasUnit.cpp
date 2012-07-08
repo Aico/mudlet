@@ -46,10 +46,7 @@ void AliasUnit::_uninstall( TAlias * pChild, QString packageName )
     {
         TAlias * pT = *it2;
         _uninstall( pT, packageName );
-        if( pT->mPackageName == packageName )
-        {
-            uninstallList.append( pT );
-        }
+        uninstallList.append( pT );
     }
 }
 
@@ -60,9 +57,10 @@ void AliasUnit::uninstall( QString packageName )
     for( IT it = mAliasRootNodeList.begin(); it != mAliasRootNodeList.end(); it ++ )
     {
         TAlias * pT = *it;
-        _uninstall( pT, packageName );
+
         if( pT->mPackageName == packageName )
         {
+            _uninstall( pT, packageName );
             uninstallList.append( pT );
         }
     }
@@ -71,6 +69,7 @@ void AliasUnit::uninstall( QString packageName )
         unregisterAlias(uninstallList[i]);
 
     }
+    uninstallList.clear();
 }
 
 void AliasUnit::compileAll()
@@ -83,10 +82,6 @@ void AliasUnit::compileAll()
         {
             pChild->compileAll();
         }
-    }
-    for( int i=0; i<uninstallList.size(); i++ )
-    {
-        unregisterAlias(uninstallList[i]);
     }
 }
 

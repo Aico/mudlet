@@ -38,6 +38,11 @@
 #include <QMessageBox>
 #include "dlgNotepad.h"
 
+extern "C" {
+    #include "lua.h"
+    #include "lualib.h"
+    #include "lauxlib.h"
+}
 
 Host::Host( int port, QString hostname, QString login, QString pass, int id )
 : mTelnet( this )
@@ -363,12 +368,12 @@ void Host::saveModules(int sync){
             QMapIterator<int, QStringList> it4(moduleOrder);
             while(it4.hasNext()){
                 it4.next();
-                qDebug()<<"On priority "<<it4.key();
+                //qDebug()<<"On priority "<<it4.key();
                 QStringList moduleList = it4.value();
                 for(int i=0;i<moduleList.size();i++){
                     QString moduleName = moduleList[i];
                     if (modulesToSync.contains(moduleName)){
-                        qDebug()<<"synchronizing module:"<<moduleName<<" in profile:"<<host->mHostName;
+                        //qDebug()<<"synchronizing module:"<<moduleName<<" in profile:"<<host->mHostName;
                         host->reloadModule(moduleName);
                     }
                 }
@@ -927,6 +932,38 @@ bool Host::installPackage( QString fileName, int module )
         // - the xml file must be located in the root directory of the zip package. example: myPack.zip contains: the folder images and the file myPack.xml
 
         QDir _dir( _dest );
+        // before we start importing xmls in, see if the config.lua manifest file exists
+        // - if it does, update the packageName from it
+        if (_dir.exists("config.lua"))
+        {
+            // read in the new packageName from Lua. Should be expanded in future to whatever else config.lua will have
+            readPackageConfig(_dir.absoluteFilePath("config.lua"), packageName);
+
+            // now that the packageName changed, redo relevant checks to make sure it's still valid
+            if (module)
+            {
+                if( mActiveModules.contains( packageName ) )
+                {
+                    uninstallPackage(packageName, 2);
+                }
+            }
+            else
+            {
+                if( mInstalledPackages.contains( packageName ) )
+                {
+                    // cleanup and quit if already installed
+                    removeDir( _dir.absolutePath(),_dir.absolutePath() );
+
+                    return false;
+                }
+            }
+
+            // continuing, so update the folder name on disk
+            QString newpath(QString( "%1/%2/").arg( _home ).arg( packageName ));
+            _dir.rename(_dir.absolutePath(), newpath);
+            _dir = QDir( newpath );
+        }
+
         QStringList _filterList;
         _filterList << "*.xml" << "*.trigger";
         QFileInfoList entries = _dir.entryInfoList( _filterList, QDir::Files );
@@ -1056,14 +1093,15 @@ bool Host::uninstallPackage( QString packageName, int module)
         mActiveModules.removeAll(packageName);
         return true;
     }
-    else if (module){
+    else if (module==1){
         //if module == 1, we actually uninstall it.
         QStringList entry = mInstalledModules[packageName];
+        qDebug()<<"removing"<<packageName;
         mInstalledModules.remove( packageName );
-        //reinstall the module if it was also removed.  This is a kludge, but it's cleaner than adding extra arguments/etc imo
+        //reinstall the package if it shared a module name.  This is a kludge, but it's cleaner than adding extra arguments/etc imo
         if (dualInstallations){
-            //get the pre package list so we don't get duplicates
             mInstalledPackages.removeAll(packageName); //so we don't get denied from installPackage
+            //get the pre package list so we don't get duplicates
             installPackage(entry[0], 0);
         }
     }
@@ -1080,6 +1118,9 @@ bool Host::uninstallPackage( QString packageName, int module)
     {
         mpEditorDialog->doCleanReset();
     }
+
+    getActionUnit()->updateToolbar();
+
     QString _home = QDir::homePath();
     _home.append( "/.config/mudlet/profiles/" );
     _home.append( getName() );
@@ -1105,6 +1146,71 @@ bool Host::uninstallPackage( QString packageName, int module)
 bool Host::pythonEnabled() 
 {
     return mPython;
+}
+
+void Host::readPackageConfig( QString luaConfig, QString & packageName )
+{
+
+    QFile configFile(luaConfig);
+    QStringList strings;
+    if (configFile.open(QIODevice::ReadOnly | QIODevice::Text))
+    {
+        QTextStream in(&configFile);
+        while (!in.atEnd())
+        {
+            strings += in.readLine();
+        }
+    }
+
+    lua_State *L = luaL_newstate();
+    luaL_openlibs(L);
+
+    int error = luaL_loadstring(L, strings.join("\n").toLatin1().data());
+
+    if( !error )
+        error = lua_pcall(L, 0,0,0);
+
+    if( !error )
+    {
+        // for now, only read the mpackage parameter
+        // would be nice to read author, save & version too later
+        lua_getglobal(L, "mpackage");
+        if (lua_isstring(L, -1))
+        {
+            packageName = QString(lua_tostring(L, -1));
+        }
+        lua_pop(L, -1);
+        lua_close(L);
+        return;
+    }
+    else // error
+    {
+        string e = "no error message available from Lua";
+        e = lua_tostring( L, -1 );
+        string reason;
+        switch (error)
+        {
+            case 4:
+                reason = "Out of memory"; break;
+            case 3:
+                reason = "Syntax error"; break;
+            case 2:
+                reason = "Runtime error"; break;
+            case 1:
+                reason = "Yield error"; break;
+            default:
+                reason = "Unknown error"; break;
+        }
+
+        if( mudlet::debugMode ) qDebug()<< reason.c_str() <<" in config.lua:"<<e.c_str();
+        // should print error to main display
+        QString msg = QString ("%1 in config.lua: %2\n").arg( reason.c_str() ).arg( e.c_str() );
+        mpConsole->printSystemMessage(msg);
+
+
+        lua_pop(L, -1);
+        lua_close(L);
+    }
 }
 
 #endif

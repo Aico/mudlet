@@ -19,7 +19,7 @@
 
 
 #include "XMLimport.h"
-
+#include "mudlet.h"
 #include <QStringList>
 #include <QDebug>
 
@@ -45,10 +45,8 @@ bool XMLimport::importPackage( QIODevice * device, QString packName, int moduleF
     gotAction = false;
     gotScript = false;
     module = moduleFlag;
-    /*if (moduleFlag)
-        module=1;*/
-    qDebug()<<"module flag:"<<module<<" importing: "<<mPackageName;
 
+    qDebug()<<"module flag:"<<module<<" importing: "<<mPackageName;
 
     if( ! packName.isEmpty() )
     {
@@ -73,14 +71,16 @@ bool XMLimport::importPackage( QIODevice * device, QString packName, int moduleF
         mpTrigger->setIsFolder( true );
 
         mpTimer = new TTimer( 0, mpHost );
+        mpTimer->setIsFolder( true );
+
         if (module){
             mpTimer->mModuleMasterFolder=true;
             mpTimer->mModuleMember=true;
         }
+
         mpTimer->setPackageName( mPackageName );
-        mpTimer->setIsActive( true );
         mpTimer->setName( mPackageName );
-        mpTimer->setIsFolder( true );
+        mpTimer->setIsActive( true );
 
         mpAlias = new TAlias( 0, mpHost );
         if (module){
@@ -88,9 +88,13 @@ bool XMLimport::importPackage( QIODevice * device, QString packName, int moduleF
             mpAlias->mModuleMember=true;
         }
         mpAlias->setPackageName( mPackageName );
-        mpAlias->setIsActive( true );
         mpAlias->setName( mPackageName );
         mpAlias->setIsFolder( true );
+        QString _nothing = "";
+        mpAlias->setScript(_nothing);
+        mpAlias->setRegexCode("");
+        mpAlias->setIsActive( true );
+
         mpAction = new TAction( 0, mpHost );
         if (module){
             mpAction->mModuleMasterFolder=true;
@@ -140,6 +144,23 @@ bool XMLimport::importPackage( QIODevice * device, QString packName, int moduleF
             }
         }
     }
+
+    if( gotTimer && ! packName.isEmpty() )
+    {
+        mpTimer->setIsActive( true );
+        mpTimer->enableTimer( mpTimer->getID() );
+    }
+
+    if( gotAlias && ! packName.isEmpty() )
+    {
+        mpAlias->setIsActive( true );
+    }
+
+    if( gotAction && ! packName.isEmpty() )
+    {
+        mpHost->getActionUnit()->updateToolbar();
+    }
+
     if( ! packName.isEmpty())
     {
        if( ! gotTrigger )
@@ -442,6 +463,7 @@ void XMLimport::readPackage()
             }
         }
     }
+    qDebug()<<"reading package end";
 }
 
 void XMLimport::readUnknownPackage()
@@ -1193,6 +1215,9 @@ void XMLimport::readTimerPackage()
 void XMLimport::readTimerGroup( TTimer * pParent )
 {
     TTimer * pT;
+
+    QTime _time(10,0,0,0);
+
     if( pParent )
     {
         pT = new TTimer( pParent, mpHost );
@@ -1201,10 +1226,15 @@ void XMLimport::readTimerGroup( TTimer * pParent )
     {
         pT = new TTimer( 0, mpHost );
     }
-    pT->registerTimer();
-    pT->setShouldBeActive( ( attributes().value("isActive") == "yes" ) );
     pT->mIsFolder = ( attributes().value("isFolder") == "yes" );
     pT->mIsTempTimer = ( attributes().value("isTempTimer") == "yes" );
+
+    mpHost->getTimerUnit()->registerTimer( pT );
+    pT->setShouldBeActive( ( attributes().value("isActive") == "yes" ) );
+
+    bool isOffsetTimer = ( attributes().value("isOffsetTimer") == "yes" );
+
+
     if (module)
         pT->mModuleMember = true;
     
@@ -1219,6 +1249,7 @@ void XMLimport::readTimerGroup( TTimer * pParent )
         {
             if( name() == "name" )
             {
+
                 pT->setName( readElementText() );
                 continue;
             }
@@ -1270,10 +1301,37 @@ void XMLimport::readTimerGroup( TTimer * pParent )
         pT->setScript( script );
     }
 
-    if( ( ! pT->isOffsetTimer() ) && ( pT->shouldBeActive() ) )
+
+
+    mudlet::self()->registerTimer( pT, pT->mpTimer );
+
+    //if( ( ! isOffsetTimer ) && ( ! pT->isFolder() ) && ( pT->shouldBeActive() ) )
+    if( ! pT->mpParent && pT->shouldBeActive() )
+    {
+        qDebug()<<"regular Timer enabling name:"<<pT->getName();
+        pT->setIsActive( true );
         pT->enableTimer( pT->getID() );
+//        if( pT->canBeUnlocked( 0 ) )
+//        {
+//            if( pT->activate() )
+//            {
+//                pT->mpTimer->start();
+//            }
+//            else
+//            {
+//                pT->deactivate();
+//                pT->mpTimer->stop();
+//            }
+//        }
+    }
     else
-        pT->disableTimer( pT->getID() );
+    {
+        qDebug()<<"NOT enabling Timer name:"<<pT->getName();
+        //pT->disableTimer( pT->getID() );
+        //pT->deactivate();
+        //pT->mpTimer->stop();
+        //pT->setIsActive( pT->shouldBeActive() );
+    }
 
 }
 
