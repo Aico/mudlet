@@ -145,7 +145,9 @@ class Mapper:
                     raise Exception('Value must be a Other object or a dict')
                 for k,v in value.iteritems():
                     for i in v:
-                        mudlet.addSpecialExit(self['id'],k,i)
+                        if type(i) == str:
+                            i=(i,0)
+                        mudlet.addSpecialExit(self['id'],k,i[0],i[1])
             elif key == 'highlight':
                 super(Mapper.Room,self).__setitem__(key,value)
                 mudlet.toggleHighlight(self['id'], value)
@@ -200,13 +202,18 @@ class Mapper:
         def __init__(self,it):
             super(Mapper.CommandList,self).__init__()
             for i in it:
-                super(Mapper.CommandList,self).append(i)
+                super(Mapper.CommandList,self).append((i[1:],int(i[0])))
         
         def __setitem__(self,index,value):
-            oldv=self[index]
-            r= mudlet.removeSpecialExit(self.from_id, self.to_id, oldv)
+            if type(value) != str and type(value) != tuple:
+                print 'value must be either string or tuple'
+                return
+            r= mudlet.removeSpecialExit(self.from_id, self.to_id, self[index])
             if r:
+                if type(value) == str:
+                    value = (value,0)
                 super(Mapper.CommandList,self).__setitem__(index,value)
+                mudlet.addSpecialExit(self.from_id, self.to_id, self[index][0],self[index][1])
             else:
                 print "Problem setting command list value."
                 
@@ -219,9 +226,11 @@ class Mapper:
                 print "Problem deleting command list value."
                 
         def append(self,o):
-            if type(o) is not type(''):
-                print 'Type of value to append to the command list must be a string'
-            r = mudlet.addSpecialExit(self.from_id, self.to_id, o)
+            if type(o) is not str or type(o) is not tuple:
+                print 'Type of value to append to the command list must be a string or tuple'
+            if type(o) is str:
+                o=(o,0)
+            r = mudlet.addSpecialExit(self.from_id, self.to_id, o[0], o[1])
             if r:
                 super(Mapper.CommandList,self).append(o)
             else:
@@ -229,12 +238,14 @@ class Mapper:
                
         def extend(self,it):
             for i in it:
-                if type(i) is type(''):
-                    r = mudlet.addSpecialExit(self.from_id, self.to_id, i)
-                    if r:
-                        super(Mapper.CommandList,self).append(i)
-                    else:
-                        print 'value %i cannot be added to command list.'%(i,)
+                if type(i) is str:
+                    i=(i,0)
+                r = mudlet.addSpecialExit(self.from_id, self.to_id, i[0], i[1])
+                if r:
+                    super(Mapper.CommandList,self).append(i)
+                else:
+                    print 'value %i cannot be added to command list.'%(i,)
+                    
                         
         def insert(self,index,value):
             super(Mapper.CommandList,self).insert(index,value)

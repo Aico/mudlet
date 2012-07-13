@@ -241,7 +241,7 @@ public slots:
   int deleteArea( MudletObject* o, int id );
   int updateMapLabel( MudletObject* o, int area, QString text, float x, float y, float z, QColor fg, QColor bg, int id );
   int deleteMapLabel( MudletObject* o, int area, int labelID  );
-  bool  addSpecialExit(MudletObject* o, int id_from, int id_to, QString cmd);
+  bool  addSpecialExit(MudletObject* o, int id_from, int id_to, QString cmd, bool lock);
   bool removeSpecialExit(MudletObject* o, int id_from, int id_to, QString cmd );
   bool clearSpecialExits( MudletObject* o, int id_from );
   //Callable general mapper functions.

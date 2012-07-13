@@ -2279,14 +2279,14 @@ void MudletObjectWrapper::loadMap( MudletObject* o)
     o->mpHost->getPythonInterpreter()->loadMapperVariables();
 }
 
-bool MudletObjectWrapper::addSpecialExit(MudletObject* o, int id_from, int id_to, QString cmd)
+bool MudletObjectWrapper::addSpecialExit(MudletObject* o, int id_from, int id_to, QString cmd, bool lock)
 {
     if( o->mpHost->mpMap->rooms.contains( id_from ) )
     {
         if( o->mpHost->mpMap->rooms.contains( id_to ) )
         {
             o->mpHost->mpMap->rooms[id_from]->addSpecialExit( id_to, cmd );
-            o->mpHost->mpMap->rooms[id_from]->setSpecialExitLock( id_to, cmd, false );
+            o->mpHost->mpMap->rooms[id_from]->setSpecialExitLock( id_to, cmd, lock );
             o->mpHost->mpMap->mMapGraphNeedsUpdate = true;
             return true;
         }
