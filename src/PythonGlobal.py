@@ -177,15 +177,18 @@ class Mapper:
                     for i in self[key]:
                         self[key].pop(0)
             if value.__class__ == Mapper.CommandList:
-                super(Mapper.Other,self).__setitem__(key,value)
+                super(Mapper.Other,self).__setitem__(key,[])
             elif type(value) == list:
-                super(Mapper.Room,self).__setitem__(key,Mapper.CommandList(value))
+                super(Mapper.Other,self).__setitem__(key,Mapper.CommandList([]))
             else:
                 raise Exception('Value must be a CommandList object or a list')
             self[key].set_from_id(self.from_id)
             self[key].set_to_id(key)
             for v in value:
-                self[key].append(v)
+                if type(v) == str or type(v) == unicode:
+                    self[key].append((v[1:],int(v[0])))
+                elif type(v) == tuple:
+                    self[key].append(v)
                 
         def __delitem__(self,key):
             for v in self[key]:
@@ -202,15 +205,18 @@ class Mapper:
         def __init__(self,it):
             super(Mapper.CommandList,self).__init__()
             for i in it:
-                super(Mapper.CommandList,self).append((i[1:],int(i[0])))
+                if type(i) == str or type(i) == unicode:
+                    super(Mapper.CommandList,self).append((i[1:],int(i[0])))
+                elif type(i) == tuple:
+                    super(Mapper.CommandList,self).append(i)
         
         def __setitem__(self,index,value):
-            if type(value) != str and type(value) != tuple:
-                print 'value must be either string or tuple'
+            if type(value) != str and type(value) != unicode and type(value) != tuple:
+                print 'value must be either string, unicode or tuple'
                 return
             r= mudlet.removeSpecialExit(self.from_id, self.to_id, self[index])
             if r:
-                if type(value) == str:
+                if type(value) == str or type(value) == unicode:
                     value = (value,0)
                 super(Mapper.CommandList,self).__setitem__(index,value)
                 mudlet.addSpecialExit(self.from_id, self.to_id, self[index][0],self[index][1])
@@ -226,7 +232,7 @@ class Mapper:
                 print "Problem deleting command list value."
                 
         def append(self,o):
-            if type(o) is not str or type(o) is not tuple:
+            if type(o) is not str and type(o) is not unicode and type(o) is not tuple:
                 print 'Type of value to append to the command list must be a string or tuple'
             if type(o) is str:
                 o=(o,0)
@@ -238,7 +244,7 @@ class Mapper:
                
         def extend(self,it):
             for i in it:
-                if type(i) is str:
+                if type(i) is str or type(i) is unicode:
                     i=(i,0)
                 r = mudlet.addSpecialExit(self.from_id, self.to_id, i[0], i[1])
                 if r:
@@ -255,7 +261,7 @@ class Mapper:
             if len(self) <= index:
                 raise IndexError('pop index out of range')
             oldv=self[index]
-            super(Mapper.CommandList,self).__delitem__(index)
+            self.__delitem__(index)
             return oldv
             
         def remove(self,value):
