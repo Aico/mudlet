@@ -9,10 +9,12 @@ The map functions and data structures are contained in the Mapper class which is
     > py print mapper
     <PythonQt_module1.Mapper instance at 0x2a60290>
     > py print dir(mapper)
-    ['AreaNamesMap', 'CustomEnvColors', 'EnvColors', 'Labels', 'MapLabel', 'MapLabels', 
-    'Room', 'Rooms', 'UserData', '__doc__', '__init__', '__module__', 'areaNamesMap', 
-    'centerview', 'customEnvColors', 'envColors', 'getPath', 'gotoRoom', 'mapLabels', 
-    'refresh', 'rooms', 'saveMap', 'setGridMode']
+    ['AreaNamesMap', 'CommandList', 'CustomEnvColors', 'EnvColors', 'Labels', 'MapLabel',
+    'MapLabels', 'Other', 'Room', 'Rooms', 'UserData', '__doc__', '__init__', 
+    '__module__', '_construct_name_hash', '_name_hash', 'areaNamesMap', 'centerview', 
+    'customEnvColors', 'custom_color_map', 'envColors', 'getPath', 'mapLabels', 
+    'mudlet_to_mapper_color_map', 'refresh', 'rooms', 'saveMap', 'searchRoom', 
+    'setGridMode', 'sync']
     
 where '>' is the prompt and 'py' is just an input alias I use to run python code, with the following script:
 
@@ -23,7 +25,7 @@ Classes start with a capital letter and methods and dictionaries with lowercase.
 The methods are:
 centerview(roomid)
 getPath(roomid1,roomid2)
-searchRoom(room_name,dirs=None)
+searchRoom(room_name,dirs=None,color=None,desc=None)
 refresh()
 sync()
 saveMap(location)
@@ -72,17 +74,17 @@ Above stores {areaid: {maplabelid: MapLabel}}.
 MapLabel class has the following constructor: MapLabel(pos,size,text,fgColor,bgColor,pix=None,pointer=None). the paramaters types can be seen in the above MapLabel example.
 
     >py print mapper.rooms[1]
-    {'rendered': False, 'weight': 1, 'highlightRadius': 1.8521704558075383e+28, 'up': -1,
-     'down': -1, 'highlightColor': QColor (#ff9600, at: 0x3ce0320), 'in': -1, 'id': 1, 
-    'out': -1, 'northeast': -1, 'area': 0, 'west': -1, 'highlightColor2': QColor 
-    (#000000, at: 0x3d0f100), 'environment': 259, 'isLocked': False, 'northwest': -1, 
-    'east': 1, 'southwest': -1, 'userData': {u'desc': u'The painting room here has 
-    several paintings of nobility in the Kingdom. On both sides of the walls paintings 
-    are mounted in wood frames and covered by tempered glass. Small lanterns set in the 
-    wall itself provide a soft light for the art work. An archaic wall closing off the 
-    western hall is built from light wood and metal lacing. To the north is the Library 
-    of Fame.'}, 'north': 2, 'southeast': -1, 'x': 0, 'c': 0, 'name': u'The Hall of Fame',
-     'exitLocks': (), 'y': 0, 'highlight': False, 'z': 0, 'south': -1}
+    {'rendered': False, 'weight': 1, 'highlightRadius': 0.0, 'up': -1, 'down': -1, 
+    'special_exits': {}, 'highlightColor': QColor (#ff9600, at: 0x402b500), 'in': -1, 
+    'id': 1, 'out': -1, 'northeast': -1, 'area': 0, 'west': 5, 'highlightColor2': QColor 
+    (#000000, at: 0x405bb50), 'environment': 259, 'isLocked': False, 'northwest': -1, 
+    'east': 3, 'southwest': -1, 'userData': {u'desc': u'   As you walk the hallway you 
+    are mesmerized by the feeling of serenity of these halls. Under your feet the marble 
+    floor is covered by a lavishly decorated carpet that extends the length of the hall. 
+    In the center of this room is a small statue resting on the top of a stone half 
+    column. A smaller chandelier hangs from silver chains, lighting the hall.'}, 
+    'north': -1, 'southeast': -1, 'x': 1, 'c': 0, 'name': u'The Hall of Fame', 
+    'exitLocks': (), 'y': 0, 'highlight': False, 'z': 0, 'south': -1}
  
 rooms dictionary stores {roomid: Room}. example of a room is shown above. Room can be a Room object or a dictionary with the above set of keys. For directions, -1 means no link, 0 means an exit stub while a positive number refers to the room id the exit leads to.
  
@@ -91,6 +93,6 @@ rooms dictionary stores {roomid: Room}. example of a room is shown above. Room c
 
 envColors table is like the customEnvColors table but used in IRE MUDs This table reads its data from mmp and cannot be changed.
 
-Lastly, when you change the tables, for the changes to instantly get updated on the map you need to call the mapper.refresh() method.
+Lastly, sometimes when you change the tables, for the changes to instantly get updated on the map you need to call the mapper.refresh() method. Use sync() to sync the python dictionaries with the C++ data (ie when lua or visual mapper changes the data-structure.)
 
 If you have any problems or find any bugs or unexpected behaviour, please send me an email at this address: kenneth.chik@gmail.com

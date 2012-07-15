@@ -212,7 +212,7 @@ class Mapper:
         
         def __setitem__(self,index,value):
             if type(value) != str and type(value) != unicode and type(value) != tuple:
-                print 'value must be either string, unicode or tuple'
+                raise Exception('value must be either string, unicode or tuple')
                 return
             r= mudlet.removeSpecialExit(self.from_id, self.to_id, self[index])
             if r:
@@ -221,7 +221,7 @@ class Mapper:
                 super(Mapper.CommandList,self).__setitem__(index,value)
                 mudlet.addSpecialExit(self.from_id, self.to_id, self[index][0],self[index][1])
             else:
-                print "Problem setting command list value."
+                raise Exception("Problem setting command list value.")
                 
         def __delitem__(self,index):
             oldv=self[index]
@@ -229,18 +229,18 @@ class Mapper:
             if r:
                 super(Mapper.CommandList,self).__delitem__(index)
             else:
-                print "Problem deleting command list value."
+                raise Exception("Problem deleting command list value.")
                 
         def append(self,o):
             if type(o) is not str and type(o) is not unicode and type(o) is not tuple:
-                print 'Type of value to append to the command list must be a string or tuple'
+                raise Exception('Type of value to append to the command list must be a string or tuple')
             if type(o) is str:
                 o=(o,0)
             r = mudlet.addSpecialExit(self.from_id, self.to_id, o[0], o[1])
             if r:
                 super(Mapper.CommandList,self).append(o)
             else:
-                print "Problem appending command list value."
+                raise Exception("Problem appending command list value.")
                
         def extend(self,it):
             for i in it:
@@ -250,7 +250,7 @@ class Mapper:
                 if r:
                     super(Mapper.CommandList,self).append(i)
                 else:
-                    print 'value %i cannot be added to command list.'%(i,)
+                    raise Exception('value %i cannot be added to command list.'%(i,))
                     
                         
         def insert(self,index,value):
@@ -427,11 +427,11 @@ class Mapper:
         if color:
             matched_rooms = filter(lambda x:self.rooms[x]['environment']==color,matched_rooms)
             if len(matched_rooms) == 0:
-                print 'Color not found'
+                mudlet.echo('Color not found.\n','main')
         if desc:
             matched_rooms = filter(lambda x:'desc' in self.rooms[x]['userData'] and self.rooms[x]['userData']['desc']==desc,matched_rooms)
             if len(matched_rooms) == 0:
-                print 'Description not found'
+                mudlet.echo('Description not found.\n','main')
         if dirs:
             result = []
             for room in matched_rooms:
@@ -439,7 +439,6 @@ class Mapper:
                 for d in ('north','northeast','east','southeast','south','southwest','west','northwest','up','down','in','out'):
                     if (self.rooms[room][d] == -1 and d in dirs) or (self.rooms[room][d] != -1 and d not in dirs):
                         not_found = True
-                        print 'Direction %s not found' % (d,)
                         break
                 if not not_found:
                     result.append(room)
