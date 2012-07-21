@@ -51,7 +51,7 @@ class Mapper:
         #self.hashTable = Mapper.HashTable()
         self.mapLabels = Mapper.MapLabels()
         del HOST_MAP_LABELS
-        self._name_hash = self._construct_name_hash()
+        self._name_hash, self._coord_hash = self._construct_hash()
         self.rooms._name_hash = self._name_hash
         
     class EnvColors(dict):
@@ -445,6 +445,14 @@ class Mapper:
             return result
         else:
             return matched_rooms
+            
+    def searchRoomByCoord(self,x,y,z):
+        """Search room id using coordinate x,y,z"""
+        try:
+            result = self._coord_hash[(x,y,z)]
+        except KeyError:
+            return []
+        return result
         
     def saveMap(self,location):
         """Saves a copy of the map to file at location."""
@@ -463,14 +471,19 @@ class Mapper:
         mudlet.loadMap()
         self.__init__()
         
-    def _construct_name_hash(self):
-        result = {}
+    def _construct_hash(self):
+        result_name = {}
+        result_coord = {}
         for key,value in self.rooms.iteritems():
-            if result.has_key(value['name']):
-                result[value['name']].append(key)
+            if result_name.has_key(value['name']):
+                result_name[value['name']].append(key)
             else:
-                result[value['name']] = [key]
-        return result
+                result_name[value['name']] = [key]
+            if result_coord.has_key( (value['x'],value['y'],value['z']) ):
+                result_coord[(value['x'],value['y'],value['z'])].append(key)
+            else:
+                result_coord[(value['x'],value['y'],value['z'])] = [key]
+        return result_name,result_coord
 
 line = ''
 command = ''
