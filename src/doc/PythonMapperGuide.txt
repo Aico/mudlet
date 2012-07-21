@@ -26,12 +26,13 @@ The methods are:
 centerview(roomid)
 getPath(roomid1,roomid2)
 searchRoom(room_name,dirs=None,color=None,desc=None)
+searchRoomByCoord(x,y,z)
 refresh()
 sync()
 saveMap(location)
 setGridMode(areaid,gridmode?)
 
-What the methods do should hopefully be apparent. The python version only has 7 methods as opposed to the 52 in the Lua version.
+What the methods do should hopefully be apparent. The python version only has 8 methods as opposed to the 52 in the Lua version.
 What happened to the other 45 methods you might wonder? They are replaced by the five dictionaries listed below:
 areaNamesMap
 customEnvColors
