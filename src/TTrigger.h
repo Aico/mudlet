@@ -155,7 +155,8 @@ public:
     QString                                mName;
     bool                                   mIsTempTrigger;
     QStringList                            mRegexCodeList;
-
+    bool             exportItem;
+    bool            mModuleMasterFolder;
 private:
 
                                            TTrigger(){};
@@ -191,7 +192,6 @@ private:
     QColor                                 mBgColor;
     bool                                   mIsColorizerTrigger;
     bool                  mModuleMember;
-    bool            mModuleMasterFolder;
 
 };
 

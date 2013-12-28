@@ -134,13 +134,14 @@ public:
     QString          css;
     QColor           mButtonColor;
     Host *           mpHost;
-
+    bool             exportItem;
+    bool            mModuleMasterFolder;
 private:
 
     TAction(){};
     QString          mFuncName;
     bool                  mModuleMember;
-    bool            mModuleMasterFolder;
+
 };
 
 #endif

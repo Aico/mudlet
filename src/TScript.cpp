@@ -45,6 +45,7 @@ TScript::TScript( TScript * parent, Host * pHost )
 , mModuleMember(false)
 , mModuleMasterFolder(false)
 , mNeedsToBeCompiled( true )
+, exportItem(true)
 {
 }
 
@@ -55,6 +56,7 @@ TScript::TScript( QString name, Host * pHost )
 , mModuleMember(false)
 , mModuleMasterFolder(false)
 , mNeedsToBeCompiled( true )
+, exportItem(true)
 {
 }
 
@@ -92,7 +94,6 @@ void TScript::setEventHandlerList( QStringList handlerList )
     for( int i=0; i<handlerList.size(); i++ )
     {
         if( handlerList[i].size() < 1 ) continue;
-
         mEventHandlerList.append( handlerList[i] );
         mpHost->registerEventHandler( handlerList[i], this );
     }
@@ -115,6 +116,7 @@ void TScript::callEventHandler( TEvent * pE )
     // Only call this event handler if this script and all its ancestors are active:
     if(isActive() && ancestorsActive())
     {
+		qDebug()<<"-->calling:"<<mName;
         if (mScriptLanguage == PYTHON)
         {
             (mpHost->getPythonInterpreter())->callEventHandler( mName, pE );

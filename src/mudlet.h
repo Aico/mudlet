@@ -122,6 +122,8 @@ public:
    void                          readSettings();
    void                          writeSettings();
    void                          showUnzipProgress( QString txt );
+   bool                          openWebPage(QString path);
+   void                          processEventLoopHack();
    static TConsole *             mpDebugConsole;
    static QMainWindow *          mpDebugArea;
    static bool                   debugMode;
@@ -141,10 +143,12 @@ public:
    void                          showEvent( QShowEvent * event );
    void                          hideEvent( QHideEvent * event );
    bool                          resetFormat( Host *, QString & name );
+   bool                          moduleTableVisible();
    bool                          mWindowMinimized;
    //QString                       readProfileData( QString profile, QString item );
    void                          doAutoLogin( QString & );
    void                          deselect( Host * pHost, QString & name );
+   void                          stopSounds();
    void                          playSound( QString s );
    QTime                         mReplayTime;
    int                           mReplaySpeed;
@@ -159,11 +163,14 @@ public:
    Phonon::MediaObject *         mpMusicBox2;
    Phonon::MediaObject *         mpMusicBox3;
    Phonon::MediaObject *         mpMusicBox4;
+   QTabBar *                     mpTabBar;
+   QStringList                   packagesToInstallList;
 
 
 
 public slots:
 
+   void                          processEventLoopHack_timerRun();
    void                          slot_mapper();
    void                          slot_replayTimeChanged();
    void                          slot_replaySpeedUp();
@@ -177,6 +184,7 @@ public slots:
    void                          slot_show_help_dialog_download();
    void                          slot_open_mappingscripts_page();
    void                          slot_module_clicked(QTableWidgetItem*);
+   void                          slot_module_changed(QTableWidgetItem*);
    void                          slot_multi_view();
    void                          slot_stopAllTriggers();
    void                          slot_userToolBar_hovered( QAction* pA );
@@ -194,10 +202,12 @@ public slots:
    void                          slot_uninstall_package();
    void                          slot_install_package();
    void                          slot_package_manager();
+   void                          slot_package_exporter();
    void                          slot_uninstall_module();
    void                          slot_install_module();
    void                          slot_module_manager();
    void                          layoutModules();
+   void                          slot_help_module();
 
 protected:
 
@@ -221,7 +231,7 @@ private:
 
    void                          goingDown() { mIsGoingDown = true; }
    QMap<QString, TConsole *>         mTabMap;
-   QTabBar *                     mpTabBar;
+   //QTabBar *                     mpTabBar;
    QWidget *                     mainPane;
 
    Host *                        mpDefaultHost;
@@ -251,6 +261,7 @@ private:
    QTableWidget *                 moduleTable;
    QPushButton *                 moduleUninstallButton;
    QPushButton *                 moduleInstallButton;
+   QPushButton *                 moduleHelpButton;
 
 };
 

@@ -63,6 +63,7 @@ TTrigger::TTrigger( TTrigger * parent, Host * pHost )
 , mModuleMasterFolder(false)
 , mNeedsToBeCompiled( true )
 , mTriggerType( REGEX_SUBSTRING )
+, exportItem(true)
 , mIsLineTrigger( false )
 , mStartOfLineDelta( 0 )
 , mLineDelta( 3 )
@@ -94,6 +95,7 @@ TTrigger::TTrigger( QString name, QStringList regexList, QList<int> regexPropery
 , mRegexCodeList( regexList )
 , mRegexCodePropertyList( regexProperyList )
 , mNeedsToBeCompiled( true )
+, exportItem(true)
 , mTriggerType( REGEX_SUBSTRING )
 , mIsLineTrigger( false )
 , mStartOfLineDelta( 0 )
@@ -984,7 +986,7 @@ bool TTrigger::match( char * subject, QString & toMatch, int line, int posOffset
                 if( --mLineDelta <= 0 )
                 {
                     deactivate();
-                    mpHost->getTriggerUnit()->mCleanupList.push_back( this );
+                    mpHost->getTriggerUnit()->markCleanup( this );
                 }
                 return true;
             }

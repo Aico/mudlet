@@ -97,7 +97,7 @@
      <x>0</x>
      <y>0</y>
      <width>750</width>
-     <height>25</height>
+     <height>24</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuEditor">
@@ -111,12 +111,14 @@
     <addaction name="actionPackage_manager"/>
     <addaction name="dactionReplay"/>
     <addaction name="actionModule_manager"/>
+    <addaction name="actionPackage_Exporter"/>
    </widget>
    <widget class="QMenu" name="menuOptions">
     <property name="title">
      <string>Options</string>
     </property>
     <addaction name="dactionOptions"/>
+    <addaction name="dactionMultiView"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
@@ -202,7 +204,7 @@
   </action>
   <action name="dactionHelp">
    <property name="text">
-    <string>Manual</string>
+    <string>API Reference</string>
    </property>
   </action>
   <action name="dactionForum_2">
@@ -266,7 +268,7 @@
     <string>Package manager</string>
    </property>
    <property name="shortcut">
-    <string>Alt+P</string>
+    <string>Alt+O</string>
    </property>
   </action>
   <action name="actionTest1">
@@ -282,6 +284,19 @@
   <action name="actionModule_manager">
    <property name="text">
     <string>Module manager</string>
+   </property>
+  </action>
+  <action name="actionPackage_Exporter">
+   <property name="text">
+    <string>Package exporter (experimental)</string>
+   </property>
+  </action>
+  <action name="dactionMultiView">
+   <property name="text">
+    <string>MultiView</string>
+   </property>
+   <property name="shortcut">
+    <string>Alt+V</string>
    </property>
   </action>
  </widget>

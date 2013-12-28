@@ -291,6 +291,7 @@ public:
     QMap<QString, QStringList> mInstalledModules;
     QMap<QString, int> mModulePriorities;
     QMap<QString, QStringList> modulesToWrite;
+    QMap<QString, QMap<QString, QString> > moduleHelp;
     QStringList        mActiveModules;
     bool               mModuleSaveBlock;
 
@@ -305,6 +306,8 @@ public:
     double             mRoomSize;
     bool               mShowInfo;
     bool               mBubbleMode;
+    bool               mShowRoomID;
+    bool               mShowPanel;
     int                mServerGUI_Package_version;
     QString            mServerGUI_Package_name;
     bool               mAcceptServerGUI;
@@ -312,6 +315,7 @@ public:
     QColor             mCommandLineBgColor;
     bool               mMapperUseAntiAlias;
     bool               mFORCE_MXP_NEGOTIATION_OFF;
+    bool               mHaveMapperScript;
 
 private:
     Host();

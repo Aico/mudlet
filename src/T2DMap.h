@@ -33,9 +33,12 @@ public:
 
     T2DMap();
     explicit T2DMap( QWidget *parent = 0);
+    void     paintMap();
+    void     setMapZoom( int zoom );
     QColor   getColor( int id );
     QColor   _getColor( int id );
     void     init();
+    void     exportAreaImage( int );
     void     paintEvent( QPaintEvent * );
     void     mousePressEvent(QMouseEvent * );
     void     mouseDoubleClickEvent ( QMouseEvent * event );
@@ -56,7 +59,7 @@ public:
     QPoint   mPHighlight;
     bool     mPick;
     int      mTarget;
-    int      mRoomSelection;
+    //int      mRoomSelection;
     bool     mStartSpeedWalk;
     QMap<int, QPoint> mAreaExitList;
     QMap<QString, QStringList> mUserActions; //string list: 0 is event name, 1 is menu it is under if it is
@@ -79,7 +82,7 @@ public:
     int      mFontHeight;
     bool     mShowRoomID;
     QMap<int,QPixmap> mPixMap;
-    QMap<int, QPixmap *> mGridPix;
+//    QMap<int, QPixmap > mGridPix;
     int      gzoom;
     double   rSize;
     double   eSize;
@@ -110,6 +113,9 @@ public:
     int mCustomLineSelectedPoint;
     QTreeWidget mMultiSelectionListWidget;
     bool mSizeLabel;
+    bool gridMapSizeChange;
+    bool isCenterViewCall;
+    QString mHelpMsg;
 
 signals:
 
@@ -123,7 +129,6 @@ public slots:
     void slot_setPlayerLocation();
     void slot_createLabel();
     void slot_customLineColor();
-    void showInfo();
     void shiftZup();
     void shiftZdown();
     void switchArea(QString);

@@ -80,6 +80,20 @@ TMap::TMap( Host * pH )
     int mViewArea = 0;
 }
 
+void TMap::mapClear()
+{
+    rooms.clear();
+    areas.clear();
+    areaNamesMap.clear();
+    mRoomId = 0;
+    pixNameTable.clear();
+    pixTable.clear();
+    hashTable.clear();
+    envColors.clear();
+    customEnvColors.clear();
+    mapLabels.clear();
+}
+
 #include <QFileDialog>
 void TMap::exportMapToDatabase()
 {
@@ -348,6 +362,42 @@ void TMap::init( Host * pH )
     }
     qDebug()<<" TMap::init() initialize area rooms: run time:"<<_time.elapsed();
     auditRooms();
+    // convert old style labels
+    QMapIterator<int, TArea *> it( areas );
+    while( it.hasNext() )
+    {
+        it.next();
+        TArea * pA = it.value();
+        int areaID = it.key();
+        if( mapLabels.contains(areaID) )
+        {
+            QList<int> labelIDList = mapLabels[areaID].keys();
+            for( int i=0; i<labelIDList.size(); i++ )
+            {
+                TMapLabel l = mapLabels[areaID][labelIDList[i]];
+                if( l.pix.isNull() )
+                {
+                    int newID = createMapLabel(areaID, l.text, l.pos.x(), l.pos.y(), l.pos.z(), l.fgColor, l.bgColor, true, false, 40.0, 50 );
+                    if( newID > -1 )
+                    {
+                        cout << "CONVERTING: old style label areaID:"<<areaID<<" labelID:"<< labelIDList[i]<<endl;
+                        mapLabels[areaID][labelIDList[i]] = mapLabels[areaID][newID];
+                        deleteMapLabel( areaID, newID );
+                    }
+                    else
+                        cout << "ERROR: cannot convert old style label areaID:"<<areaID<<" labelID:"<< labelIDList[i]<<endl;
+                }
+                if ( ( l.size.width() > std::numeric_limits<qreal>::max() ) || ( l.size.width() < -std::numeric_limits<qreal>::max() ) )
+                {
+                    mapLabels[areaID][labelIDList[i]].size.setWidth(l.pix.width());
+                }
+                if ( ( l.size.height() > std::numeric_limits<qreal>::max() ) || ( l.size.height() < -std::numeric_limits<qreal>::max() ) )
+                {
+                    mapLabels[areaID][labelIDList[i]].size.setHeight(l.pix.height());
+                }
+            }
+        }
+    }
 }
 
 void TMap::auditRooms()
@@ -794,6 +844,7 @@ void TMap::initGraph()
         l.z = rooms[i]->z;
         locations.push_back( l );
 
+
         if( rooms[i]->north != -1 && rooms.contains( rooms[i]->north ) && !rooms[rooms[i]->north]->isLocked )
         {
             if( ! rooms[i]->hasExitLock( DIR_NORTH ) )
@@ -804,8 +855,10 @@ void TMap::initGraph()
                 tie(e, inserted) = add_edge( i,
                                              rooms[i]->north,
                                              g );
-                weightmap[e] = rooms[rooms[i]->north]->weight;
-
+                if( rooms[i]->exitWeights.contains("n"))
+                    weightmap[e] = rooms[i]->exitWeights["n"];
+                else
+                    weightmap[e] = rooms[rooms[i]->north]->weight;
             }
         }
         if( rooms[i]->south != -1 && rooms.contains( rooms[i]->south ) && !rooms[rooms[i]->south]->isLocked )
@@ -818,7 +871,10 @@ void TMap::initGraph()
                 tie(e, inserted) = add_edge( i,
                                              rooms[i]->south,
                                              g );
-                weightmap[e] = rooms[rooms[i]->south]->weight;
+                if( rooms[i]->exitWeights.contains("s"))
+                    weightmap[e] = rooms[i]->exitWeights["s"];
+                else
+                    weightmap[e] = rooms[rooms[i]->south]->weight;
             }
         }
         if( rooms[i]->northeast != -1 && rooms.contains( rooms[i]->northeast ) && !rooms[rooms[i]->northeast]->isLocked )
@@ -831,7 +887,10 @@ void TMap::initGraph()
                 tie(e, inserted) = add_edge( i,
                                             rooms[i]->northeast,
                                             g );
-                weightmap[e] = rooms[rooms[i]->northeast]->weight;
+                if( rooms[i]->exitWeights.contains("ne"))
+                    weightmap[e] = rooms[i]->exitWeights["ne"];
+                else
+                    weightmap[e] = rooms[rooms[i]->northeast]->weight;
 
             }
         }
@@ -845,7 +904,10 @@ void TMap::initGraph()
                tie(e, inserted) = add_edge( i,
                                             rooms[i]->east,
                                             g );
-               weightmap[e] = rooms[rooms[i]->east]->weight;
+               if( rooms[i]->exitWeights.contains("e"))
+                   weightmap[e] = rooms[i]->exitWeights["e"];
+               else
+                   weightmap[e] = rooms[rooms[i]->east]->weight;
             }
         }
         if( rooms[i]->west != -1 && rooms.contains( rooms[i]->west ) && !rooms[rooms[i]->west]->isLocked )
@@ -858,7 +920,10 @@ void TMap::initGraph()
                 tie(e, inserted) = add_edge( i,
                                              rooms[i]->west,
                                              g );
-                weightmap[e] = rooms[rooms[i]->west]->weight;
+                if( rooms[i]->exitWeights.contains("w"))
+                    weightmap[e] = rooms[i]->exitWeights["w"];
+                else
+                    weightmap[e] = rooms[rooms[i]->west]->weight;
             }
         }
         if( rooms[i]->southwest != -1 && rooms.contains( rooms[i]->southwest ) && !rooms[rooms[i]->southwest]->isLocked )
@@ -871,7 +936,10 @@ void TMap::initGraph()
                 tie(e, inserted) = add_edge( i,
                                              rooms[i]->southwest,
                                              g );
-                weightmap[e] = rooms[rooms[i]->southwest]->weight;
+                if( rooms[i]->exitWeights.contains("sw"))
+                    weightmap[e] = rooms[i]->exitWeights["sw"];
+                else
+                    weightmap[e] = rooms[rooms[i]->southwest]->weight;
             }
         }
         if( rooms[i]->southeast != -1 && rooms.contains( rooms[i]->southeast ) && !rooms[rooms[i]->southeast]->isLocked )
@@ -884,7 +952,10 @@ void TMap::initGraph()
                 tie(e, inserted) = add_edge( i,
                                              rooms[i]->southeast,
                                              g );
-                weightmap[e] = rooms[rooms[i]->southeast]->weight;
+                if( rooms[i]->exitWeights.contains("se"))
+                    weightmap[e] = rooms[i]->exitWeights["se"];
+                else
+                    weightmap[e] = rooms[rooms[i]->southeast]->weight;
             }
         }
         if( rooms[i]->northwest != -1 && rooms.contains( rooms[i]->northwest ) && !rooms[rooms[i]->northwest]->isLocked )
@@ -897,7 +968,10 @@ void TMap::initGraph()
                 tie(e, inserted) = add_edge( i,
                                              rooms[i]->northwest,
                                              g );
-                weightmap[e] = rooms[rooms[i]->northwest]->weight;
+                if( rooms[i]->exitWeights.contains("nw"))
+                    weightmap[e] = rooms[i]->exitWeights["nw"];
+                else
+                    weightmap[e] = rooms[rooms[i]->northwest]->weight;
             }
         }
         if( rooms[i]->up != -1 && rooms.contains( rooms[i]->up ) && !rooms[rooms[i]->up]->isLocked )
@@ -910,7 +984,10 @@ void TMap::initGraph()
                 tie(e, inserted) = add_edge( i,
                                              rooms[i]->up,
                                              g );
-                weightmap[e] = rooms[rooms[i]->up]->weight;
+                if( rooms[i]->exitWeights.contains("up"))
+                    weightmap[e] = rooms[i]->exitWeights["up"];
+                else
+                    weightmap[e] = rooms[rooms[i]->up]->weight;
             }
         }
         if( rooms[i]->down != -1 && rooms.contains( rooms[i]->down ) && !rooms[rooms[i]->down]->isLocked )
@@ -923,7 +1000,10 @@ void TMap::initGraph()
                 tie(e, inserted) = add_edge( i,
                                              rooms[i]->down,
                                              g );
-                weightmap[e] = rooms[rooms[i]->down]->weight;
+                if( rooms[i]->exitWeights.contains("down"))
+                    weightmap[e] = rooms[i]->exitWeights["down"];
+                else
+                    weightmap[e] = rooms[rooms[i]->down]->weight;
             }
         }
         if( rooms[i]->in != -1 && rooms.contains( rooms[i]->in ) && !rooms[rooms[i]->in]->isLocked )
@@ -936,7 +1016,10 @@ void TMap::initGraph()
                 tie(e, inserted) = add_edge( i,
                                              rooms[i]->in,
                                              g );
-                weightmap[e] = rooms[rooms[i]->in]->weight;
+                if( rooms[i]->exitWeights.contains("in"))
+                    weightmap[e] = rooms[i]->exitWeights["in"];
+                else
+                    weightmap[e] = rooms[rooms[i]->in]->weight;
             }
         }
         if( rooms[i]->out != -1 && rooms.contains( rooms[i]->out ) && !rooms[rooms[i]->out]->isLocked )
@@ -949,7 +1032,10 @@ void TMap::initGraph()
                  tie(e, inserted) = add_edge( i,
                                               rooms[i]->out,
                                               g );
-                 weightmap[e] = rooms[rooms[i]->out]->weight;
+                 if( rooms[i]->exitWeights.contains("out"))
+                     weightmap[e] = rooms[i]->exitWeights["out"];
+                 else
+                     weightmap[e] = rooms[rooms[i]->out]->weight;
             }
         }
         if( rooms[i]->other.size() > 0 )
@@ -959,7 +1045,11 @@ void TMap::initGraph()
             {
                 it.next();
                 int _id = it.key();
-                if( ! rooms[i]->hasSpecialExitLock( _id, it.value() ) )
+                QString _cmd = it.value();
+                if( _cmd.size()>0 ) _cmd.remove(0,1);//strip special exit lock information
+
+                // FIXME: double check if the special exit id really exists in the room db as a workaround
+                if( rooms.contains( _id ) && !rooms[i]->hasSpecialExitLock( _id, it.value() ) )
                 {
                     edgeCount++;
                     edge_descriptor e;
@@ -967,7 +1057,14 @@ void TMap::initGraph()
                     tie(e, inserted) = add_edge( i,
                                                  _id,
                                                  g );
-                    weightmap[e] = rooms[_id]->weight;
+                    if( rooms[i]->exitWeights.contains(_cmd))
+                    {
+                        weightmap[e] = rooms[i]->exitWeights[_cmd];
+                    }
+                    else
+                    {
+                        weightmap[e] = rooms[_id]->weight;
+                    }
                 }
             }
         }
@@ -1118,7 +1215,7 @@ bool TMap::findPath( int from, int to )
 
 bool TMap::serialize( QDataStream & ofs )
 {
-    version = 14;
+    version = 16;
     ofs << version;
     ofs << envColors;
     ofs << areaNamesMap;
@@ -1184,6 +1281,8 @@ bool TMap::serialize( QDataStream & ofs )
             ofs << label.fgColor;
             ofs << label.bgColor;
             ofs << label.pix;
+            ofs << label.noScaling;
+            ofs << label.showOnTop;
         }
     }
     QMapIterator<int, TRoom *> it( rooms );
@@ -1226,6 +1325,8 @@ bool TMap::serialize( QDataStream & ofs )
         ofs << rooms[i]->customLinesStyle;
         ofs << rooms[i]->exitLocks;
         ofs << rooms[i]->exitStubs;
+        ofs << rooms[i]->exitWeights;
+        ofs << rooms[i]->doors;
     }
 
     return true;
@@ -1359,6 +1460,11 @@ bool TMap::restore(QString location)
                     ifs >> label.fgColor;
                     ifs >> label.bgColor;
                     ifs >> label.pix;
+                    if( version >= 15 )
+                    {
+                        ifs >> label.noScaling;
+                        ifs >> label.showOnTop;
+                    }
                     _map.insert( labelID, label );
                     labelCount++;
                 }
@@ -1425,6 +1531,11 @@ bool TMap::restore(QString location)
             {
                 ifs >> rooms[i]->exitStubs;
             }
+            if( version >= 16 )
+            {
+                ifs >> rooms[i]->exitWeights;
+                ifs >> rooms[i]->doors;
+            }
             rooms[i]->calcRoomDimensions();
         }
         customEnvColors[257] = mpHost->mRed_2;
@@ -1453,11 +1564,11 @@ bool TMap::restore(QString location)
     {
         QMessageBox msgBox;
 
-        if( mpHost->mUrl == "achaea.com"
-            || mpHost->mUrl == "aetolia.com"
-            || mpHost->mUrl == "imperian.com"
-            || mpHost->mUrl == "midkemiaonline.com"
-            || mpHost->mUrl == "lusternia.com" )
+        if( mpHost->mUrl.toLower().contains( "achaea.com" )
+            || mpHost->mUrl.toLower().contains( "aetolia.com" )
+            || mpHost->mUrl.toLower().contains( "imperian.com" )
+            || mpHost->mUrl.toLower().contains( "midkemiaonline.com" )
+            || mpHost->mUrl.toLower().contains( "lusternia.com" ) )
         {
             msgBox.setText("No map found. Would you like to download the map or start your own?");
             QPushButton *yesButton = msgBox.addButton("Download the map", QMessageBox::ActionRole);
@@ -1465,9 +1576,7 @@ bool TMap::restore(QString location)
             msgBox.exec();
             init( mpHost );
             if (msgBox.clickedButton() == yesButton) {
-                qDebug()<<"--trace before map download";
                 mpMapper->downloadMap();
-                qDebug()<<"--trace after map download";
             }
         }
         else
@@ -1479,10 +1588,10 @@ bool TMap::restore(QString location)
 }
 
 
-// called from scripts
-int TMap::createMapLabel(int area, QString text, float x, float y, float z, QColor fg, QColor bg )
+int TMap::createMapLabel(int area, QString text, float x, float y, float z, QColor fg, QColor bg, bool showOnTop, bool noScaling, qreal zoom, int fontSize )
 {
     if( ! areas.contains( area ) ) return -1;
+
     TMapLabel label;
     label.text = text;
     label.bgColor = bg;
@@ -1490,11 +1599,36 @@ int TMap::createMapLabel(int area, QString text, float x, float y, float z, QCol
     label.fgColor = fg;
     label.size = QSizeF(100,100);
     label.pos = QVector3D( x, y, z);
-        //label.posz = z;
-//    int labelID = areas[area]->labelMap.size();
-//    areas[area]->labelMap[labelID] = label;
+    label.showOnTop = showOnTop;
+    label.noScaling = noScaling;
+
+    if( label.text.length() < 1 )
+    {
+        return -1;
+    }
+    QRectF lr = QRectF( 0, 0, 1000, 1000 );
+    QPixmap pix( lr.size().toSize() );
+    pix.fill(QColor(0,0,0,0));
+    QPainter lp( &pix );
+    lp.fillRect( lr, label.bgColor );
+    QPen lpen;
+    lpen.setColor( label.fgColor );
+    QFont font;
+    font.setPointSize(fontSize); //good: font size = 50, zoom = 30.0
+    lp.setRenderHint(QPainter::TextAntialiasing, true);
+    lp.setPen( lpen );
+    lp.setFont(font);
+    QRectF br;
+    lp.drawText( lr, Qt::AlignLeft|Qt::AlignTop, label.text, &br );
+
+    label.size = br.normalized().size();
+    label.pix = pix.copy(br.normalized().topLeft().x(), br.normalized().topLeft().y(), br.normalized().width(), br.normalized().height());
+    QSizeF s = QSizeF(label.size.width()/zoom, label.size.height()/zoom);
+    label.size = s;
+    label.clickSize = s;
+    if( !areas.contains(area) ) return -1;
     int labelID;
-    if( ! mapLabels.contains( area ) )
+    if( !mapLabels.contains( area ) )
     {
         QMap<int, TMapLabel> m;
         m[0] = label;
@@ -1502,39 +1636,73 @@ int TMap::createMapLabel(int area, QString text, float x, float y, float z, QCol
     }
     else
     {
-        labelID = mapLabels[area].size();
-        mapLabels[area].insert(labelID, label);
+        labelID = createMapLabelID( area );
+        if( labelID > -1 )
+        {
+            mapLabels[area].insert(labelID, label);
+        }
     }
 
     if( mpMapper ) mpMapper->mp2dMap->update();
     return labelID;
 }
 
-int TMap::updateMapLabel(int area, QString text, float x, float y, float z, QColor fg, QColor bg, int id )
+int TMap::createMapImageLabel(int area, QString imagePath, float x, float y, float z, float width, float height, float zoom, bool showOnTop, bool noScaling )
 {
     if( ! areas.contains( area ) ) return -1;
-    TMapLabel label;
-    label.text = text;
-    label.bgColor = bg;
-    label.bgColor.setAlpha(50);
-    label.fgColor = fg;
-    label.size = QSizeF(100,100);
-    label.pos = QVector3D( x, y, z );
 
-    int labelID = id;
-    if( ! mapLabels.contains( area ) )
+    TMapLabel label;
+    label.size = QSizeF(width, height);
+    label.pos = QVector3D( x, y, z);
+    label.showOnTop = showOnTop;
+    label.noScaling = noScaling;
+
+    QRectF drawRect = QRectF( 0, 0, width*zoom, height*zoom );
+    QPixmap imagePixmap = QPixmap(imagePath);
+    QPixmap pix = QPixmap( drawRect.size().toSize() );
+    pix.fill(QColor(0,0,0,0));
+    QPainter lp( &pix );
+    lp.drawPixmap(QPoint(0,0), imagePixmap.scaled(drawRect.size().toSize()));
+    label.size = QSizeF(width, height);
+    label.pix = pix;
+    if( !areas.contains(area) ) return -1;
+    int labelID;
+    if( !mapLabels.contains( area ) )
     {
         QMap<int, TMapLabel> m;
-        m[labelID] = label;
+        m[0] = label;
         mapLabels[area] = m;
     }
     else
     {
-        mapLabels[area].insert(labelID, label);
+        labelID = createMapLabelID( area );
+        if( labelID > -1 )
+        {
+            mapLabels[area].insert(labelID, label);
+        }
     }
 
     if( mpMapper ) mpMapper->mp2dMap->update();
-    return 0;
+    return labelID;
+}
+
+
+int TMap::createMapLabelID(int area )
+{
+    if( mapLabels.contains( area ) )
+    {
+        QList<int> idList = mapLabels[area].keys();
+        int id = 0;
+        while( id >= 0 )
+        {
+            if( !idList.contains( id ) )
+            {
+                return id;
+            }
+            id++;
+        }
+    }
+    return -1;
 }
 
 void TMap::deleteMapLabel(int area, int labelID )

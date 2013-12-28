@@ -67,14 +67,13 @@ cTelnet::cTelnet( Host * pH )
 , mpComposer( 0 )
 
 {
-
     mIsTimerPosting = false;
     mNeedDecompression = false;
     mWaitingForCompressedStreamToStart = false;
     // initialize default encoding
     encoding = "UTF-8";
     encodingChanged(encoding);
-    termType = "Mudlet 2.0.1";
+    termType = "Mudlet 2.1.0";
     iac = iac2 = insb = false;
 
     command = "";
@@ -188,6 +187,11 @@ void cTelnet::connectIt(const QString &address, int port)
 void cTelnet::disconnect ()
 {
     socket.disconnectFromHost();
+    TEvent me;
+    me.mArgumentList.append( "sysDisconnectionEvent" );
+    me.mArgumentTypeList.append( ARGUMENT_TYPE_STRING );
+    mpHost->raiseEvent( &me );
+
 }
 
 void cTelnet::handle_socket_signal_error()
@@ -221,11 +225,20 @@ void cTelnet::handle_socket_signal_connected()
     if( (mpHost->getPass().size()>0)  && (mpHost->getPass().size()>0))
         mTimerPass->start(3000);
     sendTelnetOption(252,3);// try to force GA by telling the server that we are NOT willing to supress GA signals
+    TEvent me;
+    me.mArgumentList.append( "sysConnectionEvent" );
+    me.mArgumentTypeList.append( ARGUMENT_TYPE_STRING );
+    mpHost->raiseEvent( &me );
+
 }
 
 void cTelnet::handle_socket_signal_disconnected()
 {
     postData();
+    TEvent me;
+    me.mArgumentList.append( "sysDisconnectionEvent" );
+    me.mArgumentTypeList.append( ARGUMENT_TYPE_STRING );
+    mpHost->raiseEvent( &me );
     QString msg;
     QTime timeDiff(0,0,0,0);
     msg = QString("[ INFO ]  -  connection time: %1\n").arg(timeDiff.addMSecs(mConnectionTime.elapsed()).toString("hh:mm:ss.zzz"));
@@ -444,7 +457,7 @@ void cTelnet::processTelnetCommand( const string & command )
   case 254: _type = "DONT"; break;
   default: _type = QString::number((quint8)ch);
   };
-  qDebug()<<"SERVER send telnet signal:"<<_type<<" + "<<(quint8)command[2];
+  qDebug()<<"SERVER sends telnet signal:"<<_type<<" + "<<(quint8)command[2];
 #endif
 
   char option;
@@ -504,27 +517,11 @@ void cTelnet::processTelnetCommand( const string & command )
               _h = TN_IAC;
               _h += TN_SB;
               _h += GMCP;
-              _h += "Core.Supports.Set [ \"Char 1\", \"Char.Skills 1\", \"Char.Items 1\", \"Room 1\", \"IRE.Composer 1\"]";
+              _h += "Core.Supports.Set [ \"Char 1\", \"Char.Skills 1\", \"Char.Items 1\", \"Room 1\", \"IRE.Rift 1\", \"IRE.Composer 1\"]";
               _h += TN_IAC;
               _h += TN_SE;
 
               socketOutRaw( _h );
-
-              /*if ((mpHost->getLogin().size()>0) && (mpHost->getPass().size()>0)) {
-                _h = TN_IAC;
-                _h += TN_SB;
-                _h += GMCP;
-                _h += "Char.Login { \"name\": \"";
-                _h += mpHost->getLogin().toLatin1().data();
-                _h += "\", \"password\": \"";
-                _h += mpHost->getPass().toLatin1().data();
-                _h += "\" }";
-                _h += TN_IAC;
-                _h += TN_SE;
-
-                cout << "  sending: " << _h << endl;
-                socketOutRaw( _h );
-              }*/
               break;
           }
 
@@ -533,11 +530,11 @@ void cTelnet::processTelnetCommand( const string & command )
               if( ! mpHost->mFORCE_MXP_NEGOTIATION_OFF )
               {
                 sendTelnetOption( TN_DO, 91 );
-                mpHost->mpConsole->print("\n<MXP enabled>\n");
+                //mpHost->mpConsole->print("\n<MXP enabled>\n");
                 break;
               }
-              else
-                  mpHost->mpConsole->print("\n<MXP declined because of user setting: force MXP off>");
+              //else
+                  //mpHost->mpConsole->print("\n<MXP declined because of user setting: force MXP off>");
           }
 
           //option = command[2];
@@ -581,7 +578,7 @@ void cTelnet::processTelnetCommand( const string & command )
                            //MCCP v2...
                            sendTelnetOption( TN_DONT, option );
                            hisOptionState[idxOption] = false;
-                           cout << "Rejecting MCCP v1, because v2 has already been negotiated." << endl;
+                           //cout << "Rejecting MCCP v1, because v2 has already been negotiated." << endl;
                        }
                        else
                        {
@@ -592,15 +589,20 @@ void cTelnet::processTelnetCommand( const string & command )
                            {
                                mMCCP_version_1 = true;
                                //MCCP->setMCCP1(true);
-                               cout << "MCCP v1 negotiated." << endl;
+                               //cout << "MCCP v1 negotiated." << endl;
                            }
                            else
                            {
                                mMCCP_version_2 = true;
                                //MCCP->setMCCP2( true );
-                               cout << "MCCP v2 negotiated!" << endl;
+                               //cout << "MCCP v2 negotiated!" << endl;
                            }
                        }
+                   }
+                   else if( supportedTelnetOptions.contains( option ) )
+                   {
+                       sendTelnetOption( TN_DO, option );
+                       hisOptionState[idxOption] = true;
                    }
                    else
                    {
@@ -609,6 +611,8 @@ void cTelnet::processTelnetCommand( const string & command )
                    }
                }
           }
+
+
           break;
       }
 
@@ -642,7 +646,7 @@ void cTelnet::processTelnetCommand( const string & command )
                   {
                       //MCCP->setMCCP1 (false);
                       mMCCP_version_1 = false;
-                      cout << "MCCP v1 disabled !" << endl;
+                      //cout << "MCCP v1 disabled !" << endl;
                   }
                   if( ( option == OPT_COMPRESS2 ) )
                   {
@@ -726,7 +730,7 @@ void cTelnet::processTelnetCommand( const string & command )
           }
           if( option == OPT_NAWS )
           {
-                                        //NAWS
+              //NAWS
               setDisplayDimensions();
           }
           break;
@@ -820,7 +824,6 @@ void cTelnet::processTelnetCommand( const string & command )
                   mpProgressDialog->show();
 
               }
-
               return;
           }
 
@@ -831,7 +834,6 @@ void cTelnet::processTelnetCommand( const string & command )
               if( command.size() < 6 ) return;
               _m = _m.mid( 3, command.size()-5 );
               setGMCPVariables( _m );
-
               return;
           }
 
@@ -911,6 +913,25 @@ void cTelnet::processTelnetCommand( const string & command )
           //other commands are simply ignored (NOP and such, see .h file for list)
       }
   };//end switch 1
+  // raise sysTelnetEvent for all unhandled protocols
+  // EXCEPT TN_GA (performance)
+  if( command[1] != TN_GA )
+  {
+      unsigned char type = static_cast<unsigned char>(command[1]);
+      unsigned char telnetOption = static_cast<unsigned char>(command[2]);
+      QString msg = command.c_str();
+      if( command.size() >= 6 ) msg = msg.mid( 3, command.size()-5 );
+      TEvent me;
+      me.mArgumentList.append( "sysTelnetEvent" );
+      me.mArgumentTypeList.append( ARGUMENT_TYPE_STRING );
+      me.mArgumentList.append( QString::number(type) );
+      me.mArgumentTypeList.append( ARGUMENT_TYPE_NUMBER );
+      me.mArgumentList.append( QString::number(telnetOption) );
+      me.mArgumentTypeList.append( ARGUMENT_TYPE_NUMBER );
+      me.mArgumentList.append( msg );
+      me.mArgumentTypeList.append( ARGUMENT_TYPE_STRING );
+      mpHost->raiseEvent( &me );
+  }
 }
 
 void cTelnet::setATCPVariables( QString & msg )
@@ -1049,6 +1070,8 @@ void cTelnet::setGMCPVariables( QString & msg )
         return;
     }
     arg.remove( '\n' );
+    // remove \r's from the data, as yajl doesn't like it
+    arg.remove(QChar('\r'));
 	mpHost->getPythonInterpreter()->setGMCPTable( var, arg );
     mpHost->mLuaInterpreter.setGMCPTable( var, arg );
 }
@@ -1630,12 +1653,12 @@ void cTelnet::handle_socket_signal_readyRead()
                                 cout << "checking mccp start seq..." << endl;
                                 if( ( buffer[i-2] == TN_IAC ) && ( buffer[i-1] == TN_SB ) && ( buffer[i+1] == TN_WILL ) && ( buffer[i+2] == TN_SE ) )
                                 {
-                                    cout << "MCCP version 2 starting sequence" << endl;
+                                    //cout << "MCCP version 2 starting sequence" << endl;
                                     _compress = true;
                                 }
                                 if( ( buffer[i-2] == TN_IAC ) && ( buffer[i-1] == TN_SB ) && ( buffer[i+1] == TN_IAC ) && ( buffer[i+2] == TN_SE ) )
                                 {
-                                    cout << "MCCP version 1 starting sequence" << endl;
+                                    //cout << "MCCP version 1 starting sequence" << endl;
                                     _compress = true;
                                 }
                                 cout << (int)buffer[i-2]<<","<<(int)buffer[i-1]<<","<<(int)buffer[i]<<","<<(int)buffer[i+1]<<","<<(int)buffer[i+2]<<endl;
@@ -1645,7 +1668,7 @@ void cTelnet::handle_socket_signal_readyRead()
                                 mNeedDecompression = true;
                                 // from this position in stream onwards, data will be compressed by zlib
                                 gotRest( cleandata );
-                                mpHost->mpConsole->print("\n<starting MCCP data compression>\n");
+                                //mpHost->mpConsole->print("\n<starting MCCP data compression>\n");
                                 cleandata = "";
                                 initStreamDecompressor();
                                 pBuffer += i + 3;//bugfix: BenH

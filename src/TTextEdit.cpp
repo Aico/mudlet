@@ -26,6 +26,7 @@
 #include <QWidget>
 #include <QPainter>
 #include <QClipboard>
+#include <QTime>
 #include "mudlet.h"
 #include "TDebug.h"
 #include "TTextEdit.h"
@@ -58,7 +59,7 @@ TTextEdit::TTextEdit( TConsole * pC, QWidget * pW, TBuffer * pB, Host * pH, bool
 , mpHost( pH )
 , mpScrollBar( 0 )
 {
-
+    mLastClickTimer.start();
     if( ! mIsDebugConsole )
     {
         mFontHeight = QFontMetrics( mpHost->mDisplayFont ).height();
@@ -71,7 +72,7 @@ TTextEdit::TTextEdit( TConsole * pC, QWidget * pW, TBuffer * pB, Host * pH, bool
         }
 
         mpHost->mDisplayFont.setFixedPitch(true);
-#ifdef Q_OS_MAC
+#if defined(Q_OS_MAC) || (defined(Q_OS_LINUX) && QT_VERSION >= 0x040800)
         QPixmap pixmap = QPixmap( mScreenWidth*mFontWidth*2, mFontHeight*2 );
         QPainter p(&pixmap);
         p.setFont(mpHost->mDisplayFont);
@@ -92,7 +93,7 @@ TTextEdit::TTextEdit( TConsole * pC, QWidget * pW, TBuffer * pB, Host * pH, bool
         mFontWidth = QFontMetrics( mDisplayFont ).width( QChar('W') );
         mScreenWidth = 100;
         mDisplayFont.setFixedPitch(true);
-#ifdef Q_OS_MAC
+#if defined(Q_OS_MAC) || (defined(Q_OS_LINUX) && QT_VERSION >= 0x040800)
         QPixmap pixmap = QPixmap( mScreenWidth*mFontWidth*2, mFontHeight*2 );
         QPainter p(&pixmap);
         p.setFont(mDisplayFont);
@@ -194,7 +195,7 @@ void TTextEdit::initDefaultSettings()
     mBgColor = QColor(0,0,0);
     mDisplayFont = QFont("Bitstream Vera Sans Mono", 10, QFont::Courier);
 //    mDisplayFont.setWordSpacing( 0 );
-#ifdef Q_OS_MAC
+#if defined(Q_OS_MAC) || (defined(Q_OS_LINUX) && QT_VERSION >= 0x040800)
         QPixmap pixmap = QPixmap( mScreenWidth*mFontWidth*2, mFontHeight*2 );
         QPainter p(&pixmap);
         p.setFont(mDisplayFont);
@@ -250,7 +251,7 @@ void TTextEdit::updateScreenView()
         mFontDescent = QFontMetrics( mDisplayFont ).descent();
         mFontAscent = QFontMetrics( mDisplayFont ).ascent();
         mFontHeight = mFontAscent + mFontDescent;
-#ifdef Q_OS_MAC
+#if defined(Q_OS_MAC) || (defined(Q_OS_LINUX) && QT_VERSION >= 0x040800)
         QPixmap pixmap = QPixmap( 2000,600 );
         QPainter p(&pixmap);
         mDisplayFont.setLetterSpacing(QFont::AbsoluteSpacing, 0);
@@ -273,7 +274,7 @@ void TTextEdit::updateScreenView()
         mFontHeight = mFontAscent + mFontDescent;
         mBgColor = mpHost->mBgColor;
         mFgColor = mpHost->mFgColor;
-#ifdef Q_OS_MAC
+#if defined(Q_OS_MAC) || (defined(Q_OS_LINUX) && QT_VERSION >= 0x040800)
         QPixmap pixmap = QPixmap( mScreenWidth*mFontWidth*2, mFontHeight*2 );
         QPainter p(&pixmap);
         mpHost->mDisplayFont.setLetterSpacing(QFont::AbsoluteSpacing, 0);
@@ -295,7 +296,7 @@ void TTextEdit::updateScreenView()
         mFontDescent = QFontMetrics( mDisplayFont ).descent();
         mFontAscent = QFontMetrics( mDisplayFont ).ascent();
         mFontHeight = mFontAscent + mFontDescent;
-#ifdef Q_OS_MAC
+#if defined(Q_OS_MAC) || (defined(Q_OS_LINUX) && QT_VERSION >= 0x040800)
         QPixmap pixmap = QPixmap( mScreenWidth*mFontWidth*2, mFontHeight*2 );
         QPainter p(&pixmap);
         mDisplayFont.setLetterSpacing(QFont::AbsoluteSpacing, 0);
@@ -470,7 +471,7 @@ inline void TTextEdit::drawCharacters( QPainter & painter,
         font.setBold( isBold );
         font.setUnderline( isUnderline );
         font.setItalic( isItalics );
-#ifdef Q_OS_MAC
+#if defined(Q_OS_MAC) || (defined(Q_OS_LINUX) && QT_VERSION >= 0x040800)
         font.setLetterSpacing(QFont::AbsoluteSpacing, mLetterSpacing);
 #endif
         painter.setFont( font );
@@ -479,7 +480,7 @@ inline void TTextEdit::drawCharacters( QPainter & painter,
     {
         painter.setPen( fgColor );
     }
-#ifdef Q_OS_MAC
+#if defined(Q_OS_MAC) || (defined(Q_OS_LINUX) && QT_VERSION >= 0x040800)
     QPointF _p(rect.x(), rect.bottom()-mFontDescent);
     painter.drawText( _p, text );
 #else
@@ -995,6 +996,10 @@ void TTextEdit::mouseMoveEvent( QMouseEvent * event )
 {
     if( (mFontWidth == 0) | (mFontHeight == 0) ) return;
     int x = event->x() / mFontWidth;// bugfix by BenH (used to be mFontWidth-1)
+    if( mShowTimeStamps )
+    {
+        x -= 13;
+    }
     int y = ( event->y() / mFontHeight ) + imageTopLine();
     //qDebug()<<"Mouse: x()="<<event->x()<<" y()="<<event->y()<< "x="<<x<<" y="<<y;
     if( x < 0 ) x = 0;
@@ -1255,6 +1260,10 @@ void TTextEdit::mousePressEvent( QMouseEvent * event )
     if( event->button() == Qt::LeftButton )
     {
         int x = event->x() / mFontWidth;
+        if( mShowTimeStamps )
+        {
+            x -= 13;
+        }
         int y = ( event->y() / mFontHeight ) + imageTopLine();
         if( x < 0 ) x = 0;
         if( y < 0 ) y = 0;
@@ -1286,26 +1295,62 @@ void TTextEdit::mousePressEvent( QMouseEvent * event )
                 }
             }
         }
-        mMouseTracking = true;
-        //int x = event->x() / mFontWidth;
-        //int y = ( event->y() / mFontHeight ) + imageTopLine();
         unHighlight( mSelectedRegion );
         mSelectedRegion = QRegion( 0, 0, 0, 0 );
-        qDebug()<<"x="<<x<<" y="<<y;
-        if( y >= mpBuffer->size() )
+        if ( mLastClickTimer.elapsed() < 300 )
         {
+            int xind=x;
+            int yind=y;
+            while( xind < static_cast<int>( mpBuffer->buffer[yind].size() ) )
+            {
+                QString c = mpBuffer->lineBuffer[yind].at(xind);
+                if (c == " ")
+                    break;
+                xind++;
+            }
+            mPB.setX ( xind-1 );
+            mPB.setY ( yind );
+            for( xind=x-1; xind>0; xind--)
+            {
+                QString c = mpBuffer->lineBuffer[yind].at(xind);
+                if (c == " ")
+                    break;
+            }
+            if ( xind > 0)
+                mPA.setX ( xind+1 );
+            else
+                mPA.setX ( xind );
+            mPA.setY ( yind );
+            highlight();
+            event->accept();
             return;
         }
-        mPA.setX( x );
-        mPA.setY( y );
-        mPB = mPA;
-        event->accept();
-        return;
+        else
+        {
+            mLastClickTimer.start();
+            mMouseTracking = true;
+            //int x = event->x() / mFontWidth;
+            //int y = ( event->y() / mFontHeight ) + imageTopLine();
+            qDebug()<<"x="<<x<<" y="<<y;
+            if( y >= mpBuffer->size() )
+            {
+                return;
+            }
+            mPA.setX( x );
+            mPA.setY( y );
+            mPB = mPA;
+            event->accept();
+            return;
+        }
     }
 
     if( event->button() == Qt::RightButton )
     {
         int x = event->x() / mFontWidth;
+        if( mShowTimeStamps )
+        {
+            x -= 13;
+        }
         int y = ( event->y() / mFontHeight ) + imageTopLine();
         if( y < static_cast<int>(mpBuffer->buffer.size()) )
         {

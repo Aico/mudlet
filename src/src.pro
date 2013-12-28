@@ -9,22 +9,25 @@ QT += network opengl phonon
 DEPENDPATH += .
 INCLUDEPATH += .
 LIBLUA = -llua5.1
-!exists(/usr/lib/liblua5.1.a):LIBLUA = -llua
+#!exists(/usr/lib/x86_64-linux-gnu/liblua5.1.a):LIBLUA = -llua
 
 # automatically link to LuaJIT if it exists
-exists(/usr/local/lib/libluajit-5.1.a):LIBLUA = -L/usr/local/lib -lluajit-5.1
+#exists(/usr/lib/x86_64-linux-gnu/libluajit-5.1.a):LIBLUA = -L/usr/lib/x86_64-linux-gnu/ -lluajit-5.1
 
 unix:LIBS += -lpcre \
     $$LIBLUA \
     -lhunspell \
+    -L/usr/local/lib/ \
     -lyajl \
     -lGLU \
+    -lquazip \
     -lzzip
 
-win32:LIBS += -L"c:\mudlet2_package" \
+win32:LIBS += -L"c:\mudlet3_package" \
     -llua51 \
     -lpcre \
     -lhunspell \
+    -lquazip \
     -lyajl
 
 LIBS += -Lpythonqt/lib -lPythonQt
@@ -36,6 +39,7 @@ win32:INCLUDEPATH += "c:\mudlet_package_MINGW\Lua_src\include" \
     "c:\mudlet_package_MINGW\pcre-8.0-lib\include" \
     #"C:\mudlet_package_MSVC\lloyd-yajl-f4b2b1a\yajl-2.0.1\include" \
     "c:\mudlet2_package\src\yajl1-src\src\include" \
+    "C:\Users\heiko\mudlet\src\quazip\quazip-0.4.4\quazip" \
     "C:\mudlet_package_MINGW\hunspell-1.3.1\src"
 
 unix:isEmpty( INSTALL_PREFIX ):INSTALL_PREFIX = /usr/local
@@ -111,7 +115,6 @@ SOURCES += TConsole.cpp \
     dlgMapper.cpp \
     TRoom.cpp \
     TMap.cpp \
-    lua_yajl1.c \
     TBuffer.cpp \
     irc/src/ircbuffer.cpp \
     irc/src/irc.cpp \
@@ -120,6 +123,7 @@ SOURCES += TConsole.cpp \
     dlgIRC.cpp \
     T2DMap.cpp \
     dlgRoomExits.cpp \
+    dlgPackageExporter.cpp \
     exitstreewidget.cpp
 
 
@@ -197,6 +201,7 @@ HEADERS += mudlet.h \
     dlgIRC.h \
     T2DMap.h \
     dlgRoomExits.h \
+    dlgPackageExporter.h \
     exitstreewidget.h
 
 FORMS += ui/connection_profiles.ui \
@@ -230,6 +235,7 @@ FORMS += ui/connection_profiles.ui \
     ui/package_manager.ui \
     ui/module_manager.ui \
     ui/package_manager_unpack.ui \
+    ui/dlgPackageExporter.ui \
     ui/custom_lines.ui
 
 #win32: {

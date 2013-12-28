@@ -37,7 +37,6 @@
         <file>icons/folder-downloads.png</file>
         <file>icons/folder-green-locked.png</file>
         <file>icons/folder-green.png</file>
-        <file>icons/folder-grey.png</file>
         <file>icons/folder-lightblue-locked.png</file>
         <file>icons/folder-new.png</file>
         <file>icons/folder-orange-locked.png</file>
@@ -119,5 +118,19 @@
         <file>ui/custom_lines.ui</file>
         <file>generic_mapper_script.xml</file>
         <file>mudlet-mapper.xml</file>
+        <file>icons/filter-grey.png</file>
+        <file>icons/filter-grey-locked.png</file>
+        <file>icons/folder-grey.png</file>
+        <file>icons/folder-grey-locked.png</file>
+        <file>icons/tag_checkbox_checked_grey.png</file>
+        <file>icons/tag_checkbox-grey.png</file>
+        <file>icons/3klogo.png</file>
+        <file>icons/3slogo.png</file>
+        <file>3k-mapper.xml</file>
+        <file>echo.xml</file>
+        <file>run-lua-code-v4.xml</file>
+        <file>vyzor.mpackage</file>
+        <file>deleteOldProfiles.xml</file>
+        <file>icons/Slothmud.png</file>
     </qresource>
 </RCC>

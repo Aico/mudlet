@@ -115,6 +115,21 @@ public:
     TGatekeeperThread * mpGatekeeperThread;
     QNetworkAccessManager * mpFileDownloader;
 
+    static int setMergeTables(lua_State * L);
+    static int addSupportedTelnetOption( lua_State * );
+    static int setDoor( lua_State * );
+    static int getDoors( lua_State * );
+    static int setExitWeight( lua_State * );
+    static int getExitWeights( lua_State * );
+    static int uninstallPackage( lua_State * );
+    static int setMapZoom( lua_State * L );
+    static int createMapImageLabel( lua_State * );
+    static int exportAreaImage( lua_State * );
+    static int installPackage( lua_State * );
+    static int installModule( lua_State * L);
+    static int uninstallModule( lua_State * L );
+    static int getModulePath (lua_State * L );
+    static int reloadModule( lua_State * L );
     static int lockExit( lua_State * );
     static int lockSpecialExit( lua_State * );
     static int hasExitLock( lua_State * );
@@ -179,6 +194,7 @@ public:
     static int tempExactMatchTrigger( lua_State * );
     static int centerview( lua_State *L );
     static int getAreaTable( lua_State *L );
+    static int getAreaTableSwap( lua_State *L );
     static int getPath( lua_State * );
     static int getAreaRooms( lua_State * );
     static int clearCmdLine( lua_State * );
@@ -291,6 +307,7 @@ public:
     static int tempColorTrigger( lua_State * );
     static int isAnsiFgColor( lua_State * );
     static int isAnsiBgColor( lua_State * );
+    static int stopSounds (lua_State * );
     static int playSoundFile( lua_State * );
     static int setBorderTop( lua_State * );
     static int setBorderBottom( lua_State * );
@@ -332,8 +349,6 @@ public:
     static int getExitStubs( lua_State * L  );
     static int getModulePriority( lua_State * L  );
     static int setModulePriority( lua_State * L  );
-    static int getMapVar( lua_State * L  );
-    static int setMapVar( lua_State * L  );
     static int updateMap(lua_State * L);
     static int addMapEvent(lua_State * L);
     static int removeMapEvent(lua_State * L);

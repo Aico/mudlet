@@ -609,16 +609,22 @@ void TConsole::resizeEvent( QResizeEvent * event )
     }
     int x = event->size().width();
     int y = event->size().height();
-    mpMainFrame->resize( x, y );
+
+
     if( ! mIsSubConsole && ! mIsDebugConsole )
     {
+        mpMainFrame->resize(x,y);
+        mpBaseVFrame->resize(x, y);
+        mpBaseHFrame->resize(x, y);
+        x = x-mpLeftToolBar->width()-mpRightToolBar->width();
+        y = y-mpTopToolBar->height();
         mpMainDisplay->resize( x - mMainFrameLeftWidth - mMainFrameRightWidth,
                                y - mMainFrameTopHeight - mMainFrameBottomHeight - mpCommandLine->height() );
     }
     else
     {
-        mpMainDisplay->resize( x - mMainFrameLeftWidth - mMainFrameRightWidth,
-                               y - mMainFrameTopHeight - mMainFrameBottomHeight );
+        mpMainFrame->resize( x, y );
+        mpMainDisplay->resize( x,y);//x - mMainFrameLeftWidth - mMainFrameRightWidth, y - mMainFrameTopHeight - mMainFrameBottomHeight );
 
     }
     mpMainDisplay->move( mMainFrameLeftWidth, mMainFrameTopHeight );
@@ -630,7 +636,8 @@ void TConsole::resizeEvent( QResizeEvent * event )
     }
     else
     {
-        layerCommandLine->move(0,mpMainFrame->height()-layerCommandLine->height());
+        //layerCommandLine->move(0,mpMainFrame->height()-layerCommandLine->height());
+        layerCommandLine->move(0, mpBaseVFrame->height()-layerCommandLine->height());
     }
 
     QWidget::resizeEvent( event );
@@ -648,9 +655,11 @@ void TConsole::resizeEvent( QResizeEvent * event )
         me.mArgumentList.append( "sysWindowResizeEvent" );
         me.mArgumentList.append( QString::number(x - mMainFrameLeftWidth - mMainFrameRightWidth) );
         me.mArgumentList.append( QString::number(y - mMainFrameTopHeight - mMainFrameBottomHeight - mpCommandLine->height()) );
+        me.mArgumentList.append( mConsoleName );
         me.mArgumentTypeList.append( ARGUMENT_TYPE_STRING );
         me.mArgumentTypeList.append( ARGUMENT_TYPE_NUMBER );
         me.mArgumentTypeList.append( ARGUMENT_TYPE_NUMBER );
+        me.mArgumentTypeList.append( ARGUMENT_TYPE_STRING );
         mpHost->raiseEvent( &me );
     }
 }
@@ -664,12 +673,29 @@ void TConsole::refresh()
         mMainFrameLeftWidth = mpHost->mBorderLeftWidth;
         mMainFrameRightWidth = mpHost->mBorderRightWidth;
     }
-    int x = mpMainFrame->size().width();
-    int y = mpMainFrame->size().height();
-    mpMainFrame->resize( x, y );
-    mpMainDisplay->resize( x - mMainFrameLeftWidth - mMainFrameRightWidth - 15,
-                           y - mMainFrameTopHeight - mMainFrameBottomHeight );
+
+    int x = width();
+    int y = height();
+
+    mpBaseVFrame->resize( x, y );
+    mpBaseHFrame->resize( x, y );
+
+    x = mpBaseVFrame->width();
+    if( !mpLeftToolBar->isHidden() ) x -= mpLeftToolBar->width();
+    if( !mpRightToolBar->isHidden() ) x -= mpRightToolBar->width();
+
+    y = mpBaseVFrame->height();
+    if( !mpTopToolBar->isHidden() ) y -= mpTopToolBar->height();
+
+    mpMainDisplay->resize( x - mMainFrameLeftWidth - mMainFrameRightWidth,
+                           y - mMainFrameTopHeight - mMainFrameBottomHeight - mpCommandLine->height() );
+
     mpMainDisplay->move( mMainFrameLeftWidth, mMainFrameTopHeight );
+    x = width();
+    y = height();
+    QSize s = QSize(x,y);
+    QResizeEvent event(s, s);
+    QApplication::sendEvent( this, &event);
 }
 
 
@@ -937,7 +963,7 @@ void TConsole::changeColors()
     else if( mIsSubConsole )
     {
         mDisplayFont.setStyleStrategy( (QFont::StyleStrategy)(QFont::NoAntialias | QFont::PreferQuality ) );
-#ifdef Q_OS_MAC
+#if defined(Q_OS_MAC) || (defined(Q_OS_LINUX) && QT_VERSION >= 0x040800)
         QPixmap pixmap = QPixmap( 2000, 600 );
         QPainter p(&pixmap);
         mDisplayFont.setLetterSpacing( QFont::AbsoluteSpacing, 0 );
@@ -981,7 +1007,7 @@ void TConsole::changeColors()
             mpHost->mDisplayFont.setStyleStrategy( (QFont::StyleStrategy)( QFont::PreferAntialias | QFont::PreferQuality ) );
         mpHost->mDisplayFont.setFixedPitch(true);
         mDisplayFont.setFixedPitch(true);
-#ifdef Q_OS_MAC
+#if defined(Q_OS_MAC) || (defined(Q_OS_LINUX) && QT_VERSION >= 0x040800)
         QPixmap pixmap = QPixmap( 2000, 600 );
         QPainter p(&pixmap);
         QFont _font = mpHost->mDisplayFont;
@@ -1091,9 +1117,11 @@ void TConsole::printOnDisplay( std::string & incomingSocketData )
             {
                 if( buffer.size() > mLastBufferLogLine + 1 )
                 {
-                    if (buffer.size() < mLastBufferLogLine) {
+                    if( buffer.size() < mLastBufferLogLine)
+                    {
                         mLastBufferLogLine -= buffer.mBatchDeleteSize;
-                        if (mLastBufferLogLine < 0) {
+                        if( mLastBufferLogLine < 0 )
+                        {
                             mLastBufferLogLine = 0;
                         }
                     }
@@ -1648,19 +1676,10 @@ void TConsole::insertText( QString text, QPoint P )
                 int y_tmp = mUserCursor.y();
                 int down = buffer.wrapLine( mUserCursor.y(),mpHost->mScreenWidth, mpHost->mWrapIndentCount, mFormatCurrent );
                 console->needUpdate( y_tmp, y_tmp+down+1 );
-                int y_neu = y_tmp+down;
-                int x_adjust = text.lastIndexOf("\n");
-                int x_neu = 0;
-                if( x_adjust != -1 )
-                {
-                    x_neu = text.size()-x_adjust-1 > 0 ? text.size()-x_adjust-1 : 0;
-                }
-                moveCursor( x_neu, y_neu );
             }
             else
             {
                 console->needUpdate( mUserCursor.y(),mUserCursor.y()+1 );
-                moveCursor( mUserCursor.x()+text.size(), mUserCursor.y() );
             }
         }
     }
@@ -1734,16 +1753,29 @@ bool TConsole::saveMap(QString location)
 
 bool TConsole::loadMap(QString location)
 {
-    if (!mpHost || !mpHost->mpMap || !mpHost->mpMap->mpMapper)
-        return false;
-    mpHost->mpMap->restore(location);
-    mpHost->mpMap->init( mpHost );
-    qDebug()<<"TConsle::loadMap() -> call T2DMap::init()";
-    mpHost->mpMap->mpMapper->mp2dMap->init();
-    mpHost->mpMap->mpMapper->show();
-    // previous selections stay, so we need to clear it
-    //mpHost->mpMap->mpMapper->mp2dMap->deselect();
-    return true;
+    if( !mpHost ) return false;
+    if( !mpHost->mpMap || !mpHost->mpMap->mpMapper )
+    {
+        mudlet::self()->slot_mapper();
+    }
+    if( !mpHost->mpMap || !mpHost->mpMap->mpMapper ) return false;
+
+    mpHost->mpMap->mapClear();
+
+    if ( mpHost->mpMap->restore(location) )
+    {
+        mpHost->mpMap->init( mpHost );
+        mpHost->mpMap->mpMapper->mp2dMap->init();
+        mpHost->mpMap->mpMapper->show();
+        if( mpHost->mpMap )
+            if( mpHost->mpMap->mpMapper )
+                mpHost->mpMap->mpMapper->updateAreaComboBox();
+        // previous selections stay, so we need to clear it
+        //mpHost->mpMap->mpMapper->mp2dMap->deselect();
+        return true;
+    }
+
+    return false;
 }
 
 bool TConsole::deleteLine( int y )
@@ -2320,6 +2352,7 @@ TConsole * TConsole::createMiniConsole( QString & name, int x, int y, int width,
             return 0;
         }
         mSubConsoleMap[key] = pC;
+        pC->setFocusPolicy( Qt::NoFocus );
         pC->setUserWindow();
         pC->console->setIsMiniConsole();
         pC->console2->setIsMiniConsole();
@@ -2370,11 +2403,16 @@ void TConsole::createMapper( int x, int y, int width, int height )
         mpMapper->mpHost = mpHost;
         mpHost->mpMap->restore("");
         mpHost->mpMap->init( mpHost );
+
+        TEvent mapOpenEvent;
+        mapOpenEvent.mArgumentList.append( "mapOpenEvent" );
+        mapOpenEvent.mArgumentTypeList.append(ARGUMENT_TYPE_STRING);
+        mpHost->raiseEvent( & mapOpenEvent );
     }
     mpMapper->resize( width, height );
     mpMapper->move( x, y );
-    qDebug()<<"TConsole::createMapper() calling T2DMap::init()";
-    mpMapper->mp2dMap->init();
+    //mpMapper->mp2dMap->init();
+    mpMapper->mp2dMap->gridMapSizeChange = true; //mapper size has changed, but only init grid map when necessary
     mpMapper->show();
 }
 
@@ -2753,7 +2791,6 @@ void TConsole::slot_searchBufferDown()
 
 QSize TConsole::getMainWindowSize() const
 {
-    qDebug()<<"CALLED!!!";
     QSize consoleSize = size();
     int toolbarWidth = mpLeftToolBar->width() + mpRightToolBar->width();
     int toolbarHeight = mpTopToolBar->height();

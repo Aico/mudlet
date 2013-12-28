@@ -39,10 +39,9 @@ class dlgMapper : public QWidget , public Ui::mapper
 Q_OBJECT
 
 public:
-
-        void downloadMap();
-
         dlgMapper( QWidget *, Host *, TMap * );
+        void downloadMap();
+        void updateAreaComboBox();
         TMap * mpMap;
         Host * mpHost;
         QNetworkAccessManager * mpDownloader;
@@ -52,7 +51,7 @@ public:
 
 public slots:
         void slot_bubbles();
-        void slot_showGrid();
+        void slot_info();
         void slot_toggleShowRoomIDs(int s);
         void slot_toggleStrongHighlight( int v );
         void show2dView();

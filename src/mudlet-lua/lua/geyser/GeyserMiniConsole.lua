@@ -33,7 +33,7 @@ function Geyser.MiniConsole:setWrap (wrapAt)
       self.wrapAt = wrapAt
    end
    setWindowWrap(self.name, self.wrapAt)
-end            
+end
 
 --- Sets the text format for this window. Note that the *echo()
 -- functions will override these settings.
@@ -47,8 +47,6 @@ end
 -- @param underline The underlined status. 1 is underlined, 0 is normal.
 -- @param italics The italicized status. 1 is italicized, 0 is normal.
 function Geyser.MiniConsole:setTextFormat(r1, g1, b1, r2, g2, b2, bold, underline, italics)
-   self.fgColor:set(r1,g1,b1)
-   self.bgColor:set(r2,b2,g2)
    setTextFormat(self.name, r1, g1, b1, r2, g2, b2, bold, underline, italics)
 end
 
@@ -57,7 +55,7 @@ end
 function Geyser.MiniConsole:setBold(bool)
    setBold(self.name, val)
 end
-                       
+
 --- Sets underline status for this miniconsole
 -- @param bool True for underlined
 function Geyser.MiniConsole:setUnderline(bool)
@@ -75,6 +73,36 @@ end
 function Geyser.MiniConsole:setFontSize(size)
    self.parent:setFontSize(size)
    setMiniConsoleFontSize(self.name, size)
+end
+
+--- Appends copied selection to this miniconsole.
+function Geyser.MiniConsole:appendBuffer()
+   appendBuffer(self.name)
+end
+
+--- sets the current foreground color of cursor in this miniconsole.
+function Geyser.MiniConsole:fg(color)
+   fg(self.name, color)
+end
+
+--- sets the current background color of cursor in this miniconsole.
+function Geyser.MiniConsole:bg(color)
+   bg(self.name, color)
+end
+
+--- inserts clickable text into the miniconsole at the end of the current line
+function Geyser.MiniConsole:echoLink(...)
+   echoLink(self.name, ...)
+end
+
+--- inserts clickable text into the miniconsole at the current cursor position
+function Geyser.MiniConsole:insertLink(...)
+   insertLink(self.name, ...)
+end
+
+--- turns selected text info clickable text into the miniconsole
+function Geyser.MiniConsole:setLink(...)
+   setLink(self.name, ...)
 end
 
 -- Save a reference to our parent constructor
@@ -110,7 +138,7 @@ function Geyser.MiniConsole:new (cons, container)
       me:setFontSize(container.fontSize)
    else
       me:setFontSize(8)
-   end   
+   end
    --print("  New in " .. self.name .. " : " .. me.name)
    return me
 end

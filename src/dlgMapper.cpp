@@ -36,32 +36,37 @@ dlgMapper::dlgMapper( QWidget * parent, Host * pH, TMap * pM )
     mp2dMap->mpMap = pM;
     mp2dMap->mpHost = pH;
     QMapIterator<int, QString> it( mpMap->areaNamesMap );
-	//sort them alphabetically (case sensitive)
-	QMap <QString, QString> areaNames;
+    //sort them alphabetically (case sensitive)
+    QMap <QString, QString> areaNames;
     while( it.hasNext() )
     {
         it.next();
         QString name = it.value();
-		areaNames.insert(name.toLower(), name);
+        areaNames.insert(name.toLower(), name);
     }
-	//areaNames.sort();
-	QMapIterator<QString, QString> areaIt( areaNames );
-	while( areaIt.hasNext() )
+    //areaNames.sort();
+    QMapIterator<QString, QString> areaIt( areaNames );
+    while( areaIt.hasNext() )
     {
         areaIt.next();
-		showArea->addItem( areaIt.value() );
+        showArea->addItem( areaIt.value() );
     }
-    grid->setChecked( true );
     bubbles->setChecked( mpHost->mBubbleMode );
+    mp2dMap->mBubbleMode = mpHost->mBubbleMode;
     d3buttons->setVisible(false);
     roomSize->setValue(mpHost->mRoomSize*10);
     lineSize->setValue(mpHost->mLineSize);
-    strongHighlight->setChecked( mpHost->mMapStrongHighlight );
     showInfo->setChecked( mpHost->mShowInfo );
+    mp2dMap->mShowInfo = mpHost->mShowInfo;
+
+    showRoomIDs->setChecked( mpHost->mShowRoomID );
+    mp2dMap->mShowRoomID = mpHost->mShowRoomID;
+
+    panel->setVisible(mpHost->mShowPanel);
     //searchList->setSelectionMode( QAbstractItemView::SingleSelection );
     //connect(roomID, SIGNAL(returnPressed()), this, SLOT(goRoom()));
     connect(bubbles, SIGNAL(clicked()), this, SLOT(slot_bubbles()));
-    connect(grid, SIGNAL(clicked()), this, SLOT(slot_showGrid()));
+    connect(showInfo, SIGNAL(clicked()), this, SLOT(slot_info()));
     connect(ortho, SIGNAL(pressed()), glWidget, SLOT(fullView()));
     connect(singleLevel, SIGNAL(pressed()), glWidget, SLOT(singleView()));
     connect(increaseTop, SIGNAL(pressed()), glWidget, SLOT(increaseTop()));
@@ -75,7 +80,6 @@ dlgMapper::dlgMapper( QWidget * parent, Host * pH, TMap * pM )
     connect(shiftRight, SIGNAL(pressed()), mp2dMap, SLOT(shiftRight()));
     connect(shiftUp, SIGNAL(pressed()), mp2dMap, SLOT(shiftUp()));
     connect(shiftDown, SIGNAL(pressed()), mp2dMap, SLOT(shiftDown()));
-    connect(showInfo, SIGNAL(clicked()), mp2dMap, SLOT(showInfo()));
 
     connect(shiftZup, SIGNAL(pressed()), glWidget, SLOT(shiftZup()));
     connect(shiftZdown, SIGNAL(pressed()), glWidget, SLOT(shiftZdown()));
@@ -97,10 +101,8 @@ dlgMapper::dlgMapper( QWidget * parent, Host * pH, TMap * pM )
     connect(xRot, SIGNAL(valueChanged(int)), glWidget, SLOT(setXRotation(int)));
     connect(yRot, SIGNAL(valueChanged(int)), glWidget, SLOT(setYRotation(int)));
     connect(zRot, SIGNAL(valueChanged(int)), glWidget, SLOT(setZRotation(int)));
-    connect(strongHighlight, SIGNAL(stateChanged(int)), this, SLOT( slot_toggleStrongHighlight(int)));
     mpDownloader = new QNetworkAccessManager( this );
     connect(mpDownloader, SIGNAL(finished(QNetworkReply*)),this, SLOT(replyFinished(QNetworkReply*)));
-    showRoomIDs->setChecked(Qt::Unchecked);
     connect(showRoomIDs, SIGNAL(stateChanged(int)), this, SLOT(slot_toggleShowRoomIDs(int)));
     mp2dMap->mFontHeight = QFontMetrics( mpHost->mDisplayFont ).height();
     glWidget->hide();
@@ -124,12 +126,34 @@ dlgMapper::dlgMapper( QWidget * parent, Host * pH, TMap * pM )
     mp2dMap->init();
 }
 
+void dlgMapper::updateAreaComboBox()
+{
+    QMapIterator<int, QString> it( mpMap->areaNamesMap );
+    //sort them alphabetically (case sensitive)
+    QMap <QString, QString> areaNames;
+    while( it.hasNext() )
+    {
+        it.next();
+        QString name = it.value();
+        areaNames.insert(name.toLower(), name);
+    }
+    //areaNames.sort();
+    QMapIterator<QString, QString> areaIt( areaNames );
+    showArea->clear();
+    while( areaIt.hasNext() )
+    {
+        areaIt.next();
+        showArea->addItem( areaIt.value() );
+    }
+}
+
 void dlgMapper::slot_toggleShowRoomIDs(int s)
 {
     if( s == Qt::Checked )
         mp2dMap->mShowRoomID = true;
     else
         mp2dMap->mShowRoomID = false;
+    mp2dMap->mpHost->mShowRoomID = mp2dMap->mShowRoomID;
     mp2dMap->update();
 }
 
@@ -142,6 +166,7 @@ void dlgMapper::slot_toggleStrongHighlight( int v )
 void dlgMapper::slot_togglePanel()
 {
     panel->setVisible(!panel->isVisible());
+    mpHost->mShowPanel = panel->isVisible();
 }
 
 void dlgMapper::show2dView()
@@ -211,6 +236,16 @@ void dlgMapper::replyFinished( QNetworkReply * reply )
 
     mpHost->mpMap->init( mpHost );
     glWidget->updateGL();
+
+    if( mpHost->mpMap )
+        if( mpHost->mpMap->mpMapper )
+            mpHost->mpMap->mpMapper->updateAreaComboBox();
+
+    TEvent mapDownloadEvent;
+    mapDownloadEvent.mArgumentList.append( "sysMapDownloadEvent" );
+    mapDownloadEvent.mArgumentTypeList.append(ARGUMENT_TYPE_STRING);
+    mpHost->raiseEvent( & mapDownloadEvent );
+
 }
 
 void dlgMapper::choseRoom(QListWidgetItem * pT )
@@ -290,14 +325,16 @@ void dlgMapper::slot_lineSize(int d)
     mp2dMap->update();
 }
 
-void dlgMapper::slot_showGrid()
-{
-    mp2dMap->mShowGrid = grid->isChecked();
-    mp2dMap->update();
-}
-
 void dlgMapper::slot_bubbles()
 {
     mp2dMap->mBubbleMode = bubbles->isChecked();
+    mp2dMap->mpHost->mBubbleMode = mp2dMap->mBubbleMode;
+    mp2dMap->update();
+}
+
+void dlgMapper::slot_info()
+{
+    mp2dMap->mShowInfo = showInfo->isChecked();
+    mp2dMap->mpHost->mShowInfo = mp2dMap->mShowInfo;
     mp2dMap->update();
 }

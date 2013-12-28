@@ -74,8 +74,8 @@ public:
     void             setEventHandlerList( QStringList handlerList );
     QStringList      getEventHandlerList()                             { return mEventHandlerList; }
     bool             isClone(TScript &b) const;
-
-
+    bool             exportItem;
+    bool            mModuleMasterFolder;
 private:
 
                      TScript(){};
@@ -88,7 +88,7 @@ private:
     bool             mNeedsToBeCompiled;
     QStringList      mEventHandlerList;
     bool                  mModuleMember;
-    bool            mModuleMasterFolder;
+
 };
 
 #endif
