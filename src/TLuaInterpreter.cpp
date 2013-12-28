@@ -8103,11 +8103,11 @@ int TLuaInterpreter::insertLink( lua_State *L )
     Host * pHost = TLuaInterpreter::luaInterpreterMap[L];
     if( _name == "main" )
     {
-        pHost->mpConsole->insertLink( QString(a1.c_str()), command, hint, LUA );
+        pHost->mpConsole->insertLink( printScreen, command, hint, LUA, b );
     }
     else
     {
-        mudlet::self()->insertLink( pHost, _name, QString( a2.c_str() ), command, hint, LUA );
+        mudlet::self()->insertLink( pHost, _name, printScreen, command, hint, LUA, b );
     }
 
     return 0;

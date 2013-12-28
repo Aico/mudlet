@@ -630,6 +630,7 @@ void MudletObjectWrapper::raiseEvent( MudletObject* o, QVariantList args )
         }
     }
     o->mpHost->raiseEvent( pE );
+    delete pE;
 }
 
 void MudletObjectWrapper::reconnect( MudletObject* o )
@@ -2238,9 +2239,11 @@ int MudletObjectWrapper::centerview( MudletObject* o, int roomid )
         {
             o->mpHost->mpMap->mpM->update();
         }
-        if( o->mpHost->mpMap->mpMapper )
+        if( o->mpHost->mpMap->mpM )
         {
+	    o->mpHost->mpMap->mpMapper->mp2dMap->isCenterViewCall = true;
             o->mpHost->mpMap->mpMapper->mp2dMap->update();
+	    o->mpHost->mpMap->mpMapper->mp2dMap->isCenterViewCall = false;
         }
 
     }
@@ -2270,6 +2273,15 @@ bool MudletObjectWrapper::setGridMode( MudletObject* o, int area, bool gridMode 
     else
     {
         o->mpHost->mpMap->areas[area]->gridMode = gridMode;
+	o->mpHost->mpMap->areas[area]->calcSpan();
+        if( o->mpHost->mpMap->mpMapper )
+        {
+            if( o->mpHost->mpMap->mpMapper->mp2dMap )
+            {
+                o->mpHost->mpMap->mpMapper->mp2dMap->init();
+                cout << "NEW GRID MAP: init" << endl;
+            }
+        }
     }
     return true;
 }
