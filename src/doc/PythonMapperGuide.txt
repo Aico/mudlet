@@ -9,12 +9,11 @@ The map functions and data structures are contained in the Mapper class which is
     > py print mapper
     <PythonQt_module1.Mapper instance at 0x2a60290>
     > py print dir(mapper)
-    ['AreaNamesMap', 'CommandList', 'CustomEnvColors', 'EnvColors', 'Labels', 'MapLabel',
-    'MapLabels', 'Other', 'Room', 'Rooms', 'UserData', '__doc__', '__init__', 
-    '__module__', '_construct_name_hash', '_name_hash', 'areaNamesMap', 'centerview', 
-    'customEnvColors', 'custom_color_map', 'envColors', 'getPath', 'mapLabels', 
-    'mudlet_to_mapper_color_map', 'refresh', 'rooms', 'saveMap', 'searchRoom', 
-    'setGridMode', 'sync']
+    ['AreaNamesMap', 'CommandList', 'CustomEnvColors', 'EnvColors', 'Other', 'Room', 
+     'Rooms', 'UserData', '__doc__', '__init__', '__module__', '_construct_hash', 
+     '_coord_hash', '_name_hash', 'areaNamesMap', 'centerview', 'customEnvColors', 
+     'custom_color_map', 'envColors', 'getPath', 'mudlet_to_mapper_color_map', 'refresh', 
+     'rooms', 'saveMap', 'searchRoom', 'searchRoomByCoord', 'setGridMode', 'sync']
     
 where '>' is the prompt and 'py' is just an input alias I use to run python code, with the following script:
 
@@ -37,10 +36,9 @@ What happened to the other 45 methods you might wonder? They are replaced by the
 areaNamesMap
 customEnvColors
 envColors
-mapLabels
 rooms
 
-The above five dictionaries contain the data of a map. They are almost identical to the underlying C++ data structures used to store the map data. When a mud session is started, the C++ map data is used to populate the above python dictionaries. When the data in the dictionaries are created,updated or deleted, the changes are automatically updated to the C++ data structures. This process is transparent to the user who only has to treat the above as normal python dictionaries.
+The above four dictionaries contain the data of a map. They are almost identical to the underlying C++ data structures used to store the map data. When a mud session is started, the C++ map data is used to populate the above python dictionaries. When the data in the dictionaries are created,updated or deleted, the changes are automatically updated to the C++ data structures. This process is transparent to the user who only has to treat the above as normal python dictionaries.
 
 Below I will do a quick rundown of the data expected in these dictionaries:
 
@@ -60,19 +58,6 @@ Above stores {areaid: areaName}
     0x3cdf470), 272: QColor (#808080, at: 0x3d0cbb0)}
 
 Above stores {customEnvColorsid: QColor}. id is referenced by the environment field of a room to set the room's color.
-
-    >py print mapper.mapLabels
-    {0: {0: <PythonQt_module1.MapLabel object at 0x3f43690>}}
-
-Above stores {areaid: {maplabelid: MapLabel}}. 
-
-    >py print mapper.mapLabels[0][0].__dict__
-    {'labelid': 0, 'text': u'Library', 'labels': {0: <PythonQt_module1.MapLabel object 
-    at 0x3f43690>}, 'pos': QPointF (-1, 2, at: 0x3ce0c60), 'pix': None, 'bgColor': 
-    QColor (#000000, at: 0x3d03ab0), 'pointer': None, 'fgColor': QColor (#ff0000, at: 
-    0x3d039d0), 'size': QSizeF (100, 100, at: 0x3d0ebb0)}
-
-MapLabel class has the following constructor: MapLabel(pos,size,text,fgColor,bgColor,pix=None,pointer=None). the paramaters types can be seen in the above MapLabel example.
 
     >py print mapper.rooms[1]
     {'rendered': False, 'weight': 1, 'highlightRadius': 0.0, 'up': -1, 'down': -1, 

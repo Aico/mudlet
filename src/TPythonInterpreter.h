@@ -69,8 +69,6 @@ private:
     QMap<QString,QVariant> convertQMap(const QMap<int,QString> map);
     QMap<QString,QVariant> convertQMap(const QMap<int,QColor> map);
     QMap<QString,QVariant> convertQMap(const QMap<QString,int> map);
-    QMap<QString,QVariant> mapLabelsToQVariant(const QMap<qint32,QMap<qint32,TMapLabel> > map);
-    QMap<QString,QVariant> mapLabelToQVariant(const TMapLabel label);
     QMap<QString,QVariant> convertQMap(const QMap<int,TRoom *> map);
     QMap<QString,QVariant> convertQMap(const QMap<QString,QString> map);
     QList<QVariant> convertQList(const QList<int> list);
@@ -239,8 +237,6 @@ public slots:
   int toggleHighlight( MudletObject* o, int roomID, bool highlight);
   int setAreaName( MudletObject* o, int id, QString name );
   int deleteArea( MudletObject* o, int id );
-  int updateMapLabel( MudletObject* o, int area, QString text, float x, float y, float z, QColor fg, QColor bg, int id );
-  int deleteMapLabel( MudletObject* o, int area, int labelID  );
   bool  addSpecialExit(MudletObject* o, int id_from, int id_to, QString cmd, bool lock);
   bool removeSpecialExit(MudletObject* o, int id_from, int id_to, QString cmd );
   bool clearSpecialExits( MudletObject* o, int id_from );

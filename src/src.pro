@@ -12,16 +12,17 @@ LIBLUA = -llua5.1
 #!exists(/usr/lib/x86_64-linux-gnu/liblua5.1.a):LIBLUA = -llua
 
 # automatically link to LuaJIT if it exists
-#exists(/usr/lib/x86_64-linux-gnu/libluajit-5.1.a):LIBLUA = -L/usr/lib/x86_64-linux-gnu/ -lluajit-5.1
+exists(/usr/lib/i386-linux-gnu/libluajit-5.1.a):LIBLUA = -L/usr/lib/i386-linux-gnu/ -lluajit-5.1
+exists(/usr/lib/x86_64-linux-gnu/libluajit-5.1.a):LIBLUA = -L/usr/lib/x86_64-linux-gnu/ -lluajit-5.1
 
 unix:LIBS += -lpcre \
+    -lz \
     $$LIBLUA \
     -lhunspell \
     -L/usr/local/lib/ \
     -lyajl \
     -lGLU \
-    -lquazip \
-    -lzzip
+    -lquazip
 
 win32:LIBS += -L"c:\mudlet3_package" \
     -llua51 \

@@ -48,9 +48,6 @@ class Mapper:
         del HOST_AREA_NAMES_MAP
         self.customEnvColors = Mapper.CustomEnvColors()
         del HOST_CUSTOM_ENV_COLORS
-        #self.hashTable = Mapper.HashTable()
-        self.mapLabels = Mapper.MapLabels()
-        del HOST_MAP_LABELS
         self._name_hash, self._coord_hash = self._construct_hash()
         self.rooms._name_hash = self._name_hash
         
@@ -326,85 +323,7 @@ class Mapper:
         def __delitem__(self, key):
             mudlet.removeCustomEnvColor(key)
             super(Mapper.CustomEnvColors,self).__delitem__(key)
-                
-#    class HashTable(dict):
-#        def __init__(self):
-#            super(Mapper.HashTable,self).__init__()
-#            for key,value in HOST_MAP_HASH_TABLE.iteritems():
-#                super(Mapper.HashTable,self).__setitem__(str(key),value)                
-                
-    class MapLabels(dict):
-        def __init__(self):
-            super(Mapper.MapLabels,self).__init__()
-            for key,value in HOST_MAP_LABELS.iteritems():
-                labelmap = {}
-                for map_key,map_value in value.iteritems():
-                    l = {}
-                    for label_key,label_value in map_value.iteritems():
-                        l[str(label_key)] = label_value
-                    labelmap[ord(map_key)]=Mapper.MapLabel(l.get('x'),l.get('y'),l.get('z'),l.get('size'),l.get('text'),l.get('fgColor'),l.get('bgColor'),l.get('pix'),l.get('pointer'))
-                super(Mapper.MapLabels,self).__setitem__(ord(key),Mapper.Labels(labelmap))
-                self[ord(key)].setContainer(self,ord(key))
-                
-        def __setitem__(self,key,value):
-            if type(value) == dict:
-                value = Mapper.Labels(value)
-            if type(value) == Mapper.Labels:
-                value.setContainer(self,key)
-                for k,v in value.iteritems():
-                    # area, text, x, y, z, fg, bg, id
-                    mudlet.updateMapLabel( key, v.text, v.x, v.y, v.z, v.fgColor, v.bgColor, k )
-                super(Mapper.MapLabels,self).__setitem__(key,value)          
-            else:
-                raise Exception('Value must be a Label or a dict')
-                
-        def __delitem__(self,key):
-            for k,v in self[key].items():
-                del self[key][k]
-            super(Mapper.MapLabels,self).__delitem__(key)
-                
-    class Labels(dict):
-        def __init__(self,data):
-            for k,v in data.iteritems():
-                v.setContainer(self,k)
-                super(Mapper.Labels,self).__setitem__(k,v)                
-                
-        def __setitem__(self,key,value):            
-            if type(value) == Mapper.MapLabel:
-                mudlet.updateMapLabel( self.areaid, value.text, value.x, value.y, value.z, value.fgColor, value.bgColor, key )            
-            else:
-                raise Exception('Value must be a MapLabel(int x,int y,int z,QSizeF size,text,QColor fgColor,QColor bgColor,QPixmap pix=None,QPointF pointer=None)')
-            value.setContainer(self,key)
-            super(Mapper.Labels,self).__setitem__(key,value)
-            
-        def __delitem__(self,key):
-            mudlet.deleteMapLabel(self.areaid, key)
-            super(Mapper.Labels,self).__delitem__(key)
-            
-        def setContainer(self,c,areaid):
-            self.maplabels = c
-            self.areaid = areaid
-            
-    class MapLabel(object):
-        def __init__(self,x,y,z,size,text,fgColor,bgColor,pix=None,pointer=None):            
-            super(Mapper.MapLabel,self).__setattr__('x', x)
-            super(Mapper.MapLabel,self).__setattr__('y', y)
-            super(Mapper.MapLabel,self).__setattr__('z', z)
-            super(Mapper.MapLabel,self).__setattr__('pointer', pointer)
-            super(Mapper.MapLabel,self).__setattr__('size', size)
-            super(Mapper.MapLabel,self).__setattr__('text', text)
-            super(Mapper.MapLabel,self).__setattr__('fgColor', fgColor)
-            super(Mapper.MapLabel,self).__setattr__('bgColor', bgColor)
-            super(Mapper.MapLabel,self).__setattr__('pix', pix)
-            
-        def __setattr__(self, name, value):
-            super(Mapper.MapLabel,self).__setattr__(name, value)
-            self.labels[self.labelid]=self
-            
-        def setContainer(self,c,labelid):
-            super(Mapper.MapLabel,self).__setattr__('labels', c)
-            super(Mapper.MapLabel,self).__setattr__('labelid', labelid)
-            
+
     def centerview(self,roomid):
         """Centers the map to room, also highlights the room.
         Also sets the current room to the roomid."""

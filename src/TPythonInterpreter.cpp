@@ -96,12 +96,6 @@ void TPythonInterpreter::loadMapperVariables() {
     const QString& varCustomEnvColors = "HOST_CUSTOM_ENV_COLORS";
     const QVariant& varCustomEnvColorsValue = convertQMap(mpHost->mpMap->customEnvColors);
     add_python_variable(varCustomEnvColors,varCustomEnvColorsValue);
-    //const QString& varMapHash = "HOST_MAP_HASH_TABLE";
-    //const QVariant& varMapHashValue = convertQMap(mpHost->mpMap->hashTable);
-    //add_python_variable(varMapHash,varMapHashValue);
-    const QString& varMapLabels = "HOST_MAP_LABELS";
-    const QVariant& varMapLabelsValue = mapLabelsToQVariant(mpHost->mpMap->mapLabels);
-    add_python_variable(varMapLabels,varMapLabelsValue);
     const QString& varRooms = "HOST_ROOMS";
     const QVariant& varRoomsValue = convertQMap(mpHost->mpMap->rooms);
     add_python_variable(varRooms,varRoomsValue);
@@ -182,50 +176,6 @@ QList<QVariant> TPythonInterpreter::convertQList(const QList<int> list) {
         result.append(QVariant(i.next()));
     }
 
-    return result;
-}
-
-QMap<QString,QVariant> TPythonInterpreter::mapLabelsToQVariant(const QMap<qint32,QMap<qint32,TMapLabel> > map) {
-    QMap<QString,QVariant> result;
-    QMapIterator<qint32,QMap<qint32,TMapLabel> > i(map);
-    while (i.hasNext()) {
-        i.next();
-        QMap<QString,QVariant> labels;
-        QMapIterator<qint32,TMapLabel> j(i.value());
-        while (j.hasNext()) {
-            j.next();
-            labels[QString((int)j.key())]=mapLabelToQVariant(j.value());
-        }
-        result[QString((int)i.key())]=QVariant(labels);
-    }
-    return result;
-}
-
-QMap<QString,QVariant> TPythonInterpreter::mapLabelToQVariant(const TMapLabel label) {
-    QMap<QString,QVariant> result;
-    if (!label.pos.isNull()) {
-        result["x"]=QVariant(label.pos.x());
-        result["y"]=QVariant(label.pos.y());
-        result["z"]=QVariant(label.pos.z());
-    }
-    if (!label.pointer.isNull()) {
-        result["pointer"]=QVariant(label.pointer);
-    }
-    if (!label.size.isNull()) {
-        result["size"]=QVariant(label.size);
-    }
-    if (!label.text.isNull()) {
-        result["text"]=QVariant(label.text);
-    }
-    if (label.fgColor.isValid()) {
-        result["fgColor"]=(QVariant)label.fgColor;
-    }
-    if (label.bgColor.isValid()) {
-        result["bgColor"]=(QVariant)label.bgColor;
-    }
-    if (!label.pix.isNull()) {
-        result["pix"]=(QVariant)label.pix;
-    }
     return result;
 }
 
@@ -2214,18 +2164,6 @@ int MudletObjectWrapper::deleteArea( MudletObject* o, int id )
         o->mpHost->mpMap->deleteArea( id );
         o->mpHost->mpMap->mMapGraphNeedsUpdate = false;
     }
-    return 0;
-}
-
-int MudletObjectWrapper::updateMapLabel( MudletObject* o, int area, QString text, float x, float y, float z, QColor fg, QColor bg, int id )
-{
-    o->mpHost->mpMap->updateMapLabel(area, text, x, y, z, fg, bg, id );
-    return 0;
-}
-
-int MudletObjectWrapper::deleteMapLabel( MudletObject* o, int area, int labelID  )
-{
-    o->mpHost->mpMap->deleteMapLabel( area, labelID );
     return 0;
 }
 

@@ -2,11 +2,11 @@ The following instructions describe the steps to compile the mudlet source for U
 
 1. First you need to installed the required dependencies:
 
-a) sudo apt-get install build-essential qt4-dev-tools libqt4-opengl-dev lua5.1 liblua5.1-0-dev liblua5.1-rex-pcre-dev liblua5.1-sql-sqlite3-dev libpcre3-dev libboost1.40-dev zlib1g-dev libyajl-dev libzzip-dev liblua5.1-filesystem* liblua5.1-zip* libphonon-dev python-dev hunspell libhunspell*
+a) sudo apt-get install build-essential qt4-dev-tools libqt4-opengl-dev lua5.1 liblua5.1-0-dev liblua5.1-rex-pcre-dev liblua5.1-sql-sqlite3-dev libpcre3-dev libboost-dev zlib1g-dev libyajl-dev libquazip0-dev liblua5.1-filesystem* liblua5.1-zip* libphonon-dev python-dev hunspell libhunspell*
 
 2. Download and install QtSDK
 
-a) download the SDK from http://qt.nokia.com/downloads
+a) download the SDK from http://developer.nokia.com/Develop/Qt/Tools/
 
 b) chmod u+x the file to make it executable and then run to install.
 
